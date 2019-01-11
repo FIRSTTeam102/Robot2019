@@ -71,7 +71,7 @@ deploy {
 		}
 		
 		fileTreeArtifact("frcStaticFileDeploy") {
-			files = fileTree(dir: 'src/main/deploy')
+			files = fileTree(dir: "src/main/deploy")
 			
 			targets << "roborio"
 			directory = "/home/lvuser/deploy"

@@ -20,8 +20,13 @@
 
 package org.team102.robots.robot2019;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class Robot extends TimedRobot {
 	
+	// ALWAYS include this!!
+	public static void main(String[] args) {
+		RobotBase.startRobot(Robot::new);
+	}
 }
