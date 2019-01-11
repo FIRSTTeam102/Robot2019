@@ -1,0 +1,94 @@
+// Hey you! Yes, you! The person trying to edit this file!
+// Please make absolutely sure that you know what you're doing before you edit this file!
+// If you don't, you might mess up the build system!
+// So, please, err on the side of caution.
+
+// This will apply all our plugins
+plugins {
+	id "java"
+	id "eclipse"
+	id "edu.wpi.first.GradleRIO" version "2019.1.1"
+}
+
+// We need file access
+import java.io.File
+
+// Acquire access to the FRC repository
+repositories {
+	maven {
+		url "http://first.wpi.edu/FRC/roborio/maven/release/"
+	}
+}
+
+// This will warn the user if the robot class named isn't present.
+build {
+	// We'll execute before the build
+	doFirst {
+		def hasRobotClass = false
+		
+		def robotClassPathElements = ROBOT_CLASS.split("\\.")
+		robotClassPathElements[robotClassPathElements.length - 1] += ".java"
+		
+		for(srcDir in sourceSets.main.allJava.srcDirs) {
+			def currFile = srcDir
+			
+			for(String pathElement : robotClassPathElements) {
+				def nextFile = new File(currFile, pathElement)
+				
+				if(!nextFile.exists()) {
+					currFile = null
+					break
+				} else {
+					currFile = nextFile
+				}
+			}
+			
+			if(currFile != null) {
+				hasRobotClass = true
+			}
+		}
+		
+		if(!hasRobotClass) {
+			throw new InvalidUserDataException("Error: Robot class doesn't exist! Maybe you spelled the name wrong?")
+		}
+	}
+}
+
+// This defines how we deploy
+deploy {
+	// We only need to deploy to one RoboRIO, which is just a normal RoboRIO, with out team name.
+	targets {
+		roboRIO("roborio") {
+			team = 102
+		}
+	}
+	
+	// We want to make a normal FRC-compatible Jar file for our RoboRIO.
+	artifacts {
+		frcJavaArtifact("frcJava") {
+			targets << "roborio"
+			debug = false
+		}
+		
+		fileTreeArtifact("frcStaticFileDeploy") {
+			files = fileTree(dir: 'src/main/deploy')
+			
+			targets << "roborio"
+			directory = "/home/lvuser/deploy"
+		}
+	}
+}
+
+// Add all our dependencies
+dependencies {
+	compile wpi.deps.wpilib()
+	compile wpi.deps.vendor.java()
+	nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
+	nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
+}
+
+// Create a Fat Jar (all dependencies contained within), also including the manifest
+jar {
+	from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
+}
