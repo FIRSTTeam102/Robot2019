@@ -18,27 +18,9 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019;
+package org.team102.robots.robot2019.subsystems;
 
-import org.team102.robots.robot2019.subsystems.*;
-
-import edu.wpi.first.wpilibj.TimedRobot;
-
-public class Robot extends TimedRobot {
-	public static SubsystemDriveTrain driveTrain;
-	public static SubsystemArm arm;
-	public static SubsystemCargoManipulator cargoManip;
-	public static SubsystemHatchManipulator hatchManip;
-	public static SubsystemClimber climber;
+public class SubsystemCargoManipulator {
 	
-	public static OI oi;
 	
-	// ALWAYS include this!!
-	public static void main(String[] args) {
-		TimedRobot.startRobot(Robot::new);
-	}
-	
-	public void robotInit() {
-		oi = new OI();
-	}
 }
