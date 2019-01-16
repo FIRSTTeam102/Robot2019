@@ -24,11 +24,6 @@ repositories {
 build {
 	// We'll execute before the build
 	doFirst {
-	//compile def frcMavenDir = 
-	
-	
-	//println 
-	
 		checkForRobotClass()
 	}
 }
