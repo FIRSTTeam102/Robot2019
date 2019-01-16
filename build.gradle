@@ -24,33 +24,42 @@ repositories {
 build {
 	// We'll execute before the build
 	doFirst {
-		def hasRobotClass = false
+	//compile def frcMavenDir = 
+	
+	
+	//println 
+	
+		checkForRobotClass()
+	}
+}
+
+void checkForRobotClass() {
+	def hasRobotClass = false
+	
+	def robotClassPathElements = ROBOT_CLASS.split("\\.")
+	robotClassPathElements[robotClassPathElements.length - 1] += ".java"
+	
+	for(srcDir in sourceSets.main.allJava.srcDirs) {
+		def currFile = srcDir
 		
-		def robotClassPathElements = ROBOT_CLASS.split("\\.")
-		robotClassPathElements[robotClassPathElements.length - 1] += ".java"
-		
-		for(srcDir in sourceSets.main.allJava.srcDirs) {
-			def currFile = srcDir
+		for(String pathElement : robotClassPathElements) {
+			def nextFile = new File(currFile, pathElement)
 			
-			for(String pathElement : robotClassPathElements) {
-				def nextFile = new File(currFile, pathElement)
-				
-				if(!nextFile.exists()) {
-					currFile = null
-					break
-				} else {
-					currFile = nextFile
-				}
-			}
-			
-			if(currFile != null) {
-				hasRobotClass = true
+			if(!nextFile.exists()) {
+				currFile = null
+				break
+			} else {
+				currFile = nextFile
 			}
 		}
 		
-		if(!hasRobotClass) {
-			throw new InvalidUserDataException("Error: Robot class doesn't exist! Maybe you spelled the name wrong?")
+		if(currFile != null) {
+			hasRobotClass = true
 		}
+	}
+	
+	if(!hasRobotClass) {
+		throw new InvalidUserDataException("Error: Robot class doesn't exist! Maybe you spelled the name wrong?")
 	}
 }
 
@@ -79,12 +88,19 @@ deploy {
 	}
 }
 
-// Add all our dependencies
+// Add all our dependencies, including the ones that are locally stored in vender drops
 dependencies {
 	compile wpi.deps.wpilib()
 	compile wpi.deps.vendor.java()
 	nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
 	nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
+	
+	compile files(
+		fileTree(System.properties["frcMavenDir"]).exclude {
+			it.file.absolutePath.endsWith(".pom") ||
+			it.file.absolutePath.endsWith(".xml")
+		}
+	)
 }
 
 // Create a Fat Jar (all dependencies contained within), also including the manifest
