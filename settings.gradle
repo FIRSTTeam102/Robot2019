@@ -1,3 +1,8 @@
+// Hey you! Yes, you! The person trying to edit this file!
+// Please make absolutely sure that you know what you're doing before you edit this file!
+// If you don't, you might mess up the build system!
+// So, please, err on the side of caution.
+
 // We need access to this class
 import org.gradle.internal.os.OperatingSystem
 
