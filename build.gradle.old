@@ -8,8 +8,10 @@ plugins {
 	id "java"
 	id "eclipse"
 	id "edu.wpi.first.GradleRIO" version "2019.1.1"
-	id "com.snobot.simulator.plugin.SnobotSimulatorPlugin" version "2019-0.2.0" apply false
 }
+
+// We need file access
+import java.io.File
 
 // Acquire access to the FRC repository
 repositories {
@@ -36,7 +38,7 @@ void checkForRobotClass() {
 		def currFile = srcDir
 		
 		for(String pathElement : robotClassPathElements) {
-			def nextFile = file("${currFile.absolutePath}/${pathElement}")
+			def nextFile = new File(currFile, pathElement)
 			
 			if(!nextFile.exists()) {
 				currFile = null
@@ -48,9 +50,6 @@ void checkForRobotClass() {
 		
 		if(currFile != null) {
 			hasRobotClass = true
-			
-			println "Robot class: ${currFile.absolutePath}"
-			println ""
 		}
 	}
 	
@@ -84,46 +83,19 @@ deploy {
 	}
 }
 
-// Add the simulator stuff
-apply plugin: com.snobot.simulator.plugin.SnobotSimulatorPlugin
-configurations {
-	snobotSimCompile
-}
-
 // Add all our dependencies, including the ones that are locally stored in vender drops
 dependencies {
-	// WPILib and friends
 	compile wpi.deps.wpilib()
 	compile wpi.deps.vendor.java()
 	nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
 	nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 	
-	// Vendor libraries
 	compile files(
 		fileTree(System.properties["frcMavenDir"]).exclude {
 			it.file.absolutePath.endsWith(".pom") ||
 			it.file.absolutePath.endsWith(".xml")
 		}
 	)
-	
-	// Simulator
-	snobotSimCompile snobotSimJava()
-}
-
-runJavaSnobotSim {
-	doFirst {
-		checkForRobotClass()
-		
-		def simConfigDir = "simulator_config"
-		mkdir simConfigDir
-		
-		def simConfigFile = file("${simConfigDir}/simulator_config.properties")
-		delete simConfigFile
-		
-		simConfigFile << "robot_type=java\n"
-		simConfigFile << "simulator_config=${simConfigDir}/simulator_config.yml\n"
-		simConfigFile << "robot_class=${ROBOT_CLASS}\n"
-	}
 }
 
 // Create a Fat Jar (all dependencies contained within), also including the manifest
