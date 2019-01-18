@@ -1,4 +1,4 @@
-package org.team102.robots.robot2019.subsystems.cameras;
+package org.team102.robots.robot2019.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
