@@ -19,11 +19,10 @@
  */
 
 package org.team102.robots.robot2019;
-import edu.wpi.first.hal.*;
+
 import org.team102.robots.robot2019.subsystems.*;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-
 
 public class Robot extends TimedRobot {
 	public static SubsystemDriveTrain driveTrain;
@@ -31,6 +30,8 @@ public class Robot extends TimedRobot {
 	public static SubsystemCargoManipulator cargoManip;
 	public static SubsystemHatchManipulator hatchManip;
 	public static SubsystemClimber climber;
+	public static SubsystemCameras cameras;
+	
 	public static OI oi;
 	
 	// ALWAYS include this!!
@@ -39,11 +40,13 @@ public class Robot extends TimedRobot {
 	}
 	
 	public void robotInit() {
-		oi = new OI();
 		driveTrain = new SubsystemDriveTrain();
 		arm = new SubsystemArm();
 		cargoManip = new SubsystemCargoManipulator();
+		hatchManip = new SubsystemHatchManipulator();
+		climber = new SubsystemClimber();
+		cameras = new SubsystemCameras();
 		
-		
+		oi = new OI();
 	}
 }

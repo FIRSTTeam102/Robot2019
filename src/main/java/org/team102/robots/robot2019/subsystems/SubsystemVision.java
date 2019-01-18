@@ -1,7 +1,6 @@
 package org.team102.robots.robot2019.subsystems;
 
 import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.*;
 import org.opencv.core.*;
 import org.opencv.imgproc.*;
