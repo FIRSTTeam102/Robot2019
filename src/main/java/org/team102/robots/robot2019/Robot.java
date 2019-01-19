@@ -20,7 +20,6 @@
 
 package org.team102.robots.robot2019;
 
-
 import org.team102.robots.robot2019.subsystems.*;
 
 import edu.wpi.first.wpilibj.TimedRobot;

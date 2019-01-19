@@ -20,8 +20,6 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-import org.team102.robots.robot2019.OI;
-
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -33,7 +31,6 @@ public class SubsystemShuffleboard extends Subsystem {
 	boolean testBoolA;
 	
 	public SubsystemShuffleboard() {
-		
 		testIntA = 0;
 		testIntB = 0;
 		testIntC = 10;
