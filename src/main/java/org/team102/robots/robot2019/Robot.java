@@ -47,7 +47,10 @@ public class Robot extends TimedRobot {
 		cargoManip = new SubsystemCargoManipulator();
 		hatchManip = new SubsystemHatchManipulator();
 		climber = new SubsystemClimber();
-		cameras = new SubsystemCameras();
+		
+		if(RobotMap.HAS_CAMERAS) {
+			cameras = new SubsystemCameras();
+		}
 		
 		oi = new OI();
 	}
