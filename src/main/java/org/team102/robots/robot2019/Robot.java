@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
 	public static SubsystemCargoManipulator cargoManip;
 	public static SubsystemHatchManipulator hatchManip;
 	public static SubsystemClimber climber;
+	public static SubsystemCameras cameras;
 	
 	public static OI oi;
 	
@@ -51,6 +52,13 @@ public class Robot extends TimedRobot {
 	}
 	
 	public void robotInit() {
+		driveTrain = new SubsystemDriveTrain();
+		arm = new SubsystemArm();
+		cargoManip = new SubsystemCargoManipulator();
+		hatchManip = new SubsystemHatchManipulator();
+		climber = new SubsystemClimber();
+		cameras = new SubsystemCameras();
+		
 		oi = new OI();
 		
 		/*testIntA = 0;
