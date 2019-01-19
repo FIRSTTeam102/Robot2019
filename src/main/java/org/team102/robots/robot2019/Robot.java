@@ -52,6 +52,8 @@ public class Robot extends TimedRobot {
 			cameras = new SubsystemCameras();
 		}
 		
+		shuffleboard = new SubsystemShuffleboard();
+		
 		oi = new OI();
 	}
 	

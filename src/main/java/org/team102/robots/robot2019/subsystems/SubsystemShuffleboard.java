@@ -20,32 +20,47 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import java.util.Map;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SubsystemShuffleboard extends Subsystem {
 	
-	int testIntA;
-	int testIntB;
-	int testIntC;
-	boolean testBoolA;
+	NetworkTableEntry testIntA;
+	NetworkTableEntry testIntB;
+	NetworkTableEntry testIntC;
+	NetworkTableEntry testBoolA;
+	ShuffleboardTab tab1;
 	
 	public SubsystemShuffleboard() {
-		testIntA = 0;
-		testIntB = 0;
-		testIntC = 10;
-		testBoolA = false;
-
-		SmartDashboard.putNumber("Test Int A", testIntA);
-		SmartDashboard.putNumber("Test Int B", testIntB);
-		SmartDashboard.putNumber("Test Int C", testIntC);
-		SmartDashboard.putBoolean("Test Bool A", testBoolA);
+		
+		tab1 = Shuffleboard.getTab("Tab1");
+		
+		testIntA = tab1
+				.add("Test Int A", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", 0, "max", 100))
+				.getEntry();
+		
+		testIntB = tab1
+				.add("Test Int B", 0).getEntry();
+		
+		testIntC = tab1
+				.add("Test Int C", 0)
+				.withWidget(BuiltInWidgets.kGraph)
+				.getEntry();
 		
 	}
 	
 	@Override
 	public void periodic() {
-		System.out.println("Test");
+		testIntB.setNumber( (int) (Math.random() * (testIntA.getNumber(0).intValue())));
+		testIntC.setNumber(testIntB.getNumber(0));
 	}
 
 	@Override
