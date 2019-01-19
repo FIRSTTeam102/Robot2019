@@ -23,12 +23,8 @@ package org.team102.robots.robot2019;
 
 import org.team102.robots.robot2019.subsystems.*;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class Robot extends TimedRobot {
 	public static SubsystemDriveTrain driveTrain;
@@ -47,8 +43,29 @@ public class Robot extends TimedRobot {
 	}
 	
 	public void robotInit() {
+		driveTrain = new SubsystemDriveTrain();
+		arm = new SubsystemArm();
+		cargoManip = new SubsystemCargoManipulator();
+		hatchManip = new SubsystemHatchManipulator();
+		climber = new SubsystemClimber();
+		cameras = new SubsystemCameras();
 		
+		oi = new OI();
 	}
 	
+	public void robotPeriodic() {
+		Scheduler.getInstance().run();
+	}
 	
+	public void teleopInit() {}
+	public void teleopPeriodic() {}
+	
+	public void autonomousInit() {}
+	public void autononousPeriodic() {}
+	
+	public void disabledInit() {}
+	public void disabledPeriodic() {}
+	
+	public void testInit() {}
+	public void testPeriodic() {}
 }

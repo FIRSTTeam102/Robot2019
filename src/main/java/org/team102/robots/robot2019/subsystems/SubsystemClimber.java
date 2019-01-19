@@ -20,7 +20,16 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-public class SubsystemClimber {
+import edu.wpi.first.wpilibj.command.Subsystem;
+
+public class SubsystemClimber  extends Subsystem {
 	
-	
+	public SubsystemClimber() {
+		super("Climber");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }

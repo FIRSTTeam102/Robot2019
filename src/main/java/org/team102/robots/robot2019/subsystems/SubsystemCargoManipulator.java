@@ -20,7 +20,16 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-public class SubsystemCargoManipulator {
+import edu.wpi.first.wpilibj.command.Subsystem;
+
+public class SubsystemCargoManipulator  extends Subsystem {
 	
-	
+	public SubsystemCargoManipulator() {
+		super("Cargo Manipulator");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }

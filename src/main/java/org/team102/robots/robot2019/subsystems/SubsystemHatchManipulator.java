@@ -20,7 +20,16 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-public class SubsystemHatchManipulator {
+import edu.wpi.first.wpilibj.command.Subsystem;
+
+public class SubsystemHatchManipulator  extends Subsystem {
 	
-	
+	public SubsystemHatchManipulator() {
+		super("Hatch Manipulator");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }
