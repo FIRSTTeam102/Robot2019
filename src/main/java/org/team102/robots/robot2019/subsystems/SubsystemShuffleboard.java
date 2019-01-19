@@ -18,37 +18,41 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019;
+package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.OI;
 
-import org.team102.robots.robot2019.subsystems.*;
-
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 
-public class Robot extends TimedRobot {
-	public static SubsystemDriveTrain driveTrain;
-	public static SubsystemArm arm;
-	public static SubsystemCargoManipulator cargoManip;
-	public static SubsystemHatchManipulator hatchManip;
-	public static SubsystemClimber climber;
-	public static SubsystemCameras cameras;
-	public static SubsystemShuffleboard shuffleboard;
+public class SubsystemShuffleboard extends Subsystem {
 	
-	public static OI oi;
+	int testIntA;
+	int testIntB;
+	int testIntC;
+	boolean testBoolA;
 	
-	// ALWAYS include this!!
-	public static void main(String[] args) {
-		TimedRobot.startRobot(Robot::new);
-	}
-	
-	public void robotInit() {
+	public SubsystemShuffleboard() {
+		
+		testIntA = 0;
+		testIntB = 0;
+		testIntC = 10;
+		testBoolA = false;
+
+		SmartDashboard.putNumber("Test Int A", testIntA);
+		SmartDashboard.putNumber("Test Int B", testIntB);
+		SmartDashboard.putNumber("Test Int C", testIntC);
+		SmartDashboard.putBoolean("Test Bool A", testBoolA);
 		
 	}
 	
-	
+	@Override
+	public void periodic() {
+		System.out.println("Test");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }
