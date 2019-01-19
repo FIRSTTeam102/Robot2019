@@ -20,7 +20,16 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-public class SubsystemArm {
+import edu.wpi.first.wpilibj.command.Subsystem;
+
+public class SubsystemArm extends Subsystem {
 	
-	
+	public SubsystemArm() {
+		super("Arm");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }

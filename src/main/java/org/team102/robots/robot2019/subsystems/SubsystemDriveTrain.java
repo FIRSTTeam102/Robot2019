@@ -20,7 +20,16 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-public class SubsystemDriveTrain {
+import edu.wpi.first.wpilibj.command.Subsystem;
+
+public class SubsystemDriveTrain  extends Subsystem {
 	
-	
+	public SubsystemDriveTrain() {
+		super("Drive Train");
+	}
+
+	@Override
+	protected void initDefaultCommand() {
+		
+	}
 }
