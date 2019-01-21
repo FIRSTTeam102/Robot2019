@@ -1,6 +1,7 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.opencv.core.Mat;
+import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
 import edu.wpi.cscore.UsbCamera;
@@ -8,12 +9,23 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemCameras extends Subsystem {
-	private UsbCamera visionCamera;
 	
 	public SubsystemCameras() {
 		super("Cameras");
 		
-		visionCamera = CameraServer.getInstance().startAutomaticCapture();
+		if(Robot.isReal()) {
+			if(UsbCamera.enumerateUsbCameras().length > 0) {
+				initialize();
+			} else {
+				System.out.println("Warning: This is a real robot, and no cameras were detected! Check the USB ports?");
+			}
+		} else {
+			System.out.println("Cameras are disabled due to SnobotSim not supporting OpenCV.");
+		}
+	}
+	
+	private void initialize() {
+		UsbCamera visionCamera = CameraServer.getInstance().startAutomaticCapture();
 		VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", new Pipe());
 	}
 	

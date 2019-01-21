@@ -47,13 +47,7 @@ public class Robot extends TimedRobot {
 		cargoManip = new SubsystemCargoManipulator();
 		hatchManip = new SubsystemHatchManipulator();
 		climber = new SubsystemClimber();
-		
-		if(RobotMap.HAS_CAMERAS) {
-			cameras = new SubsystemCameras();
-		} else if(Robot.isReal()) {
-			System.out.println("Warning: This is a real robot, and no cameras were detected! Check the USB ports?");
-		}
-		
+		cameras = new SubsystemCameras();
 		shuffleboard = new SubsystemShuffleboard();
 		
 		oi = new OI();
