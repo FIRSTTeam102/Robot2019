@@ -27,10 +27,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SubsystemShuffleboard extends Subsystem {
-	
 	NetworkTableEntry testIntA;
 	NetworkTableEntry testIntB;
 	NetworkTableEntry testIntC;
@@ -38,7 +36,6 @@ public class SubsystemShuffleboard extends Subsystem {
 	ShuffleboardTab tab1;
 	
 	public SubsystemShuffleboard() {
-		
 		tab1 = Shuffleboard.getTab("Tab1");
 		
 		testIntA = tab1
@@ -53,8 +50,7 @@ public class SubsystemShuffleboard extends Subsystem {
 		testIntC = tab1
 				.add("Test Int C", 0)
 				.withWidget(BuiltInWidgets.kGraph)
-				.getEntry();
-		
+				.getEntry();	
 	}
 	
 	@Override
@@ -62,7 +58,7 @@ public class SubsystemShuffleboard extends Subsystem {
 		testIntB.setNumber( (int) (Math.random() * (testIntA.getNumber(0).intValue())));
 		testIntC.setNumber(testIntB.getNumber(0));
 	}
-
+	
 	@Override
 	protected void initDefaultCommand() {
 		
