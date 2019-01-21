@@ -50,6 +50,8 @@ public class Robot extends TimedRobot {
 		
 		if(RobotMap.HAS_CAMERAS) {
 			cameras = new SubsystemCameras();
+		} else if(Robot.isReal()) {
+			System.out.println("Warning: This is a real robot, and no cameras were detected! Check the USB ports?");
 		}
 		
 		shuffleboard = new SubsystemShuffleboard();

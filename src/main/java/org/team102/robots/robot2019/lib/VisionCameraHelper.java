@@ -20,18 +20,13 @@
 
 package org.team102.robots.robot2019.lib;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import org.opencv.core.Mat;
 
+import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
-
-import edu.wpi.first.vision.VisionPipeline;
-import edu.wpi.first.vision.VisionRunner;
-import edu.wpi.first.vision.VisionThread;
+import edu.wpi.first.wpilibj.Timer;
 
 public class VisionCameraHelper {
 	
@@ -42,62 +37,104 @@ public class VisionCameraHelper {
 	 * @param height The width of the video stream
 	 * @param outputName The name of the video stream that will be sent to the camera server, from the output of the pipeline, or null to disable output
 	 * @param pipeline The vision pipeline
-	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Pipeline pipeline) {
-		startPipeline(camera, width, height, outputName, (Function<Mat, Mat>)pipeline::process);
-	}
-	
-	/**
-	 * Starts an OpenCV vision pipeline
-	 * @param camera The camera to be used as input
-	 * @param width The width of the video stream
-	 * @param height The width of the video stream
-	 * @param outputName The name of the video stream that will be sent to the camera server, from the output of the pipeline, or null to disable output
-	 * @param pipeline The vision pipeline
-	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Function<Mat, Mat> pipeline) {
-		Mat[] latestOutput = new Mat[1];
-		
-		VisionPipeline frcPipeline = (input) -> { latestOutput[0] = pipeline.apply(input); };
-		Supplier<Mat> frcPipelineOutput = () -> latestOutput[0];
-		
-		startPipeline(camera, width, height, outputName, frcPipeline, frcPipelineOutput);
-	}
-	
-	/**
-	 * Starts an OpenCV vision pipeline
-	 * @param camera The camera to be used as input
-	 * @param width The width of the video stream
-	 * @param height The width of the video stream
-	 * @param outputName The name of the video stream that will be sent to the camera server, from the output of the pipeline, or null to disable output
-	 * @param pipeline The vision pipeline
 	 * @param pipelineOutput The supplier of the frames that were output by the pipeline
 	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, VisionPipeline pipeline, Supplier<Mat> pipelineOutput) {
+	public static void startPipeline(VideoSource camera, int width, int height, String outputName, /*Vision*/Pipeline pipeline/*, Supplier<Mat> pipelineOutput*/) {
 		camera.setResolution(width, height);
 		
-		VisionRunner.Listener<VisionPipeline> listener;
-		if(pipelineOutput != null && outputName != null) {
-			CvSource processedOutput = CameraServer.getInstance().putVideo(outputName, width, height);
-			listener = (pipe) -> processedOutput.putFrame(pipelineOutput.get());
-		} else {
-			listener = (pipe) -> {};
+		CvSink input = CameraServer.getInstance().getVideo(camera);
+		CvSource[] output = new CvSource[1]; // It's an array to avoid the final-or-effectively-final requirement for lambda methods
+		
+		if(outputName != null) {
+			output[0] = CameraServer.getInstance().putVideo(outputName, width, height);
 		}
 		
-		VisionThread thread = new VisionThread(camera, pipeline, listener);
-		thread.setName(thread.getName() + " (" + outputName + ")");
-		thread.start();
+		Thread pipelineRunnerThread = new Thread(pipeline, "Vision runner: Pipeline " + pipeline);
+		
+		Thread pipelineTransferRunnerThread = new Thread(() -> {
+			Mat inputFrame = new Mat();
+			boolean lastFrameErrored = false;
+			
+			while(true) {
+				try {
+					input.grabFrame(inputFrame);
+					pipeline.supplyInput(inputFrame);
+					
+					if(output != null) {
+						Mat outputFrame = pipeline.getOutput();
+						
+						if(outputFrame != null) {
+							output[0].putFrame(outputFrame);
+						}
+					}
+				} catch(Exception e) {
+					System.err.println("Failed to grab frame for the vision pipeline for " + camera.getName() + ": " + e.getClass() + ": " + e.getLocalizedMessage());
+					
+					if(lastFrameErrored) {
+						System.err.println("This has happened twice in a row. The vision pipeline will now quit to prevent console spam.");
+						e.printStackTrace();
+						
+						break;
+					} else {
+						lastFrameErrored = true;
+					}
+				}
+			}
+		}, "Vision runner: "+ camera.getName());
+		
+		pipelineRunnerThread.setDaemon(true);
+		pipelineRunnerThread.start();
+		
+		pipelineTransferRunnerThread.setDaemon(true);
+		pipelineTransferRunnerThread.start();
 	}
 	
 	/**
 	 * An interface to be implemented by any vision pipeline
 	 */
-	public static interface Pipeline {
+	public static abstract class Pipeline implements Runnable {
+		private Mat lastInput = null;
+		private Mat lastOutput = null;
+		private int inputs = 0;
+		
+		private Object frameLock = new Object();
+		
 		/**
 		 * The main pipeline processing method
 		 * @param input The frame of video to be processed
 		 * @return The frame of video, after being processed
 		 */
-		Mat process(Mat input);
+		public abstract Mat process(Mat input);
+		
+		public void run() {
+			while(true) {
+				if(inputs > 0) {
+					if(inputs > 1) {
+						System.out.println("Warning: Skipped " + (inputs - 1) + " frame(s) for vision pipeline " + this);
+					}
+					
+					synchronized(frameLock) {
+						lastOutput = process(lastInput);
+					}
+					
+					inputs = 0;
+				} else {
+					Timer.delay(.01);
+				}
+			}
+		}
+		
+		public void supplyInput(Mat input) {
+			synchronized(frameLock) {
+				lastInput = input;
+				inputs++;
+			}
+		}
+		
+		public Mat getOutput() {
+			synchronized(frameLock) {
+				return lastOutput;
+			}
+		}
 	}
 }
