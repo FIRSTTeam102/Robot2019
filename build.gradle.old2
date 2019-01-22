@@ -7,7 +7,7 @@
 plugins {
 	id "java"
 	id "eclipse"
-	id "edu.wpi.first.GradleRIO" version "2019.2.1"
+	id "edu.wpi.first.GradleRIO" version "2019.1.1"
 	id "com.snobot.simulator.plugin.SnobotSimulatorPlugin" version "2019-0.2.0" apply false
 }
 
@@ -110,11 +110,16 @@ dependencies {
 	// Simulator
 	snobotSimCompile snobotSimJava()
 	
-	def openCVDep = configurations.compile.allDependencies.matching { it.name.contains("opencv") }.getAt(0)
-	def cscoreDep = configurations.compile.allDependencies.matching { it.name.contains("cscore") }.getAt(0)
+	// Get the OpenCV Java dependency
+	def openCVJavaDep = project.configurations.compile.allDependencies.matching { it.name.contains("opencv") }.getAt(0)
+	def cscoreJavaDep = project.configurations.compile.allDependencies.matching { it.name.contains("cscore") }.getAt(0)
 	
-	dummyDownloadConfig "${openCVDep.group}:opencv-jni:${openCVDep.version}:windowsx86-64"
-	dummyDownloadConfig "${cscoreDep.group}:cscore-jni:${cscoreDep.version}:windowsx86-64"
+	["windowsx86-64", "linuxx86-64", "osxx86-64"].forEach { // Supported platforms: Windows, Linux, and Mac (64 bit only for each of them)
+		dummyDownloadConfig "${openCVJavaDep.group}:opencv-jni:${openCVJavaDep.version}:${it}"
+		dummyDownloadConfig "${cscoreJavaDep.group}:cscore-jni:${cscoreJavaDep.version}:${it}"
+	}
+	
+	compile "${openCVJavaDep.group}:opencv-cpp:${openCVJavaDep.version}"
 }
 
 runJavaSnobotSim {
@@ -131,15 +136,24 @@ runJavaSnobotSim {
 		simConfigFile << "simulator_config=${simConfigDir}/simulator_config.yml\n"
 		simConfigFile << "robot_class=${ROBOT_CLASS}\n"
 		
-		configurations.dummyDownloadConfig.resolvedConfiguration.getFiles().forEach { jarFile ->
-			copy {
-				from zipTree(jarFile).filter {
-					it.absolutePath.endsWith(".dll")
-				}
-				
-				into "${buildDir}/tmp/snobotSimJava"
+		def home = System.properties["user.home"].replace("\\", "/")
+		if(!home.endsWith("/")) {
+			home += "/"
+		}
+		
+		def nativesDir = file("${home}.wpilib/nativecache/windows/x86-64")
+		def libDir = file("${buildDir}/tmp/snobotSimJava")
+		
+		copy {
+			from fileTree(nativesDir).getFiles()
+			into libDir
+			
+			rename {
+				it.substring(0, it.lastIndexOf("."))
 			}
 		}
+		
+		println project.configurations.compile.allDependencies.matching { it.name.contains("opencv-cpp") }.getAt(0).getAllModuleArtifacts()
 	}
 }
 

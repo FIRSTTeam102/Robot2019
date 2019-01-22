@@ -60,10 +60,10 @@ public class VisionCameraHelper {
 					input.grabFrame(inputFrame);
 					pipeline.supplyInput(inputFrame);
 					
-					if(output != null) {
+					if(output[0] != null) {
 						Mat outputFrame = pipeline.getOutput();
 						
-						if(outputFrame != null) {
+						if(!(outputFrame == null || outputFrame.empty())) {
 							output[0].putFrame(outputFrame);
 						}
 					}
@@ -125,6 +125,10 @@ public class VisionCameraHelper {
 		}
 		
 		public void supplyInput(Mat input) {
+			if(input == null || input.empty()) {
+				return;
+			}
+			
 			synchronized(frameLock) {
 				lastInput = input;
 				inputs++;

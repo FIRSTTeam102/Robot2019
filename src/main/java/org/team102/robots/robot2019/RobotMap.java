@@ -20,9 +20,10 @@
 
 package org.team102.robots.robot2019;
 
-import edu.wpi.cscore.UsbCamera;
-
 public class RobotMap {
 	
-	public static final boolean HAS_CAMERAS = UsbCamera.enumerateUsbCameras().length > 0;
+	public static final int CAMERA_ID_VISION_REAL = 0;
+	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
+	
+	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
 }
