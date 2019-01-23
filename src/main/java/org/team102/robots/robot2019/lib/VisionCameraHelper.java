@@ -42,15 +42,7 @@ public class VisionCameraHelper {
 			return null;
 		}
 		
-		UsbCamera cam = new UsbCamera("USB Camera " + deviceID, deviceID);
-		
-		if(!(cam.isConnected() && cam.isValid())) {
-			System.err.println("Error: Attempted to connect to a non-existant or unsupported camera with ID " + deviceID);
-		} else {
-			CameraServer.getInstance().startAutomaticCapture(cam);
-		}
-		
-		return cam;
+		return CameraServer.getInstance().startAutomaticCapture(deviceID);
 	}
 	
 	/**
@@ -62,8 +54,8 @@ public class VisionCameraHelper {
 	 * @param pipeline The vision pipeline
 	 * @param pipelineOutput The supplier of the frames that were output by the pipeline
 	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Pipeline pipeline/*, Supplier<Mat> pipelineOutput*/) {
-		if(camera == null || !(camera.isConnected() && camera.isValid())) {
+	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Pipeline pipeline) {
+		if(camera == null) {
 			return;
 		}
 		
@@ -136,7 +128,7 @@ public class VisionCameraHelper {
 		public void run() {
 			while(true) {
 				if(inputs > 0) {
-					if(inputs > 1) {
+					if(inputs > 5) {
 						System.out.println("Warning: Skipped " + (inputs - 1) + " frame(s) for vision pipeline " + this);
 					}
 					
