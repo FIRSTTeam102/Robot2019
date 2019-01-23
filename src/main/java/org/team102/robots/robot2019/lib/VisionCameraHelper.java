@@ -24,11 +24,34 @@ import org.opencv.core.Mat;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Timer;
 
 public class VisionCameraHelper {
+	
+	/**
+	 * Opens the given camera, checking whether or not it is existent and supported in the process
+	 * @param deviceID The camera's ID number
+	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
+	 */
+	public static UsbCamera openAndVerifyCamera(int deviceID) {
+		if(deviceID < 0) {
+			System.out.println("Warning: Given an invalid camera ID " + deviceID + "; ignoring...");
+			return null;
+		}
+		
+		UsbCamera cam = new UsbCamera("USB Camera " + deviceID, deviceID);
+		
+		if(!(cam.isConnected() && cam.isValid())) {
+			System.err.println("Error: Attempted to connect to a non-existant or unsupported camera with ID " + deviceID);
+		} else {
+			CameraServer.getInstance().startAutomaticCapture(cam);
+		}
+		
+		return cam;
+	}
 	
 	/**
 	 * Starts an OpenCV vision pipeline
@@ -39,7 +62,11 @@ public class VisionCameraHelper {
 	 * @param pipeline The vision pipeline
 	 * @param pipelineOutput The supplier of the frames that were output by the pipeline
 	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, /*Vision*/Pipeline pipeline/*, Supplier<Mat> pipelineOutput*/) {
+	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Pipeline pipeline/*, Supplier<Mat> pipelineOutput*/) {
+		if(camera == null || !(camera.isConnected() && camera.isValid())) {
+			return;
+		}
+		
 		camera.setResolution(width, height);
 		
 		CvSink input = CameraServer.getInstance().getVideo(camera);
@@ -60,10 +87,10 @@ public class VisionCameraHelper {
 					input.grabFrame(inputFrame);
 					pipeline.supplyInput(inputFrame);
 					
-					if(output != null) {
+					if(output[0] != null) {
 						Mat outputFrame = pipeline.getOutput();
 						
-						if(outputFrame != null) {
+						if(!(outputFrame == null || outputFrame.empty())) {
 							output[0].putFrame(outputFrame);
 						}
 					}
@@ -125,6 +152,10 @@ public class VisionCameraHelper {
 		}
 		
 		public void supplyInput(Mat input) {
+			if(input == null || input.empty()) {
+				return;
+			}
+			
 			synchronized(frameLock) {
 				lastInput = input;
 				inputs++;
