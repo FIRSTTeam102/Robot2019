@@ -6,7 +6,6 @@ import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemCameras extends Subsystem {
@@ -26,7 +25,7 @@ public class SubsystemCameras extends Subsystem {
 	}
 	
 	private void initialize() {
-		UsbCamera visionCamera = CameraServer.getInstance().startAutomaticCapture(RobotMap.CAMERA_ID_VISION);
+		UsbCamera visionCamera = VisionCameraHelper.openAndVerifyCamera(RobotMap.CAMERA_ID_VISION);
 		VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", new Pipe());
 	}
 	
