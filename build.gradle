@@ -113,8 +113,10 @@ dependencies {
 	def openCVDep = configurations.compile.allDependencies.matching { it.name.contains("opencv") }.getAt(0)
 	def cscoreDep = configurations.compile.allDependencies.matching { it.name.contains("cscore") }.getAt(0)
 	
-	dummyDownloadConfig "${openCVDep.group}:opencv-jni:${openCVDep.version}:windowsx86-64"
-	dummyDownloadConfig "${cscoreDep.group}:cscore-jni:${cscoreDep.version}:windowsx86-64"
+	["windowsx86-64", "linuxx86-64", "osxx86-64"].forEach { plat -> // Supported platforms: Windows, Linux, and Mac (64 bit only for each of them)
+		dummyDownloadConfig "${openCVDep.group}:opencv-jni:${openCVDep.version}:${plat}"
+		dummyDownloadConfig "${cscoreDep.group}:cscore-jni:${cscoreDep.version}:${plat}"
+	}
 }
 
 runJavaSnobotSim {
@@ -134,7 +136,9 @@ runJavaSnobotSim {
 		configurations.dummyDownloadConfig.resolvedConfiguration.getFiles().forEach { jarFile ->
 			copy {
 				from zipTree(jarFile).filter {
-					it.absolutePath.endsWith(".dll")
+					it.absolutePath.endsWith(".dll") ||
+					it.absolutePath.endsWith(".so") ||
+					it.absolutePath.endsWith(".dylib")
 				}
 				
 				into "${buildDir}/tmp/snobotSimJava"
