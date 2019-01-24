@@ -28,19 +28,17 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemCargoManipulator  extends Subsystem {
 	
-	private WPI_TalonSRX rollers;
+	private WPI_TalonSRX roller;
 	
 	public SubsystemCargoManipulator() {
 		super("Cargo Manipulator");
 		
-		rollers = new WPI_TalonSRX(RobotMap.m4);
-		
+		roller = new WPI_TalonSRX(RobotMap.CAN_TALON_CARGO_MANIP_ROLLER);
+		addChild("Cargo Roller", roller);
 	}
 
 	@Override
 	protected void initDefaultCommand() {
 		
 	}
-	
-	
 }

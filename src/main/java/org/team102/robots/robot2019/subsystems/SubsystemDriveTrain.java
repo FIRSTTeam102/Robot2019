@@ -30,38 +30,31 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 public class SubsystemDriveTrain  extends Subsystem {
 	
 	private MecanumDrive drive;
+	
 	private WPI_TalonSRX frontLeft;
 	private WPI_TalonSRX frontRight;
-	private WPI_TalonSRX backLeft;
-	private WPI_TalonSRX backRight;
+	private WPI_TalonSRX rearLeft;
+	private WPI_TalonSRX rearRight;
 	
 	public SubsystemDriveTrain() {
 		super("Drive Train");
 		
-		//creates and instantiates motor controllers
-		frontLeft = new WPI_TalonSRX(RobotMap.m0); 
-		frontRight = new WPI_TalonSRX(RobotMap.m1);
-		 backLeft = new WPI_TalonSRX(RobotMap.m2);
-		backRight = new WPI_TalonSRX(RobotMap.m3);
+		frontLeft = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_FRONT_LEFT); 
+		frontRight = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT);
+		rearLeft = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_REAR_LEFT);
+		rearRight = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_REAR_RIGHT);
+		addChild("Front Left Motor", frontLeft);
+		addChild("Front Right Motor", frontRight);
+		addChild("Rear Left Motor", rearLeft);
+		addChild("Rear Right Motor", rearRight);
 		
-		//creates and instantiates mecanum drive train
-		drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
-		
+		drive = new MecanumDrive(frontLeft, frontRight, rearLeft, rearRight);
 		drive.setSafetyEnabled(true);
-		
+		addChild("Mecanum Drive Train", drive);
 	}
-
+	
 	@Override
 	protected void initDefaultCommand() {
 		
-		//drive with controller will be here eventually
 	}
-	//right now takes in the speeds because I'm unfamiliar with new control system
-	//should eventually take in controller and .get controller values in this method
-	public void driveWithController( double ySpeed, double xSpeed, double zRotation) {
-		
-		
-		drive.driveCartesian(ySpeed, xSpeed, zRotation);
-	}
-	
 }

@@ -20,12 +20,20 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.RobotMap;
+
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemClimber  extends Subsystem {
 	
+	private Solenoid climber;
+	
 	public SubsystemClimber() {
 		super("Climber");
+		
+		climber = new Solenoid(RobotMap.SOLENOID_CLIMBER);
+		addChild("Climbing Cylinder", climber);
 	}
 
 	@Override

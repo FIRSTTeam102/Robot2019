@@ -22,7 +22,6 @@ package org.team102.robots.robot2019.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;

@@ -27,18 +27,20 @@ public class RobotMap {
 	
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
 	
-	//drive motors
-	public static final int m0 = 0;
-	public static final int m1 = 1;
-	public static final int m2 = 2;
-	public static final int m3 = 3;
+	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 0;
+	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;
+	public static final int CAN_TALON_DRIVE_TRAIN_REAR_LEFT = 2;
+	public static final int CAN_TALON_DRIVE_TRAIN_REAR_RIGHT = 3;
 	
-	//arm motors
-	//elbow
-	public static final int m4= 4;
-	//wrist
-	public static final int m5= 5;
+	public static final int CAN_TALON_ARM_ELBOW = 4;
+	public static final int CAN_TALON_ARM_WRIST = 5;
 	
-	//rollers
-	public static final int m6= 6;
+	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 6;
+	
+	public static final int SOLENOID_ARM_EXTENDER = 0;
+	
+	public static final int SOLENOID_HATCH_MANIP_EJECTOR_1 = 1;
+	public static final int SOLENOID_HATCH_MANIP_EJECTOR_2 = 2;
+	
+	public static final int SOLENOID_CLIMBER = 3;
 }

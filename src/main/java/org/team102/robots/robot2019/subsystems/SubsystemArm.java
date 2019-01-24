@@ -24,21 +24,27 @@ import org.team102.robots.robot2019.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemArm extends Subsystem {
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
-	
+	private Solenoid extender;
 	
 	public SubsystemArm() {
 		super("Arm");
 		
-		wrist = new WPI_TalonSRX(RobotMap.m5);
-		elbow = new WPI_TalonSRX(RobotMap.m6);
+		wrist = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_WRIST);
+		elbow = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_ELBOW);
+		addChild("Wrist Motor", wrist);
+		addChild("Elbow Motor", elbow);
+		
+		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);
+		addChild("Extender Cylinder", extender);
 	}
-
+	
 	@Override
 	protected void initDefaultCommand() {
 		

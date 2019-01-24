@@ -20,16 +20,32 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.RobotMap;
+
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemHatchManipulator  extends Subsystem {
 	
+	private Solenoid ejector1;
+	private Solenoid ejector2;
+	
 	public SubsystemHatchManipulator() {
 		super("Hatch Manipulator");
+		
+		ejector1 = new Solenoid(RobotMap.SOLENOID_HATCH_MANIP_EJECTOR_1);
+		ejector2 = new Solenoid(RobotMap.SOLENOID_HATCH_MANIP_EJECTOR_2);
+		addChild("Ejection Cylinder 1", ejector1);
+		addChild("Ejection Cylinder 2", ejector2);
 	}
-
+	
 	@Override
 	protected void initDefaultCommand() {
 		
+	}
+	
+	public void setEjector(boolean extended) {
+		ejector1.set(extended);
+		ejector2.set(extended);
 	}
 }
