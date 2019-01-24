@@ -20,16 +20,48 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.RobotMap;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 public class SubsystemDriveTrain  extends Subsystem {
 	
+	private MecanumDrive drive;
+	private WPI_TalonSRX frontLeft;
+	private WPI_TalonSRX frontRight;
+	private WPI_TalonSRX backLeft;
+	private WPI_TalonSRX backRight;
+	
 	public SubsystemDriveTrain() {
 		super("Drive Train");
+		
+		//creates and instantiates motor controllers
+		frontLeft = new WPI_TalonSRX(RobotMap.m0); 
+		frontRight = new WPI_TalonSRX(RobotMap.m1);
+		 backLeft = new WPI_TalonSRX(RobotMap.m2);
+		backRight = new WPI_TalonSRX(RobotMap.m3);
+		
+		//creates and instantiates mecanum drive train
+		drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
+		
+		drive.setSafetyEnabled(true);
+		
 	}
 
 	@Override
 	protected void initDefaultCommand() {
 		
+		//drive with controller will be here eventually
 	}
+	//right now takes in the speeds because I'm unfamiliar with new control system
+	//should eventually take in controller and .get controller values in this method
+	public void driveWithController( double ySpeed, double xSpeed, double zRotation) {
+		
+		
+		drive.driveCartesian(ySpeed, xSpeed, zRotation);
+	}
+	
 }

@@ -26,4 +26,19 @@ public class RobotMap {
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
 	
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
+	
+	//drive motors
+	public static final int m0 = 0;
+	public static final int m1 = 1;
+	public static final int m2 = 2;
+	public static final int m3 = 3;
+	
+	//arm motors
+	//elbow
+	public static final int m4= 4;
+	//wrist
+	public static final int m5= 5;
+	
+	//rollers
+	public static final int m6= 6;
 }

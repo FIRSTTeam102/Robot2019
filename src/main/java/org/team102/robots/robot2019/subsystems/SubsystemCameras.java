@@ -2,6 +2,7 @@ package org.team102.robots.robot2019.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;
@@ -65,7 +66,7 @@ public class SubsystemCameras extends Subsystem {
 			findHarrisCorners(harrisInput, harrisOutput, 200);*/
 			
 			Mat andrewCornersInput = blurOutput;
-			andrewCorners(andrewCornersInput/*, convexHullsOutput, andrewCornersOutput*/, andrewCornersImageOutput);
+			andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
 			
 			return andrewCornersImageOutput;
 		}
@@ -215,8 +216,7 @@ public class SubsystemCameras extends Subsystem {
 		 * @param inputContours The contours on which to perform the operation.
 		 * @param outputContours The contours where the output will be stored.
 		 */
-		private void convexHulls(List<MatOfPoint> inputContours,
-			ArrayList<MatOfPoint> outputContours) {
+		private void convexHulls(List<MatOfPoint> inputContours, ArrayList<MatOfPoint> outputContours) {
 			final MatOfInt hull = new MatOfInt();
 			outputContours.clear();
 			for (int i = 0; i < inputContours.size(); i++) {
@@ -244,20 +244,61 @@ public class SubsystemCameras extends Subsystem {
 	            }
 	        }
 	    }
-		private void andrewCorners(Mat input, /*ArrayList<MatOfPoint> inputContours, ArrayList<Point> corners, */Mat output) {
+		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, /*ArrayList<Point> corners, */Mat output) {
 			input.copyTo(output);
-			//final Scalar white = new Scalar(255, 255, 255);
-			/*for(int i=0; i< inputContours.size(); i++) {
+			final Scalar white = new Scalar(255, 255, 255);
+			for(int i=0; i< inputContours.size(); i++) {
 				Rect rect = Imgproc.boundingRect(inputContours.get(i));
-				corners.add(new Point(rect.x, rect.y));
+				/*corners.add(new Point(rect.x, rect.y));
 				corners.add(new Point(rect.x + rect.width, rect.y));
 				corners.add(new Point(rect.x + rect.width, rect.y + rect.height));
-				corners.add(new Point(rect.x, rect.y + rect.height));
+				corners.add(new Point(rect.x, rect.y + rect.height));*/
 				Imgproc.circle(output, new Point(rect.x, rect.y), 5, white);
 				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, white);
 				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, white);
 				Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, white);
-			}*/
+			}
+		}	
+		//to find distance between two Points created above
+		private double getDifference(Point a, Point b) {
+			double xDiff = a.x-b.x;
+			double yDiff = a.y-b.y;
+			double distance = Math.sqrt( (yDiff*yDiff)+(xDiff*xDiff));
+			return distance;
+		}		
+		
+		//so a few methods needed where we can pass in points- isStraight getAngle, getDistance, hasArrived
+		//we have options on how we want to do it though, we could keep having it getAngle and getDistance
+		//and then adjust until isStraight and hasArrived is true
+		//must order points a-d clockwise starting top left
+		private boolean isStraight(Point a, Point b, Point c, Point d) {	
+			//goes clockwise around a rectangle to get side values
+			double top = getDifference(a,b);
+			double right = getDifference(b,c);
+			double bottom = getDifference(c,d);
+			double left = getDifference(d,a);
+			
+			//0.1 is a placeholder for now, we can decide how much room we need
+			if(Math.abs(right-left)<0.1 && Math.abs(top-bottom)<0.1) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		
+			/*steps: 
+			 * order coordinates clockwise, so we can get distance of individual sides
+			 * compare distance of individual sides to other sides to determine rotation
+			 * compare to irl measurements to get distance away
+		
+		*/
 		}
+		private double getDistance() {
+			double distance = 0; //0 is placeholder for now
+			//use camera to see how large tape appears when robot is in correct location
+			//compare rectangle size then to rectangle size now, 
+			return distance;
+		}
+		
 	}
 }

@@ -20,12 +20,23 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.RobotMap;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemArm extends Subsystem {
 	
+	private WPI_TalonSRX wrist;
+	private WPI_TalonSRX elbow;
+	
+	
 	public SubsystemArm() {
 		super("Arm");
+		
+		wrist = new WPI_TalonSRX(RobotMap.m5);
+		elbow = new WPI_TalonSRX(RobotMap.m6);
 	}
 
 	@Override
