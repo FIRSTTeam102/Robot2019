@@ -30,6 +30,7 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
+import java.util.concurrent.TimeUnit;
 
 public class SubsystemCameras extends Subsystem {
 	
@@ -54,7 +55,7 @@ public class SubsystemCameras extends Subsystem {
 		private Mat cutToContourOutput = new Mat();
 		private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
 		private ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<MatOfPoint>();
-		private ArrayList<Point> andrewCornersOutput = new ArrayList<Point>();
+		private Point[][] andrewCornersOutput = new Point[20][4];
 		private Mat andrewCornersImageOutput = new Mat();
 
 		private Mat harrisOutput = new Mat();
@@ -62,7 +63,9 @@ public class SubsystemCameras extends Subsystem {
 	    
 		public Mat process(Mat input) {
 			
-	//Step rgbThresholdInput:
+			
+			
+			//Step rgbThresholdInput:
 			Mat rgbThresholdInput = input;
 			double[] rgbThresholdRed = {233.90286621644344, 255.0};
 			double[] rgbThresholdGreen = {235.4316663399017, 255.0};
@@ -91,8 +94,23 @@ public class SubsystemCameras extends Subsystem {
 			findHarrisCorners(harrisInput, harrisOutput, 200);*/
 			
 			Mat andrewCornersInput = blurOutput;
-			andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
-			
+			andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
+			final int centerHeights[] = new int[20];
+			final int cornersFound = 0;
+			cornersFound = 0;
+			for (int i = 0; i < 0; i++) {
+				if (andrewCornersOutput[i][0] != null)
+					cornersFound++;
+			}
+			for (int i = 0; i < cornersFound; i++) {
+				centerHeights[i] = (andrewCornersOutput[i][0].y + anrewCornersOutput[i][2].y) / 2;
+				for (int j = 0; j < i; j++) {
+					if (centerHeights[i] IS CLOSE TO THE OTHER THEN THEY GOOD)
+						
+				}
+				System.out.println(andrewCornersOutput[i][0]);
+			}
+			TimeUnit.SECONDS.sleep(1);
 			return andrewCornersImageOutput;
 		}
 		/**
@@ -269,19 +287,22 @@ public class SubsystemCameras extends Subsystem {
 	            }
 	        }
 	    }
-		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, /*ArrayList<Point> corners, */Mat output) {
+		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, Point[][] corners, Mat output) {
 			input.copyTo(output);
-			final Scalar white = new Scalar(255, 255, 255);
-			for(int i=0; i< inputContours.size(); i++) {
-				Rect rect = Imgproc.boundingRect(inputContours.get(i));
-				/*corners.add(new Point(rect.x, rect.y));
-				corners.add(new Point(rect.x + rect.width, rect.y));
-				corners.add(new Point(rect.x + rect.width, rect.y + rect.height));
-				corners.add(new Point(rect.x, rect.y + rect.height));*/
-				Imgproc.circle(output, new Point(rect.x, rect.y), 5, white);
-				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, white);
-				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, white);
-				Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, white);
+			//Point[][] corners = new Point[20][4];
+			final Scalar circleColor = new Scalar(255, 0, 0);
+			for(int i=0; i< inputContours.size(); i++) { //For every contour
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            	Rect rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
+					corners[i][0] = new Point(rect.x, rect.y); //Define the corners
+					corners[i][1] = new Point(rect.x + rect.width, rect.y);
+					corners[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
+					corners[i][3] = new Point(rect.x, rect.y + rect.height);
+					Imgproc.circle(output, new Point(rect.x, rect.y), 5, circleColor); //Circle the corners in the image
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);
+	            }
 			}
 		}	
 		//to find distance between two Points created above
