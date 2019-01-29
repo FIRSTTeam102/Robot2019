@@ -22,72 +22,61 @@ package org.team102.robots.robot2019.lib;
 
 import org.opencv.core.Mat;
 
+import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoMode;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class VisionCameraHelper {
 	
 	/**
-	 * Opens the given camera, checking whether or not it is existent and supported in the process
-	 * @param deviceID The camera's ID number
-	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
+	 * Adds the given MJPEG server to the given Shuffleboard container as a video stream
+	 * @param srv The server
+	 * @param parent Where to put the stream
+	 * @return The Shuffleboard widget that holds the stream, able to be moved and sized as normal
 	 */
-	public static UsbCamera openAndVerifyCamera(int deviceID) {
-		if(deviceID < 0) {
-			System.out.println("Warning: Given an invalid camera ID " + deviceID + "; ignoring...");
-			return null;
-		}
+	public static ComplexWidget advertiseServerToShuffleboard(MjpegServer srv, ShuffleboardContainer parent) {
+		String name = srv.getName();
 		
-		return CameraServer.getInstance().startAutomaticCapture(deviceID);
+		ComplexWidget widge = parent.add(name, new SendableBase() {
+			public void initSendable(SendableBuilder builder) {
+				builder.addStringProperty(".ShuffleboardURI", () -> "camera_server://" + name, null);
+			}
+		});
+		
+		NetworkTableInstance.getDefault().getTable("/CameraPublisher/" + srv.getName()).getEntry("streams").setStringArray(new String[] {
+				"mjpg:http://" + CameraServerJNI.getHostname() + ".local:" + srv.getPort() + "/?action=stream"
+		});
+		
+		return widge;
 	}
 	
 	/**
-	 * Starts an OpenCV vision pipeline
-	 * @param camera The camera to be used as input
-	 * @param width The width of the video stream
-	 * @param height The width of the video stream
-	 * @param outputName The name of the video stream that will be sent to the camera server, from the output of the pipeline, or null to disable output
-	 * @param pipeline The vision pipeline
-	 * @param pipelineOutput The supplier of the frames that were output by the pipeline
+	 * Start a transfer thread
+	 * @param transferFunc The transfer function
+	 * @param name The name for the thread
 	 */
-	public static void startPipeline(VideoSource camera, int width, int height, String outputName, Pipeline pipeline) {
-		if(camera == null) {
-			return;
-		}
-		
-		camera.setResolution(width, height);
-		
-		CvSink input = CameraServer.getInstance().getVideo(camera);
-		CvSource[] output = new CvSource[1]; // It's an array to avoid the final-or-effectively-final requirement for lambda methods
-		
-		if(outputName != null) {
-			output[0] = CameraServer.getInstance().putVideo(outputName, width, height);
-		}
-		
-		Thread pipelineRunnerThread = new Thread(pipeline, "Vision runner: Pipeline " + pipeline);
-		
-		Thread pipelineTransferRunnerThread = new Thread(() -> {
-			Mat inputFrame = new Mat();
+	public static void startTransferThread(Runnable transferFunc, String name) {
+		Thread runner = new Thread(() -> {
+			Threads.setCurrentThreadPriority(true, 10);
 			boolean lastFrameErrored = false;
 			
 			while(true) {
 				try {
-					input.grabFrame(inputFrame);
-					pipeline.supplyInput(inputFrame);
-					
-					if(output[0] != null) {
-						Mat outputFrame = pipeline.getOutput();
-						
-						if(!(outputFrame == null || outputFrame.empty())) {
-							output[0].putFrame(outputFrame);
-						}
-					}
+					transferFunc.run();
 				} catch(Exception e) {
-					System.err.println("Failed to grab frame for the vision pipeline for " + camera.getName() + ": " + e.getClass() + ": " + e.getLocalizedMessage());
+					System.err.println("Failed to transfer frame for " + name + ": " + e.getClass() + ": " + e.getLocalizedMessage());
 					
 					if(lastFrameErrored) {
 						System.err.println("This has happened twice in a row. The vision pipeline will now quit to prevent console spam.");
@@ -99,13 +88,88 @@ public class VisionCameraHelper {
 					}
 				}
 			}
-		}, "Vision runner: "+ camera.getName());
+		}, "Transfer: "+ name);
 		
+		runner.setDaemon(true);
+		runner.start();
+	}
+	
+	/**
+	 * Opens the given camera, checking whether or not it is existent and supported in the process<br>
+	 * <strong>Make sure you check to see if the given width, height, and FPS are supported by the camera.<br>
+	 * Just because OpenCV reports it as a valid video mode, doesn't mean it actually works with the camera</strong>
+	 * @param name The name for the camera
+	 * @param deviceID The camera's ID number
+	 * @param width The width of the stream
+	 * @param height The height of the stream
+	 * @param fps The FPS of the stream
+	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
+	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
+	 */
+	public static VideoSource openAndVerifyCamera(String name, int deviceID, int width, int height, int fps, boolean autoCapture) {
+		if(deviceID < 0) {
+			System.out.println("Warning: Given an invalid camera ID " + deviceID + "; ignoring...");
+			return null;
+		}
+		
+		UsbCamera cam = new UsbCamera(name, deviceID);
+		cam.setResolution(width, height);
+		cam.setFPS(fps);
+		
+		if(autoCapture) {
+			CameraServer.getInstance().startAutomaticCapture(cam);
+		} else {
+			CameraServer.getInstance().addCamera(cam);
+		}
+		
+		return cam;
+	}
+	
+	/**
+	 * Starts an OpenCV vision pipeline
+	 * @param camera The camera to be used as input
+	 * @param width The width of the video stream
+	 * @param height The width of the video stream
+	 * @param outputName The name of the video stream that will be sent to the camera server, from the output of the pipeline, or null to disable output
+	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
+	 * @param pipeline The vision pipeline
+	 * @return The video stream that results from the pipeline processing
+	 */
+	public static CvSource startPipeline(VideoSource camera, int width, int height, String outputName, boolean autoCapture, Pipeline pipeline) {
+		if(camera == null) {
+			return null;
+		}
+		
+		CvSink input = CameraServer.getInstance().getVideo(camera);
+		CvSource[] output = new CvSource[1]; // It's an array to avoid the final-or-effectively-final requirement for lambda methods
+		
+		if(outputName != null) {
+			output[0] = new CvSource(outputName, VideoMode.PixelFormat.kBGR, width, height, 30); // It will advertise this output, but it won't actually create a server, so it's fine
+			
+			if(autoCapture) {
+				CameraServer.getInstance().startAutomaticCapture(output[0]);
+			}
+		}
+		
+		Thread pipelineRunnerThread = new Thread(pipeline, "Vision runner: Pipeline " + pipeline);
 		pipelineRunnerThread.setDaemon(true);
 		pipelineRunnerThread.start();
 		
-		pipelineTransferRunnerThread.setDaemon(true);
-		pipelineTransferRunnerThread.start();
+		Mat[] frameBuff = { new Mat() };
+		startTransferThread(() -> {
+			input.grabFrame(frameBuff[0]);
+			pipeline.supplyInput(frameBuff[0]);
+			
+			if(output[0] != null) {
+				Mat outputFrame = pipeline.getOutput();
+				
+				if(!(outputFrame == null || outputFrame.empty())) {
+					output[0].putFrame(outputFrame);
+				}
+			}
+		}, "Vision Pipeline: " + pipeline);
+		
+		return output[0];
 	}
 	
 	/**

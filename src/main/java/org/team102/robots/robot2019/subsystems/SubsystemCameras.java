@@ -26,17 +26,23 @@ import java.util.List;
 import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
-import edu.wpi.cscore.UsbCamera;
+
+import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
 
 public class SubsystemCameras extends Subsystem {
 	
+	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
+	
 	public SubsystemCameras() {
 		super("Cameras");
 		
-		UsbCamera visionCamera = VisionCameraHelper.openAndVerifyCamera(RobotMap.CAMERA_ID_VISION);
-		VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", new Pipe());
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, false);
+		visibleVideoOutputs.add(visionCamera);
+		
+		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, new Pipe());
+		visibleVideoOutputs.add(pipelineOutput);
 	}
 	
 	protected void initDefaultCommand() {}

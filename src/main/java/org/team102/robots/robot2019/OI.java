@@ -22,5 +22,7 @@ package org.team102.robots.robot2019;
 
 public class OI {
 	
-	
+	public OI() {
+		Robot.driverNotif.initOIPortions();
+	}
 }

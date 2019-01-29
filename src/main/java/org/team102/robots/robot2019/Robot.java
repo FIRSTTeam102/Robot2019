@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
 	public static SubsystemHatchManipulator hatchManip;
 	public static SubsystemClimber climber;
 	public static SubsystemCameras cameras;
+	public static SubsystemDriverNotification driverNotif;
 	
 	public static OI oi;
 	
@@ -47,6 +48,7 @@ public class Robot extends TimedRobot {
 		hatchManip = new SubsystemHatchManipulator();
 		climber = new SubsystemClimber();
 		cameras = new SubsystemCameras();
+		driverNotif = new SubsystemDriverNotification();
 		
 		oi = new OI();
 	}
