@@ -30,6 +30,7 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
+import java.util.concurrent.TimeUnit;
 
 public class SubsystemCameras extends Subsystem {
 	
@@ -52,17 +53,37 @@ public class SubsystemCameras extends Subsystem {
 		private Mat rgbThresholdOutput = new Mat();
 		private Mat blurOutput = new Mat();
 		private Mat cutToContourOutput = new Mat();
+		private Mat isolateTapeOutput = new Mat();
 		private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
 		private ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<MatOfPoint>();
-		private ArrayList<Point> andrewCornersOutput = new ArrayList<Point>();
+		
+		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
+		
+		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
+		private Point[][] andrewCornersOutput = new Point[20][4];
 		private Mat andrewCornersImageOutput = new Mat();
-
-		private Mat harrisOutput = new Mat();
-	    private int threshold = 200;
+		
+		//point[rectangle][corner] narrows down after getting corners output to ONLY tape corners, 3 rectangles max and 4 corners
+		private int tapeMarkNumber = 3;
+		private Point[][] tapeMarks = new Point[tapeMarkNumber][4];
+		
+		//Point[rectangle][corner], once two pieces of tape are narrowed down, used to direct robot!! 
+		Point[][] tapeTargets = new Point[2][4];
+		
+		//pixel size tolerance, 0.1 right now but will change
+		//its about as much tolerance as ken has for us ;)
+		double tolerance = 100;
+		
+		
+		
+		private int threshold = 200;
+		
+		//if Harris Corners is a thing we gon use
+		//private Mat harrisOutput = new Mat();
+	    
 	    
 		public Mat process(Mat input) {
-			
-	//Step rgbThresholdInput:
+			//Step rgbThresholdInput:
 			Mat rgbThresholdInput = input;
 			double[] rgbThresholdRed = {233.90286621644344, 255.0};
 			double[] rgbThresholdGreen = {235.4316663399017, 255.0};
@@ -91,10 +112,38 @@ public class SubsystemCameras extends Subsystem {
 			findHarrisCorners(harrisInput, harrisOutput, 200);*/
 			
 			Mat andrewCornersInput = blurOutput;
-			andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
+			andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
+			/*final int centerHeights[] = new int[20];
+			final int cornersFound = 0;
+			cornersFound = 0;
+			for (int i = 0; i < 0; i++) {
+				if (andrewCornersOutput[i][0] != null)
+					cornersFound++;
+			}
+			for (int i = 0; i < cornersFound; i++) {
+				centerHeights[i] = (andrewCornersOutput[i][0].y + anrewCornersOutput[i][2].y) / 2;
+				for (int j = 0; j < i; j++) {
+					if (centerHeights[i] IS CLOSE TO THE OTHER THEN THEY GOOD)
+						
+				}
+				System.out.println(andrewCornersOutput[i][0]);
+			}
+			TimeUnit.SECONDS.sleep(1);*/
+
+			int cornersFound = findTape(andrewCornersOutput);
+			if (cornersFound == 3) {
+				isolateTape(blurOutput, tapeMarks,isolateTapeOutput);
+				return isolateTapeOutput;
+			}
+			else if (cornersFound > 3 || cornersFound < 2) {
+				System.out.println("Too many or too few corners found!");
+				return input;
+			}
 			
 			return andrewCornersImageOutput;
 		}
+		
+		//IMG PROCESSING AND FILTERS START HERE
 		/**
 		 * Segment an image based on color ranges.
 		 * @param input The image on which to perform the RGB threshold.
@@ -109,41 +158,6 @@ public class SubsystemCameras extends Subsystem {
 			Core.inRange(out, new Scalar(red[0], green[0], blue[0]),
 				new Scalar(red[1], green[1], blue[1]), out);
 		}
-
-		/**
-		 * An indication of which type of filter to use for a blur.
-		 * Choices are BOX, GAUSSIAN, MEDIAN, and BILATERAL
-		 */
-		/*enum BlurType{
-			BOX("Box Blur"), GAUSSIAN("Gaussian Blur"), MEDIAN("Median Filter"),
-				BILATERAL("Bilateral Filter");
-
-			private final String label;
-
-			BlurType(String label) {
-				this.label = label;
-			}
-
-			public static BlurType get(String type) {
-				if (BILATERAL.label.equals(type)) {
-					return BILATERAL;
-				}
-				else if (GAUSSIAN.label.equals(type)) {
-				return GAUSSIAN;
-				}
-				else if (MEDIAN.label.equals(type)) {
-					return MEDIAN;
-				}
-				else {
-					return BOX;
-				}
-			}
-
-			@Override
-			public String toString() {
-				return this.label;
-			}
-		}*/
 
 		/**
 		 * Softens an image using median filter blur.
@@ -269,21 +283,104 @@ public class SubsystemCameras extends Subsystem {
 	            }
 	        }
 	    }
-		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, /*ArrayList<Point> corners, */Mat output) {
+		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, Point[][] corners, Mat output) {
 			input.copyTo(output);
-			final Scalar white = new Scalar(255, 255, 255);
-			for(int i=0; i< inputContours.size(); i++) {
-				Rect rect = Imgproc.boundingRect(inputContours.get(i));
-				/*corners.add(new Point(rect.x, rect.y));
-				corners.add(new Point(rect.x + rect.width, rect.y));
-				corners.add(new Point(rect.x + rect.width, rect.y + rect.height));
-				corners.add(new Point(rect.x, rect.y + rect.height));*/
-				Imgproc.circle(output, new Point(rect.x, rect.y), 5, white);
-				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, white);
-				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, white);
-				Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, white);
+			//Point[][] corners = new Point[20][4];
+			final Scalar circleColor = new Scalar(255, 0, 0);
+			for(int i=0; i< inputContours.size(); i++) { //For every contour
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            	Rect rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
+					corners[i][0] = new Point(rect.x, rect.y); //Define the corners
+					corners[i][1] = new Point(rect.x + rect.width, rect.y);
+					corners[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
+					corners[i][3] = new Point(rect.x, rect.y + rect.height);
+					Imgproc.circle(output, new Point(rect.x, rect.y), 5, circleColor); //Circle the corners in the image
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);
+	            }
 			}
 		}	
+		
+		private int findTape(Point corners[][]) {
+			double centerHeights[] = new double[20];
+			int midpointsFound = 0;
+			int cornersFound = 0;
+			int[] validCorners = new int[20];
+			for (int i = 0; i < 20; i++)
+				validCorners[i] = 0;
+			int x = 0;
+			for (int i = 0; i < 0; i++) {
+				if (andrewCornersOutput[i][0] != null)
+					cornersFound++;
+			}
+			//finds center heights on rectangles left to right and then compares
+			for (int i = 0; i < cornersFound; i++) {
+				//finds midpoint of y leg of all rectangles
+				centerHeights[i] = (andrewCornersOutput[i][0].y + andrewCornersOutput[i][2].y) / 2;
+				midpointsFound++;
+			}
+			for (int i = 1; i < midpointsFound; i++) {
+				for (int j = 0; j < i; j++) {
+					//sees if centers of rectangles are approximately same height
+					if (Math.abs(centerHeights[i]-centerHeights[j])<tolerance) {
+						if (validCorners[i] == 0) {
+							tapeMarks[i][x]= andrewCornersOutput[i][x];
+							x++;
+							validCorners[i] = 1;
+						}
+						if (validCorners[j] == 0) {
+							tapeMarks[j][x]= andrewCornersOutput[j][x];
+							x++;
+							validCorners[j] = 1;
+						}
+					}
+					//System.out.println(andrewCornersOutput[i][0]);
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println(tapeMarks[0][0]);
+				}
+			}
+			return x;
+		}
+		
+		//this isolates tape once 3 rectangles are found
+		private void isolateTape(Mat input, Point[][] tape, Mat output){
+			
+			double leftDifference = getDifference(tapeMarks[0][0], tapeMarks[1][0]);
+			double rightDifference = getDifference(tapeMarks[1][0], tapeMarks[2][0]);
+			
+			if (leftDifference>rightDifference) {
+				//makes tape[0] [all points] = tape[1] [all points]
+				for(int i=0; i<=1; i++) {
+					for(int j=0; j<4; j++) {
+						tapeMarks[i][j] = tapeTargets[i][j];
+					}
+				}
+			}
+			//!!
+			else {
+				for(int i=1; i<=2; i++) {
+					for(int j=0; j<4; j++) {
+						//i-1 because we don' t want to assign it to tapeTargets[1]
+						tapeMarks[i][j] = tapeTargets[i-1][j];
+					}
+				}
+			}
+			final Scalar circleColor = new Scalar(255, 0, 0);
+			for(int i=0;i<4;i++) {
+	
+				Imgproc.circle(output, tapeTargets[0][i],5 ,circleColor );
+				Imgproc.circle(output, tapeTargets[1][i],5 ,circleColor );
+			}
+			System.out.println("Target 1 top left:" + tapeTargets[0][0]);
+			System.out.println("Target 2 top left:" + tapeTargets[1][0]);
+			
+		}
 		//to find distance between two Points created above
 		private double getDifference(Point a, Point b) {
 			double xDiff = a.x-b.x;
@@ -292,36 +389,28 @@ public class SubsystemCameras extends Subsystem {
 			return distance;
 		}		
 		
-		//so a few methods needed where we can pass in points- isStraight getAngle, getDistance, hasArrived
-		//we have options on how we want to do it though, we could keep having it getAngle and getDistance
-		//and then adjust until isStraight and hasArrived is true
-		//must order points a-d clockwise starting top left
-		private boolean isStraight(Point a, Point b, Point c, Point d) {	
-			//goes clockwise around a rectangle to get side values
-			double top = getDifference(a,b);
-			double right = getDifference(b,c);
-			double bottom = getDifference(c,d);
-			double left = getDifference(d,a);
+		//measures whether robot is directly in front of tape marks
+		//this is a public method because we should probably make the robot move and adjust elsewhere
+		//just checking if this is true as it moves
+		private boolean isStraight(Point[][] tapeTargets) {	
+			
+			double left = getDifference(tapeTargets[0][0], tapeTargets[0][1]);
+			double right = getDifference(tapeTargets[1][0], tapeTargets[1][1]);
 			
 			//0.1 is a placeholder for now, we can decide how much room we need
-			if(Math.abs(right-left)<0.1 && Math.abs(top-bottom)<0.1) {
+			if(Math.abs(right-left)<tolerance) {
 				return true;
 			}
 			else {
 				return false;
 			}
-		
-			/*steps: 
-			 * order coordinates clockwise, so we can get distance of individual sides
-			 * compare distance of individual sides to other sides to determine rotation
-			 * compare to irl measurements to get distance away
-		
-		*/
 		}
+
+		
 		private double getDistance() {
 			double distance = 0; //0 is placeholder for now
 			//use camera to see how large tape appears when robot is in correct location
-			//compare rectangle size then to rectangle size now, 
+			//compare rectangle size irl to pixel size
 			return distance;
 		}
 		
