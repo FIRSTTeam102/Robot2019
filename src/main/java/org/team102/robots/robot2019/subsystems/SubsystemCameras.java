@@ -22,6 +22,7 @@ package org.team102.robots.robot2019.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;
@@ -30,7 +31,6 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
-import java.util.concurrent.TimeUnit;
 
 public class SubsystemCameras extends Subsystem {
 	
@@ -61,6 +61,7 @@ public class SubsystemCameras extends Subsystem {
 		
 		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
 		private Point[][] andrewCornersOutput = new Point[20][4];
+		//private ArrayList<Point> andrewCornersOutput = new ArrayList<Point>();
 		private Mat andrewCornersImageOutput = new Mat();
 		
 		//point[rectangle][corner] narrows down after getting corners output to ONLY tape corners, 3 rectangles max and 4 corners
@@ -112,8 +113,8 @@ public class SubsystemCameras extends Subsystem {
 			findHarrisCorners(harrisInput, harrisOutput, 200);*/
 			
 			Mat andrewCornersInput = blurOutput;
-			andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
-			/*final int centerHeights[] = new int[20];
+			/*andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
+			final int centerHeights[] = new int[20];
 =======
 			final int centerHeights[] = new int[20];
 >>>>>>> bb77f510983db03750527d1c65a7e4b76e345235
@@ -145,6 +146,8 @@ public class SubsystemCameras extends Subsystem {
 			}
 		
 			//TimeUnit.SECONDS.sleep(1);
+			andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
+			
 			return andrewCornersImageOutput;
 		}
 		
@@ -288,22 +291,19 @@ public class SubsystemCameras extends Subsystem {
 	            }
 	        }
 	    }
-		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, Point[][] corners, Mat output) {
+		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, /*ArrayList<Point> corners, */Mat output) {
 			input.copyTo(output);
-			//Point[][] corners = new Point[20][4];
-			final Scalar circleColor = new Scalar(255, 0, 0);
-			for(int i=0; i< inputContours.size(); i++) { //For every contour
-	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
-	            	Rect rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
-					corners[i][0] = new Point(rect.x, rect.y); //Define the corners
-					corners[i][1] = new Point(rect.x + rect.width, rect.y);
-					corners[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
-					corners[i][3] = new Point(rect.x, rect.y + rect.height);
-					Imgproc.circle(output, new Point(rect.x, rect.y), 5, circleColor); //Circle the corners in the image
-					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
-					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
-					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);
-	            }
+			final Scalar white = new Scalar(255, 255, 255);
+			for(int i=0; i< inputContours.size(); i++) {
+				Rect rect = Imgproc.boundingRect(inputContours.get(i));
+				/*corners.add(new Point(rect.x, rect.y));
+				corners.add(new Point(rect.x + rect.width, rect.y));
+				corners.add(new Point(rect.x + rect.width, rect.y + rect.height));
+				corners.add(new Point(rect.x, rect.y + rect.height));*/
+				Imgproc.circle(output, new Point(rect.x, rect.y), 5, white);
+				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, white);
+				Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, white);
+				Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, white);
 			}
 		}	
 		
