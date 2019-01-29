@@ -114,6 +114,9 @@ public class SubsystemCameras extends Subsystem {
 			Mat andrewCornersInput = blurOutput;
 			andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
 			/*final int centerHeights[] = new int[20];
+=======
+			final int centerHeights[] = new int[20];
+>>>>>>> bb77f510983db03750527d1c65a7e4b76e345235
 			final int cornersFound = 0;
 			cornersFound = 0;
 			for (int i = 0; i < 0; i++) {
@@ -128,6 +131,7 @@ public class SubsystemCameras extends Subsystem {
 				}
 				System.out.println(andrewCornersOutput[i][0]);
 			}
+<<<<<<< HEAD
 			TimeUnit.SECONDS.sleep(1);*/
 
 			int cornersFound = findTape(andrewCornersOutput);
@@ -139,7 +143,8 @@ public class SubsystemCameras extends Subsystem {
 				System.out.println("Too many or too few corners found!");
 				return input;
 			}
-			
+		
+			//TimeUnit.SECONDS.sleep(1);
 			return andrewCornersImageOutput;
 		}
 		
