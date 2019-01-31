@@ -55,8 +55,11 @@ public class SubsystemCameras extends Subsystem {
 		private Mat blurOutput = new Mat();
 		private Mat cutToContourOutput = new Mat();
 		private Mat isolateTapeOutput = new Mat();
+		private Mat amandaCornersOutput = new Mat();
+		private Mat amandaCornersSomething = new Mat();
 		private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
-		private ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<MatOfPoint>();
+		private ArrayList<MatOfPoint2f> convexHullsOutput = new ArrayList<MatOfPoint2f>();
+		private ArrayList<MatOfPoint2f> amandaCornersInputCnts = new ArrayList<MatOfPoint2f>();
 		
 		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
 		
@@ -117,9 +120,6 @@ public class SubsystemCameras extends Subsystem {
 			Mat andrewCornersInput = blurOutput;
 			/*andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
 			final int centerHeights[] = new int[20];
-=======
-			final int centerHeights[] = new int[20];
->>>>>>> bb77f510983db03750527d1c65a7e4b76e345235
 			final int cornersFound = 0;
 			cornersFound = 0;
 			for (int i = 0; i < 0; i++) {
@@ -134,12 +134,11 @@ public class SubsystemCameras extends Subsystem {
 				}
 				System.out.println(andrewCornersOutput[i][0]);
 			}
-<<<<<<< HEAD
 			TimeUnit.SECONDS.sleep(1);*/
 
-			andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
+			//andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
 
-			int cornersFound = findTape(andrewCornersOutput);
+			/*int cornersFound = findTape(andrewCornersOutput);
 			if (cornersFound == 3) {
 				isolateTape(blurOutput, tapeMarks,isolateTapeOutput);
 				return isolateTapeOutput;
@@ -147,12 +146,18 @@ public class SubsystemCameras extends Subsystem {
 			else if (cornersFound > 3 || cornersFound < 2) {
 				System.out.println("Too many or too few corners found!");
 				return input;
-			}
+			}*/
 
 			//TimeUnit.SECONDS.sleep(1);
 			//andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
-		
-			return andrewCornersImageOutput;
+			
+			/*for (int i = 0; i < convexHullsOutput.size() && i < 10; i++) {
+				convexHullsOutput.get(i).convertTo(amandaCornersInputCnts.get(i), CvType.CV_32F);
+			}*/
+			
+			amandaCorners(blurOutput, convexHullsOutput, amandaCornersSomething, amandaCornersOutput);
+			
+			return amandaCornersOutput;
 		}
 		
 		//IMG PROCESSING AND FILTERS START HERE
@@ -267,14 +272,14 @@ public class SubsystemCameras extends Subsystem {
 		 * @param inputContours The contours on which to perform the operation.
 		 * @param outputContours The contours where the output will be stored.
 		 */
-		private void convexHulls(List<MatOfPoint> inputContours, ArrayList<MatOfPoint> outputContours) {
+		private void convexHulls(List<MatOfPoint> inputContours, ArrayList<MatOfPoint2f> outputContours) {
 			final MatOfInt hull = new MatOfInt();
 			outputContours.clear();
 			for (int i = 0; i < inputContours.size(); i++) {
 				final MatOfPoint contour = inputContours.get(i);
-				final MatOfPoint mopHull = new MatOfPoint();
+				final MatOfPoint2f mopHull = new MatOfPoint2f();
 				Imgproc.convexHull(contour, hull);
-				mopHull.create((int) hull.size().height, 1, CvType.CV_32SC2);
+				mopHull.create((int) hull.size().height, 1, CvType.CV_32FC2);
 				for (int j = 0; j < hull.size().height; j++) {
 					int index = (int) hull.get(j, 0)[0];
 					double[] point = new double[] {contour.get(index, 0)[0], contour.get(index, 0)[1]};
@@ -297,11 +302,12 @@ public class SubsystemCameras extends Subsystem {
 	    }
 		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, Point[][] corners, Mat output) {
 			input.copyTo(output);
+			Rect rect = new Rect();
 			//Point[][] corners = new Point[20][4];
 			final Scalar circleColor = new Scalar(255, 0, 0);
 			for(int i=0; i< inputContours.size(); i++) { //For every contour
 	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
-	            	Rect rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
+	            	rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
 					corners[i][0] = new Point(rect.x, rect.y); //Define the corners
 					corners[i][1] = new Point(rect.x + rect.width, rect.y);
 					corners[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
@@ -313,6 +319,22 @@ public class SubsystemCameras extends Subsystem {
 	            }
 			}
 		}	
+		
+		private void amandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Mat corners, Mat output) { 
+			Mat cornerPoints = new Mat();
+			input.copyTo(output);
+			RotatedRect rRect = null;
+			for (int i = 0; i < inputContours.size(); i++) {
+				rRect = Imgproc.minAreaRect(inputContours.get(i));
+				Imgproc.boxPoints(rRect, cornerPoints);
+			}
+			Point[] vertices = new Point[4];  
+	        rRect.points(vertices);  
+	        for (int j = 0; j < 4; j++){  
+	            Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(0,255,0));
+	        }
+			corners = cornerPoints;
+		}
 		
 		private int findTape(Point corners[][]) {
 			double centerHeights[] = new double[20];
