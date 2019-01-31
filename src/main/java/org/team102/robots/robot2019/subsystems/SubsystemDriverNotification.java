@@ -8,10 +8,12 @@ import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.commands.CommandSetDSVideoOutput;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
+import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -30,7 +32,7 @@ public class SubsystemDriverNotification extends Subsystem {
 	private boolean lowTimeTriggered = false;
 	private int notificationBlinkTime = 0;
 	
-	//private CvSink srcSink;
+	private NetworkTableEntry selectedStreamName;
 	private MjpegServer videoOutput;
 	
 	public SubsystemDriverNotification() {
@@ -52,6 +54,8 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getLayout("Video Selector", BuiltInLayouts.kList)
 				.withPosition(0, 1).withSize(2, 2)
 				.withProperties(PROP_HIDE_LABELS);
+		
+		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
 		
 		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
 		VisionCameraHelper.advertiseServerToShuffleboard(videoOutput, driverInfoTab).withPosition(2, 0).withSize(3, 3);
@@ -80,6 +84,7 @@ public class SubsystemDriverNotification extends Subsystem {
 		}
 		
 		videoOutput.setSource(source);
+		selectedStreamName.setString("Current Stream: " + name);
 	}
 	
 	@Override

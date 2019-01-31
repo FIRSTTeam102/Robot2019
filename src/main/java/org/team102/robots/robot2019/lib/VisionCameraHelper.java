@@ -21,6 +21,7 @@
 package org.team102.robots.robot2019.lib;
 
 import org.opencv.core.Mat;
+import org.team102.robots.robot2019.Robot;
 
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;
@@ -39,6 +40,18 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class VisionCameraHelper {
+	
+	/**
+	 * Because setting resolution on desktop causes a crash, this will set the resolution, but only on a real RoboRIO
+	 * @param src The camera or other video source
+	 * @param width The desired width
+	 * @param height The desired height
+	 */
+	public static void safeSetResolution(VideoSource src, int width, int height) {
+		if(Robot.isReal()) {
+			src.setResolution(width, height);
+		}
+	}
 	
 	/**
 	 * Adds the given MJPEG server to the given Shuffleboard container as a video stream
@@ -113,7 +126,7 @@ public class VisionCameraHelper {
 		}
 		
 		UsbCamera cam = new UsbCamera(name, deviceID);
-		cam.setResolution(width, height);
+		safeSetResolution(cam, width, height);
 		cam.setFPS(fps);
 		
 		if(autoCapture) {
