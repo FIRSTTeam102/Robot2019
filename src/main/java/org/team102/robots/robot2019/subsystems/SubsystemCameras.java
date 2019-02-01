@@ -31,7 +31,6 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
-import java.util.concurrent.TimeUnit;
 
 public class SubsystemCameras extends Subsystem {
 	
@@ -57,6 +56,7 @@ public class SubsystemCameras extends Subsystem {
 		private Mat isolateTapeOutput = new Mat();
 		private Mat amandaCornersOutput = new Mat();
 		private Mat amandaCornersSomething = new Mat();
+		private Mat amandaCornersInput = new Mat();
 		private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
 		private ArrayList<MatOfPoint2f> convexHullsOutput = new ArrayList<MatOfPoint2f>();
 		private ArrayList<MatOfPoint2f> amandaCornersInputCnts = new ArrayList<MatOfPoint2f>();
@@ -117,7 +117,7 @@ public class SubsystemCameras extends Subsystem {
 			/*Mat harrisInput = blurOutput;
 			findHarrisCorners(harrisInput, harrisOutput, 200);*/
 			
-			Mat andrewCornersInput = blurOutput;
+			//Mat andrewCornersInput = blurOutput;
 			/*andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
 			final int centerHeights[] = new int[20];
 			final int cornersFound = 0;
@@ -154,8 +154,8 @@ public class SubsystemCameras extends Subsystem {
 			/*for (int i = 0; i < convexHullsOutput.size() && i < 10; i++) {
 				convexHullsOutput.get(i).convertTo(amandaCornersInputCnts.get(i), CvType.CV_32F);
 			}*/
-			
-			amandaCorners(blurOutput, convexHullsOutput, amandaCornersSomething, amandaCornersOutput);
+			Imgproc.cvtColor(blurOutput, amandaCornersInput, 8);
+			amandaCorners(amandaCornersInput, convexHullsOutput, amandaCornersSomething, amandaCornersOutput);
 			
 			return amandaCornersOutput;
 		}
@@ -316,24 +316,54 @@ public class SubsystemCameras extends Subsystem {
 					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
 					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
 					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);*/
+		        	for (int j = 0; j < 4; j++){  
+		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
+		            	Imgproc.line(output, corners[i][j], corners[i][(j+1)%4], new Scalar(0,0,255,255), 3);
+		        	}
 	            }
 			}
 		}	
 		
 		private void amandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Mat corners, Mat output) { 
 			Mat cornerPoints = new Mat();
+			Point[] vertices = new Point[4]; 
 			input.copyTo(output);
 			RotatedRect rRect = null;
+			//System.out.printf("size: %d\n", inputContours.size());
 			for (int i = 0; i < inputContours.size(); i++) {
-				rRect = Imgproc.minAreaRect(inputContours.get(i));
-				Imgproc.boxPoints(rRect, cornerPoints);
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            	rRect = Imgproc.minAreaRect(inputContours.get(i));
+					Imgproc.boxPoints(rRect, cornerPoints);
+		        	rRect.points(vertices);
+		        	for (int j = 0; j < 4; j++){  
+		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
+		            	Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(0,255,0,255), 3);
+		        	}
+	            }
 			}
-			Point[] vertices = new Point[4];  
-	        rRect.points(vertices);  
-	        for (int j = 0; j < 4; j++){  
-	            Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(0,255,0));
-	        }
-			corners = cornerPoints;
+			
+			
+			//Add Andrew Corners
+			Rect rect = new Rect();
+			Point[][] corners2 = new Point[20][4];
+			final Scalar circleColor = new Scalar(255, 0, 0);
+			for(int i=0; i< inputContours.size(); i++) { //For every contour
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            	rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
+					corners2[i][0] = new Point(rect.x, rect.y); //Define the corners
+					corners2[i][1] = new Point(rect.x + rect.width, rect.y);
+					corners2[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
+					corners2[i][3] = new Point(rect.x, rect.y + rect.height);
+					/*Imgproc.circle(output, new Point(rect.x, rect.y), 5, circleColor); //Circle the corners in the image
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
+					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);*/
+		        	for (int j = 0; j < 4; j++){  
+		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
+		            	Imgproc.line(output, corners2[i][j], corners2[i][(j+1)%4], new Scalar(0,0,255,255), 3);
+		        	}
+	            }
+			}
 		}
 		
 		private int findTape(Point corners[][]) {
