@@ -22,6 +22,8 @@ package org.team102.robots.robot2019;
 
 public class RobotMap {
 	
+	public static final int JOYSTICK_ID_DRIVER = 0;
+	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
 	

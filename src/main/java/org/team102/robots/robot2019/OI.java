@@ -20,9 +20,15 @@
 
 package org.team102.robots.robot2019;
 
+import edu.wpi.first.wpilibj.Joystick;
+
 public class OI {
 	
+	public Joystick driverJoystick;
+	
 	public OI() {
+		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
+		
 		Robot.driverNotif.initOIPortions();
 	}
 }

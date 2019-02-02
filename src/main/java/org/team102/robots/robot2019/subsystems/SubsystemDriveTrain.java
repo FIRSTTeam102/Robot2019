@@ -21,13 +21,16 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
+import org.team102.robots.robot2019.commands.CommandDriveWithJoystick;
+import org.team102.robots.robot2019.lib.CommonIDs;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
-public class SubsystemDriveTrain  extends Subsystem {
+public class SubsystemDriveTrain extends Subsystem {
 	
 	private MecanumDrive drive;
 	
@@ -39,7 +42,7 @@ public class SubsystemDriveTrain  extends Subsystem {
 	public SubsystemDriveTrain() {
 		super("Drive Train");
 		
-		frontLeft = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_FRONT_LEFT); 
+		frontLeft = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_FRONT_LEFT);
 		frontRight = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT);
 		rearLeft = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_REAR_LEFT);
 		rearRight = new WPI_TalonSRX(RobotMap.CAN_TALON_DRIVE_TRAIN_REAR_RIGHT);
@@ -55,6 +58,18 @@ public class SubsystemDriveTrain  extends Subsystem {
 	
 	@Override
 	protected void initDefaultCommand() {
+		setDefaultCommand(new CommandDriveWithJoystick());
+	}
+	
+	public void drive(double frontBack, double leftRight, double rotation) {
+		drive.driveCartesian(leftRight, frontBack, rotation);
+	}
+	
+	public void driveWithJoystick(Joystick joy) {
+		double frontBack = joy.getRawAxis(CommonIDs.Gamepad.AXIS_LEFT_Y);
+		double leftRight = joy.getRawAxis(CommonIDs.Gamepad.AXIS_LEFT_X);
+		double rotation = joy.getRawAxis(CommonIDs.Gamepad.AXIS_RIGHT_X);
 		
+		drive(frontBack, leftRight, rotation);
 	}
 }
