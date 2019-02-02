@@ -113,10 +113,6 @@ public class SubsystemCameras extends Subsystem {
 			//Cut image to convex hulls (this gon be weird)
 			//cutToContour(input, convexHullsOutput, cutToContourOutput);
 			
-			//Harris Corners
-			/*Mat harrisInput = blurOutput;
-			findHarrisCorners(harrisInput, harrisOutput, 200);*/
-			
 			//Mat andrewCornersInput = blurOutput;
 			/*andrewCorners(andrewCornersInput, convexHullsOutput, andrewCornersOutput, andrewCornersImageOutput);
 			final int centerHeights[] = new int[20];
@@ -151,11 +147,8 @@ public class SubsystemCameras extends Subsystem {
 			//TimeUnit.SECONDS.sleep(1);
 			//andrewCorners(andrewCornersInput, convexHullsOutput/*, andrewCornersOutput*/, andrewCornersImageOutput);
 			
-			/*for (int i = 0; i < convexHullsOutput.size() && i < 10; i++) {
-				convexHullsOutput.get(i).convertTo(amandaCornersInputCnts.get(i), CvType.CV_32F);
-			}*/
-			Imgproc.cvtColor(blurOutput, amandaCornersInput, 8);
-			amandaCorners(amandaCornersInput, convexHullsOutput, amandaCornersSomething, amandaCornersOutput);
+			Imgproc.cvtColor(blurOutput, amandaCornersInput, 8); //8 = GRAY2BGR
+			//amandaCorners(amandaCornersInput, convexHullsOutput, amandaCornersSomething, amandaCornersOutput);
 			
 			return amandaCornersOutput;
 		}
@@ -210,62 +203,6 @@ public class SubsystemCameras extends Subsystem {
 			int method = Imgproc.CHAIN_APPROX_SIMPLE;
 			Imgproc.findContours(input, contours, hierarchy, mode, method);
 		}
-		
-		/*public void findHarrisCorners(Mat input, Mat dst){
-	        dst = Mat.zeros(input.size(), CvType.CV_32F);
-	        int blockSize = 2;
-	        int apertureSize = 3;
-	        double k = 0.04;
-	        Imgproc.cornerHarris(input, dst, blockSize, apertureSize, k);
-	        Core.normalize(dst, dstNorm, 0, 255, Core.NORM_MINMAX);
-	        Core.convertScaleAbs(dstNorm, dstNormScaled);
-	        float[] dstNormData = new float[(int) (dstNorm.total() * dstNorm.channels())];
-	        dstNorm.get(0, 0, dstNormData);
-	        for (int i = 0; i < dstNorm.rows(); i++) {
-	            for (int j = 0; j < dstNorm.cols(); j++) {
-	                if ((int) dstNormData[i * dstNorm.cols() + j] > threshold) {
-	                    Imgproc.circle(dstNormScaled, new Point(j, i), 5, new Scalar(0), 2, 8, 0);
-	                }
-	            }
-	        }
-	        cornerLabel.setIcon(new ImageIcon(HighGui.toBufferedImage(dstNormScaled)));
-		}	
-		public void findHarrisCorners(Mat Scene, Mat Object, int thresh) {
-
-		    // This function implements the Harris Corner detection. The corners at intensity > thresh
-		    // are drawn.
-		    Mat Harris_scene = new Mat();
-		    Mat Harris_object = new Mat();
-
-		    Mat harris_scene_norm = new Mat(), harris_object_norm = new Mat(), harris_scene_scaled = new Mat(), harris_object_scaled = new Mat();
-		    int blockSize = 9;
-		    int apertureSize = 5;
-		    double k = 0.1;
-		    Imgproc.cornerHarris(Scene, Harris_scene,blockSize, apertureSize,k);
-		    Imgproc.cornerHarris(Object, Harris_object, blockSize,apertureSize,k);
-
-		    Core.normalize(Harris_scene, harris_scene_norm, 0, 255, Core.NORM_MINMAX, CvType.CV_32FC1, new Mat());
-		    Core.normalize(Harris_object, harris_object_norm, 0, 255, Core.NORM_MINMAX, CvType.CV_32FC1, new Mat());
-
-		    Core.convertScaleAbs(harris_scene_norm, harris_scene_scaled);
-		    Core.convertScaleAbs(harris_object_norm, harris_object_scaled);
-
-		    for( int j = 0; j < harris_scene_norm.rows() ; j++){
-		        for( int i = 0; i < harris_scene_norm.cols(); i++){
-		            if ((int) harris_scene_norm.get(j,i)[0] > thresh){
-		                Imgproc.circle(harris_scene_scaled, new Point(i,j), 5 , new Scalar(0), 2 ,8 , 0);
-		            }
-		        }
-		    }
-
-		    for( int j = 0; j < harris_object_norm.rows() ; j++){
-		        for( int i = 0; i < harris_object_norm.cols(); i++){
-		            if ((int) harris_object_norm.get(j,i)[0] > thresh){
-		                Imgproc.circle(harris_object_scaled, new Point(i,j), 5 , new Scalar(0), 2 ,8 , 0);
-		            }
-		        }
-		    }
-		}*/
 
 		/**
 		 * Compute the convex hulls of contours.
@@ -300,7 +237,7 @@ public class SubsystemCameras extends Subsystem {
 	            }
 	        }
 	    }
-		private void andrewCorners(Mat input, ArrayList<MatOfPoint> inputContours, Point[][] corners, Mat output) {
+		private void findAndrewCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] corners, Mat output) {
 			input.copyTo(output);
 			Rect rect = new Rect();
 			//Point[][] corners = new Point[20][4];
@@ -324,9 +261,10 @@ public class SubsystemCameras extends Subsystem {
 			}
 		}	
 		
-		private void amandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Mat corners, Mat output) { 
+		private void findAmandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] corners, double[] angles, Mat output) { 
 			Mat cornerPoints = new Mat();
 			Point[] vertices = new Point[4]; 
+			
 			input.copyTo(output);
 			RotatedRect rRect = null;
 			//System.out.printf("size: %d\n", inputContours.size());
@@ -335,35 +273,19 @@ public class SubsystemCameras extends Subsystem {
 	            	rRect = Imgproc.minAreaRect(inputContours.get(i));
 					Imgproc.boxPoints(rRect, cornerPoints);
 		        	rRect.points(vertices);
+		        	angles[i] = rRect.angle;
 		        	for (int j = 0; j < 4; j++){  
-		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
-		            	Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(0,255,0,255), 3);
-		        	}
+		            	Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(255,0,0,255), 3);
+		            	corners[i][j] = vertices[j];
+		            }
 	            }
 			}
-			
-			
-			//Add Andrew Corners
-			Rect rect = new Rect();
-			Point[][] corners2 = new Point[20][4];
-			final Scalar circleColor = new Scalar(255, 0, 0);
-			for(int i=0; i< inputContours.size(); i++) { //For every contour
-	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
-	            	rect = Imgproc.boundingRect(inputContours.get(i)); //Find the rectangle with the corners
-					corners2[i][0] = new Point(rect.x, rect.y); //Define the corners
-					corners2[i][1] = new Point(rect.x + rect.width, rect.y);
-					corners2[i][2] = new Point(rect.x + rect.width, rect.y + rect.height);
-					corners2[i][3] = new Point(rect.x, rect.y + rect.height);
-					/*Imgproc.circle(output, new Point(rect.x, rect.y), 5, circleColor); //Circle the corners in the image
-					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y), 5, circleColor);
-					Imgproc.circle(output, new Point(rect.x + rect.width, rect.y + rect.height), 5, circleColor);
-					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);*/
-		        	for (int j = 0; j < 4; j++){  
-		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
-		            	Imgproc.line(output, corners2[i][j], corners2[i][(j+1)%4], new Scalar(0,0,255,255), 3);
-		        	}
-	            }
-			}
+		}
+		
+		private void findCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] andrewCorners, Point[][] amandaCorners, double[] angles, Mat output) {
+			Mat andrewOutput = new Mat();
+			findAndrewCorners(input, inputContours, andrewCorners, andrewOutput);
+			findAmandaCorners(andrewOutput, inputContours, amandaCorners, angles, output);
 		}
 		
 		private int findTape(Point corners[][]) {
