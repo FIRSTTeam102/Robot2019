@@ -18,17 +18,26 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019;
+package org.team102.robots.robot2019.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
+import org.team102.robots.robot2019.Robot;
 
-public class OI {
+import edu.wpi.first.wpilibj.command.Command;
+
+public class CommandDriveWithJoystick extends Command {
 	
-	public Joystick driverJoystick;
+	public CommandDriveWithJoystick() {
+		super("Drive with Joystick");
+		requires(Robot.driveTrain);
+	}
 	
-	public OI() {
-		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
-		
-		Robot.driverNotif.initOIPortions();
+	@Override
+	public void execute() {
+		Robot.driveTrain.driveWithJoystick(Robot.oi.driverJoystick);
+	}
+	
+	@Override
+	protected boolean isFinished() {
+		return false;
 	}
 }

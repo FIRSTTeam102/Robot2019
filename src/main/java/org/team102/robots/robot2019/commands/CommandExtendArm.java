@@ -18,17 +18,25 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019;
+package org.team102.robots.robot2019.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
+import org.team102.robots.robot2019.Robot;
 
-public class OI {
+import edu.wpi.first.wpilibj.command.InstantCommand;
+
+public class CommandExtendArm extends InstantCommand {
 	
-	public Joystick driverJoystick;
+	private boolean active;
 	
-	public OI() {
-		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
+	public CommandExtendArm(boolean active) {
+		super("Extend Arm");
+		requires(Robot.arm);
 		
-		Robot.driverNotif.initOIPortions();
+		this.active = active;
+	}
+	
+	@Override
+	public void initialize() {
+		Robot.arm.setExtender(active);
 	}
 }
