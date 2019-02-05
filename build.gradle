@@ -18,6 +18,14 @@ repositories {
 	}
 }
 
+// Get our other dependencies
+def dependenciesFile = file("dependencies.gradle")
+if(dependenciesFile.exists()) {
+	apply from: dependenciesFile
+} else {
+	println "Skipping external dependencies file as it doesn't exist"
+}
+
 // This will warn the user if the robot class named isn't present.
 build {
 	// We'll execute before the build
