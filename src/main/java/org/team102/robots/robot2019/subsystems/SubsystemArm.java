@@ -53,6 +53,7 @@ public class SubsystemArm extends Subsystem {
 		
 		armArduino = new ArduinoConnection(RobotMap.SERIAL_PORT_ID_ARM_ARDUINO);
 		armArduino.setLineListener(this::onArduinoLineReceived);
+		addChild("LIDAR Control Arduino", armArduino);
 		
 		setArduinoCommTime();
 	}

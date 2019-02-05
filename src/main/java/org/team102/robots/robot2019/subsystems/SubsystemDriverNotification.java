@@ -28,12 +28,10 @@ import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.commands.CommandSetDSVideoOutput;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
-import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.command.Subsystem;
