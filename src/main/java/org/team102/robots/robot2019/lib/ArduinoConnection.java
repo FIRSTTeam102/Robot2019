@@ -26,10 +26,13 @@ import java.util.function.Consumer;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
 /**
  * A connection to an Arduino via a serial port
  */
-public class ArduinoConnection implements Closeable, AutoCloseable {
+public class ArduinoConnection extends SendableBase implements Closeable, AutoCloseable {
 	private String eol = "\n";
 	
 	private SerialPort port;
@@ -113,6 +116,14 @@ public class ArduinoConnection implements Closeable, AutoCloseable {
 	}
 	
 	/**
+	 * Gets whether or not a {@link #setLineListener(Consumer) line listener} is currently attached
+	 * @return Whether or not a line listener is attached
+	 */
+	public boolean hasLineListener() {
+		return lineListener != null;
+	}
+	
+	/**
 	 * Writes the given line of text to the Arduino, then a new-line character
 	 * @param line The line
 	 */
@@ -150,13 +161,21 @@ public class ArduinoConnection implements Closeable, AutoCloseable {
 				String tok = tokens[i].trim();
 				
 				if(tok.length() > 0) {
-					if(lineListener == null) {
-						lines.add(tok);
-					} else {
+					if(hasLineListener()) {
 						lineListener.accept(tok);
+					} else {
+						lines.add(tok);
 					}
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.addBooleanProperty("serialPortConnected", port::isOpen, null);
+		builder.addDoubleProperty("numUnprocessedLines", lines::size, null);
+		builder.addBooleanProperty("hasLineListener", this::hasLineListener, null);
+		builder.addStringProperty("serialPortID", port::getSystemPortName, null);
 	}
 }
