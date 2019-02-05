@@ -21,19 +21,19 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.lib.SupplierPIDSource;
+import org.team102.robots.robot2019.lib.ArduinoConnection;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemArm extends Subsystem {
 	
-	private PIDController wristController;
-	private PIDController elbowController;
+	private ArduinoConnection armArduino;
+	
+	private int distance1 = -1, distance2 = -1, distance3 = -1;
+	private long lastArduinoCommTime;
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
@@ -51,13 +51,20 @@ public class SubsystemArm extends Subsystem {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		PIDSource wristSrc = new SupplierPIDSource(this::getWristSensorValue);
-		PIDSource elbowSrc = new SupplierPIDSource(this::getElbowSensorValue);
+		armArduino = new ArduinoConnection(RobotMap.SERIAL_PORT_ID_ARM_ARDUINO);
+		armArduino.setLineListener(this::onArduinoLineReceived);
 		
-		wristController = new PIDController(0, 0, 0, wristSrc, wrist); // TODO Add PID constants
-		elbowController = new PIDController(0, 0, 0, elbowSrc, elbow);
-		addChild("Wrist PID loop", wristController);
-		addChild("Elbow PID loop", elbowController);
+		setArduinoCommTime();
+	}
+	
+	@Override
+	public void periodic() {
+		armArduino.update();
+		
+		double lastCommTime = getTimeSinceLastArduinoComm();
+		if(lastCommTime > 1 && lastCommTime % 5 < .03) {
+			System.out.println("Warning: Last Arduino comm time was " + lastCommTime + " seconds ago!");
+		}
 	}
 	
 	@Override
@@ -69,24 +76,26 @@ public class SubsystemArm extends Subsystem {
 		extender.set(active);
 	}
 	
-	public void setPIDEnabled(boolean on) {
-		wristController.setEnabled(on);
-		elbowController.setEnabled(on);
+	
+	private void onArduinoLineReceived(String line) {
+		String[] parts = line.split(",");
+		
+		try {
+			distance1 = Integer.parseInt(parts[0]);
+			distance2 = Integer.parseInt(parts[1]);
+			distance3 = Integer.parseInt(parts[2]);
+			
+			setArduinoCommTime();
+		} catch(Exception e) {
+			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
+		}
 	}
 	
-	public void setWristAngle(double angle) {
-		wristController.setSetpoint(angle);
+	private void setArduinoCommTime() {
+		lastArduinoCommTime = System.currentTimeMillis();
 	}
 	
-	public void setElbowAngle(double angle) {
-		elbowController.setSetpoint(angle);
-	}
-	
-	private double getWristSensorValue() {
-		return 0; // TODO Implement
-	}
-	
-	private double getElbowSensorValue() {
-		return 0; // TODO Implement
+	public double getTimeSinceLastArduinoComm() {
+		return (System.currentTimeMillis() - lastArduinoCommTime) / 1e3D;
 	}
 }
