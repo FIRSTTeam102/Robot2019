@@ -22,11 +22,16 @@ package org.team102.robots.robot2019;
 
 public class RobotMap {
 	
+	public static final String SERIAL_PORT_ID_ARM_ARDUINO_REAL = "/dev/ttyACM0";
+	public static final String SERIAL_PORT_ID_ARM_ARDUINO_IN_SIM = "COM5";
+	public static final String SERIAL_PORT_ID_ARM_ARDUINO = Robot.isReal() ? SERIAL_PORT_ID_ARM_ARDUINO_REAL : SERIAL_PORT_ID_ARM_ARDUINO_IN_SIM;
+	
+	public static final int ARDUINO_BAUD_RATE = 9600;
+	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
-	
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
 	
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 0;
