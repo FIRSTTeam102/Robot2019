@@ -187,7 +187,9 @@ public class CANTalonVelocityController extends SendableBase {
 	}
 	
 	/**
-	 * Stops the motor
+	 * Stops the motor.
+	 * <strong>This is a safe-state <i>DISABLE</i>, not a "keep-this-motor-steady" command.</strong><br>
+	 * If you want to do that, please use {@link #setTargetVelocity(double)} with a parameter of {@code 0}.
 	 */
 	public void stop() {
 		talon.set(ControlMode.Disabled, 0);
