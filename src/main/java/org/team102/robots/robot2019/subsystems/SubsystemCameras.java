@@ -40,7 +40,7 @@ public class SubsystemCameras extends Subsystem {
 	public SubsystemCameras() {
 		super("Cameras");
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 1, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, new Pipe());

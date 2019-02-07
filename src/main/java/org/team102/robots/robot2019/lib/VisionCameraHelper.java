@@ -116,19 +116,22 @@ public class VisionCameraHelper {
 	 * @param width The width of the stream
 	 * @param height The height of the stream
 	 * @param fps The FPS of the stream
+	 * @param brightness The brightness of the camera
 	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
 	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
 	 */
-	public static VideoSource openAndVerifyCamera(String name, int deviceID, int width, int height, int fps, boolean autoCapture) {
+	public static VideoSource openAndVerifyCamera(String name, int deviceID, int width, int height, int fps, int brightness, boolean autoCapture) {
 		if(deviceID < 0) {
 			System.out.println("Warning: Given an invalid camera ID " + deviceID + "; ignoring...");
 			return null;
 		}
 		
 		UsbCamera cam = new UsbCamera(name, deviceID);
+		
 		safeSetResolution(cam, width, height);
 		cam.setFPS(fps);
-		cam.setBrightness(1);
+		cam.setBrightness(brightness);
+		
 		if(autoCapture) {
 			CameraServer.getInstance().startAutomaticCapture(cam);
 		} else {
