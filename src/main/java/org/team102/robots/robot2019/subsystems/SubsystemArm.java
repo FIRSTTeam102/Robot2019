@@ -22,6 +22,7 @@ package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.ArduinoConnection;
+import org.team102.robots.robot2019.lib.CANTalonVelocityController;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -37,6 +38,9 @@ public class SubsystemArm extends Subsystem {
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
+	
+	private CANTalonVelocityController wristVelocControl;
+	private CANTalonVelocityController elbowVelocControl;
 	
 	private Solenoid extender;
 	
@@ -54,6 +58,15 @@ public class SubsystemArm extends Subsystem {
 		armArduino = new ArduinoConnection(RobotMap.SERIAL_PORT_ID_ARM_ARDUINO);
 		armArduino.setLineListener(this::onArduinoLineReceived);
 		addChild("LIDAR Control Arduino", armArduino);
+		
+		wristVelocControl = new CANTalonVelocityController(wrist,
+				RobotMap.ARM_ARE_ENCODERS_ABSOLUTE, RobotMap.ARM_ARE_ENCODERS_IN_PHASE,
+				RobotMap.ARM_VELOCITY_CONTROL_P, RobotMap.ARM_VELOCITY_CONTROL_I, RobotMap.ARM_VELOCITY_CONTROL_D, RobotMap.ARM_VELOCITY_CONTROL_F);
+		elbowVelocControl = new CANTalonVelocityController(elbow,
+				RobotMap.ARM_ARE_ENCODERS_ABSOLUTE, RobotMap.ARM_ARE_ENCODERS_IN_PHASE,
+				RobotMap.ARM_VELOCITY_CONTROL_P, RobotMap.ARM_VELOCITY_CONTROL_I, RobotMap.ARM_VELOCITY_CONTROL_D, RobotMap.ARM_VELOCITY_CONTROL_F);
+		addChild("Wrist Velocity Control", wristVelocControl);
+		addChild("Elbow Velocity Control", elbowVelocControl);
 		
 		setArduinoCommTime();
 	}
@@ -76,7 +89,6 @@ public class SubsystemArm extends Subsystem {
 	public void setExtender(boolean active) {
 		extender.set(active);
 	}
-	
 	
 	private void onArduinoLineReceived(String line) {
 		String[] parts = line.split(",");

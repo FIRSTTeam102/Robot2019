@@ -22,6 +22,14 @@ package org.team102.robots.robot2019;
 
 public class RobotMap {
 	
+	public static final boolean ARM_ARE_ENCODERS_ABSOLUTE = false;
+	public static final boolean ARM_ARE_ENCODERS_IN_PHASE = false;
+	
+	public static final double ARM_VELOCITY_CONTROL_P = .25;
+	public static final double ARM_VELOCITY_CONTROL_I = .001;
+	public static final double ARM_VELOCITY_CONTROL_D = 20;
+	public static final double ARM_VELOCITY_CONTROL_F = 1023 / 7200;
+	
 	public static final String SERIAL_PORT_ID_ARM_ARDUINO_REAL = "/dev/ttyACM0";
 	public static final String SERIAL_PORT_ID_ARM_ARDUINO_IN_SIM = "COM5";
 	public static final String SERIAL_PORT_ID_ARM_ARDUINO = Robot.isReal() ? SERIAL_PORT_ID_ARM_ARDUINO_REAL : SERIAL_PORT_ID_ARM_ARDUINO_IN_SIM;
