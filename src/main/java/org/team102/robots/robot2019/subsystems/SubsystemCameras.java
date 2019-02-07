@@ -98,9 +98,9 @@ public class SubsystemCameras extends Subsystem {
 		public Mat process(Mat input) {
 			//Step rgbThresholdInput:
 			Mat rgbThresholdInput = input;
-			double[] rgbThresholdRed = {0.0, 150.0};
-			double[] rgbThresholdGreen = {100.0, 255.0};
-			double[] rgbThresholdBlue = {0.0, 150.0};
+			double[] rgbThresholdRed = {150.0, 255.0};
+			double[] rgbThresholdGreen = {220.0, 255.0};
+			double[] rgbThresholdBlue = {150.0, 255.0};
 			rgbThreshold(rgbThresholdInput, rgbThresholdRed, rgbThresholdGreen, rgbThresholdBlue, rgbThresholdOutput);
 
 			// Step Blur:
@@ -123,11 +123,12 @@ public class SubsystemCameras extends Subsystem {
 			//Find andrew and amanda corners
 			Imgproc.cvtColor(blurOutput, cornersInput, 8); //8 = GRAY2BGR
 			Arrays.fill(findCornersRects, null);
-			findCorners(input, convexHullsOutput, andrewCornersOutput, amandaCornersOutput, findCornersRects, findCornersAndrewRects, findCornersOutput);
+			findCorners(cornersInput, convexHullsOutput, andrewCornersOutput, amandaCornersOutput, findCornersRects, findCornersAndrewRects, findCornersOutput);
 			for (int i = 0; i < findCornersRects.length && findCornersRects[i] != null; i++) {
 				System.out.println(findCornersRects[i].center);
+				//prints center of all rotated rects found
 			}
-			//return findCornersOutput;
+			
 			
 			//Filter corners that are too small
 			Mat sizeFilterOutput = new Mat();
@@ -136,6 +137,20 @@ public class SubsystemCameras extends Subsystem {
 			rRectSizeFilter(findCornersOutput, findCornersRects, findCornersAndrewRects, 200, sizeFilterOutput, sizeFilterRRects, sizeFilterRects);
 			
 			return sizeFilterOutput;
+			
+
+			/*Mat pairsOutput = new Mat();
+			RotatedRect[][] rRectPairs = new RotatedRect[50][2];
+			Rect[][] rectPairs = new Rect[50][2];
+			findPairs(sizeFilterOutput, sizeFilterRRects, sizeFilterRects, pairsOutput, rRectPairs, rectPairs);
+			
+			Mat closestOutput = new Mat();
+			RotatedRect[] closestRPair = new RotatedRect[2];
+			Rect[] closestPair = new Rect[2];
+			closestPair(pairsOutput, rRectPairs, rectPairs, closestOutput, closestRPair, closestPair);
+			
+			
+			return pairsOutput;*/
 			
 			/*//Find closest tape and its pair
 			Hopefully we never see this again (unless you can get it to work)
@@ -401,11 +416,11 @@ public class SubsystemCameras extends Subsystem {
 			Point[] corners = new Point[4];
 			int n = 0;
 			inputImage.copyTo(outputImage);
-			for (int i = 0; i < input.length; i++) {
+			for (int i = 0; i < input.length && input[i] != null; i++) {
 				input[i].points(corners);
 				if (getPerimeter(corners) >= minimum) {
-					output[n] = input[n];
-					andrewOutput[n] = andrewInput[n];
+					output[n] = input[i];
+					andrewOutput[n] = andrewInput[i];
 					output[n].points(corners);
 					for (int j = 0; j < 4; j++) {
 						Imgproc.line(outputImage, corners[j], corners[(j+1)%4], new Scalar(0,0,255,255), 5);
@@ -420,7 +435,7 @@ public class SubsystemCameras extends Subsystem {
 			int n = 0;
 			inputImage.copyTo(outputImage);
 			Point[] corners = new Point[4];
-			for (int i = 1; i < input.length; i++) {
+			for (int i = 1; i < input.length && input[i] != null; i++) {
 				for (int j = i - 1; j >= 0; j--) {
 					//I love this next line of code its so elegant
 					if (withinRange(input[i].center.y, input[j].center.y, 25.0) && withinRange(input[i].angle + input[j].angle, 90.0, 5.0) && withinRange(andrewInput[i].height, andrewInput[j].height, 50.0)) {
@@ -445,27 +460,27 @@ public class SubsystemCameras extends Subsystem {
 		//Takes in rRect pairs and returns one rRect pair
 		private void closestPair (Mat inputImage, RotatedRect[][] input, Rect[][] andrewInput, Mat outputImage, RotatedRect[] output, Rect[] andrewOutput) {
 			double maxheight = 0.0;
-			int best = 0;
+			int best = 0; //
 			Point[] corners = new Point[4];
 			inputImage.copyTo(outputImage);
-			for (int i = 0; i < input.length; i++) {
-				if ((andrewInput[i][0].height + andrewInput[i][1].height) / 2 > maxheight)
-					best = i;
+			for (int i = 0; i < input.length && input[i] != null; i++) {
+				if ((andrewInput[i][0].height + andrewInput[i][1].height) / 2 > maxheight)//finds size of 90 degree rect
+					best = i; //bigger is better!
 			}
 			for (int i = 0; i < 2; i++) {
-				output[i] = input[best][i];
-				andrewOutput[i] = andrewInput[best][i];
+				output[i] = input[best][i]; //takes best pair and makes output[1 or 0] best pair[1 or 0]
+				andrewOutput[i] = andrewInput[best][i]; 
 				output[i].points(corners);
+				//draws two best
 				for (int j = 0; j < 4; j++) {
 					Imgproc.line(outputImage, corners[j], corners[(j+1)%4], new Scalar(0,100,255,255), 10);
 				}
 			}
 		}
 		
+		
 		private boolean withinRange(double one, double two, double range) {
-			if (Math.abs(one - two) <= range)
-				return true;
-			return false;
+			return (Math.abs(one - two) <= range);
 		}
 		
 		private double getPerimeter(Point[] pt) {
@@ -483,9 +498,10 @@ public class SubsystemCameras extends Subsystem {
 		//measures whether robot is directly in front of tape marks
 		//this is a public method because we should probably make the robot move and adjust elsewhere
 		//just checking if this is true as it moves
-		private boolean isStraight(Point[][] tapeTargets) {	
+		/*private boolean isStraight(Rect[] input) {	
 			
-			double left = getDifference(tapeTargets[0][0], tapeTargets[0][1]);
+			//passes in andrew rect
+			double left = getDifference(, tapeTargets[0][1]);
 			double right = getDifference(tapeTargets[1][0], tapeTargets[1][1]);
 			
 			//0.1 is a placeholder for now, we can decide how much room we need
@@ -495,7 +511,7 @@ public class SubsystemCameras extends Subsystem {
 			else {
 				return false;
 			}
-		}
+		}*/
 
 		
 		private double getDistance() {

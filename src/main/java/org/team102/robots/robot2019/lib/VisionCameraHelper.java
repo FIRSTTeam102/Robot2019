@@ -128,7 +128,6 @@ public class VisionCameraHelper {
 		UsbCamera cam = new UsbCamera(name, deviceID);
 		safeSetResolution(cam, width, height);
 		cam.setFPS(fps);
-		cam.setBrightness(1);
 		if(autoCapture) {
 			CameraServer.getInstance().startAutomaticCapture(cam);
 		} else {
