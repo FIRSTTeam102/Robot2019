@@ -22,7 +22,6 @@ package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.ArduinoConnection;
-import org.team102.robots.robot2019.lib.CANTalonVelocityController;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -33,14 +32,13 @@ public class SubsystemArm extends Subsystem {
 	
 	private ArduinoConnection armArduino;
 	
-	private int distance1 = -1, distance2 = -1, distance3 = -1;
+	private int distanceElbow = -1;
+	private int distanceWristLower = -1, distanceWristUpper = -1;
+	
 	private long lastArduinoCommTime;
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
-	
-	private CANTalonVelocityController wristVelocControl;
-	private CANTalonVelocityController elbowVelocControl;
 	
 	private Solenoid extender;
 	
@@ -58,15 +56,6 @@ public class SubsystemArm extends Subsystem {
 		armArduino = new ArduinoConnection(RobotMap.SERIAL_PORT_ID_ARM_ARDUINO);
 		armArduino.setLineListener(this::onArduinoLineReceived);
 		addChild("LIDAR Control Arduino", armArduino);
-		
-		wristVelocControl = new CANTalonVelocityController(wrist,
-				RobotMap.ARM_ARE_ENCODERS_ABSOLUTE, RobotMap.ARM_ARE_ENCODERS_IN_PHASE,
-				RobotMap.ARM_VELOCITY_CONTROL_P, RobotMap.ARM_VELOCITY_CONTROL_I, RobotMap.ARM_VELOCITY_CONTROL_D, RobotMap.ARM_VELOCITY_CONTROL_F);
-		elbowVelocControl = new CANTalonVelocityController(elbow,
-				RobotMap.ARM_ARE_ENCODERS_ABSOLUTE, RobotMap.ARM_ARE_ENCODERS_IN_PHASE,
-				RobotMap.ARM_VELOCITY_CONTROL_P, RobotMap.ARM_VELOCITY_CONTROL_I, RobotMap.ARM_VELOCITY_CONTROL_D, RobotMap.ARM_VELOCITY_CONTROL_F);
-		addChild("Wrist Velocity Control", wristVelocControl);
-		addChild("Elbow Velocity Control", elbowVelocControl);
 		
 		setArduinoCommTime();
 	}
@@ -94,9 +83,9 @@ public class SubsystemArm extends Subsystem {
 		String[] parts = line.split(",");
 		
 		try {
-			distance1 = Integer.parseInt(parts[0]);
-			distance2 = Integer.parseInt(parts[1]);
-			distance3 = Integer.parseInt(parts[2]);
+			distanceElbow = Integer.parseInt(parts[0]);
+			distanceWristLower = Integer.parseInt(parts[1]);
+			distanceWristUpper = Integer.parseInt(parts[2]);
 			
 			setArduinoCommTime();
 		} catch(Exception e) {
