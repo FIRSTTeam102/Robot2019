@@ -32,8 +32,8 @@ public class SubsystemArm extends Subsystem {
 	
 	private ArduinoConnection armArduino;
 	
-	private int distanceElbow = -1;
-	private int distanceWristLower = -1, distanceWristUpper = -1;
+	private int distanceElbow = 0;
+	private int distanceWrist = 0;
 	
 	private long lastArduinoCommTime;
 	
@@ -84,8 +84,35 @@ public class SubsystemArm extends Subsystem {
 		
 		try {
 			distanceElbow = Integer.parseInt(parts[0]);
-			distanceWristLower = Integer.parseInt(parts[1]);
-			distanceWristUpper = Integer.parseInt(parts[2]);
+			
+			int distanceWristLower = Integer.parseInt(parts[1]);
+			int distanceWristUpper = Integer.parseInt(parts[2]);
+			boolean wristLowerOutOfRange = distanceWristLower == -1;
+			boolean wristUpperOutOfRange = distanceWristUpper == -1;
+			
+			if(!wristLowerOutOfRange && !wristUpperOutOfRange) {
+				System.out.println("Warning: For some reason, both distance sensors for the wrist can see the end effector! This shouldn't be possible!");
+				System.out.print("We'll use the smaller distance, which is from the ");
+				
+				if(distanceWristLower < distanceWristUpper) {
+					wristUpperOutOfRange = true;
+					System.out.print("lower");
+				} else {
+					wristLowerOutOfRange = true;
+					System.out.print("upper");
+				}
+				
+				System.out.println(" sensor.");
+				System.out.println();
+			}
+			
+			if(wristLowerOutOfRange && wristUpperOutOfRange) {
+				distanceWrist = 0;
+			} else if(wristUpperOutOfRange) {
+				distanceWrist = -distanceWristLower;
+			} else {
+				distanceWrist = distanceWristUpper;
+			}
 			
 			setArduinoCommTime();
 		} catch(Exception e) {
