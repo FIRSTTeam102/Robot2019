@@ -29,7 +29,7 @@ public class CommandExtendArm extends InstantCommand {
 	private boolean active;
 	
 	public CommandExtendArm(boolean active) {
-		super("Extend Arm");
+		super("Set Arm Extension: " + (active ? "Extended" : "Contracted"));
 		requires(Robot.arm);
 		
 		this.active = active;
