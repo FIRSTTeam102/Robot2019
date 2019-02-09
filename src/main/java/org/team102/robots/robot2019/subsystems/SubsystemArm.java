@@ -196,4 +196,18 @@ public class SubsystemArm extends Subsystem {
 	public boolean isWithinMarginOfErrorOfSetpoints() {
 		return isElbowInRange() && isWristInRange();
 	}
+	
+	public static class ArmSetpoint {
+		
+		public final String name;
+		public final boolean isExtended;
+		public final int elbowSetpoint, wristSetpoint;
+		
+		public ArmSetpoint(String name, boolean isExtended, int elbowSetpoint, int wristSetpoint) {
+			this.name = name;
+			this.isExtended = isExtended;
+			this.elbowSetpoint = elbowSetpoint;
+			this.wristSetpoint = wristSetpoint;
+		}
+	}
 }
