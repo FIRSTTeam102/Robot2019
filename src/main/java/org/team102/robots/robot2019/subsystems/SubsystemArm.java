@@ -42,6 +42,13 @@ public class SubsystemArm extends Subsystem {
 	
 	private Solenoid extender;
 	
+	private boolean isInManualMode = false;
+	private boolean manualModeIsWrist, manualModeIsReverse;
+	
+	private boolean hasSetpoint = false;
+	private int elbowSetpoint = 0;
+	private int wristSetpoint = 0;
+	
 	public SubsystemArm() {
 		super("Arm");
 		
@@ -68,6 +75,39 @@ public class SubsystemArm extends Subsystem {
 		if(lastCommTime > 1 && lastCommTime % 5 < .03) {
 			System.out.println("Warning: Last Arduino comm time was " + lastCommTime + " seconds ago!");
 		}
+		
+		double elbowSpeed = 0, wristSpeed = 0;
+		
+		if(isInManualMode) {
+			if(manualModeIsWrist) {
+				wristSpeed = RobotMap.ARM_WRIST_SPEED;
+			} else {
+				elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
+			}
+			
+			if(manualModeIsReverse) {
+				elbowSpeed *= -1;
+				wristSpeed *= -1;
+			}
+		} else if(hasSetpoint) {
+			elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
+			wristSpeed = RobotMap.ARM_WRIST_SPEED;
+			
+			if(isElbowInRange()) {
+				elbowSpeed = 0;
+			} else if(distanceElbow > elbowSetpoint) {
+				elbowSpeed *= -1;
+			}
+			
+			if(isWristInRange()) {
+				wristSpeed = 0;
+			} else if(distanceWrist > wristSetpoint) {
+				wristSpeed *= -1;
+			}
+		}
+		
+		elbow.set(elbowSpeed);
+		wrist.set(wristSpeed);
 	}
 	
 	@Override
@@ -126,5 +166,34 @@ public class SubsystemArm extends Subsystem {
 	
 	public double getTimeSinceLastArduinoComm() {
 		return (System.currentTimeMillis() - lastArduinoCommTime) / 1e3D;
+	}
+	
+	public void setArmManual(boolean isWrist, boolean isReverse) {
+		manualModeIsWrist = isWrist;
+		manualModeIsReverse = isReverse;
+		isInManualMode = true;
+	}
+	
+	public void endManualMode() {
+		isInManualMode = false;
+	}
+	
+	public void setSetpoints(int elbowSetpoint, int wristSetpoint) {
+		hasSetpoint = true;
+		
+		this.elbowSetpoint = elbowSetpoint;
+		this.wristSetpoint = wristSetpoint;
+	}
+	
+	private boolean isElbowInRange() {
+		return Math.abs(distanceElbow - elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
+	}
+	
+	private boolean isWristInRange() {
+		return Math.abs(distanceWrist - wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
+	}
+	
+	public boolean isWithinMarginOfErrorOfSetpoints() {
+		return isElbowInRange() && isWristInRange();
 	}
 }
