@@ -130,7 +130,7 @@ public class VisionCameraHelper {
 		
 		safeSetResolution(cam, width, height);
 		cam.setFPS(fps);
-		cam.setBrightness(brightness);
+		cam.setExposureManual(brightness);
 		
 		if(autoCapture) {
 			CameraServer.getInstance().startAutomaticCapture(cam);

@@ -40,7 +40,7 @@ public class SubsystemCameras extends Subsystem {
 	public SubsystemCameras() {
 		super("Cameras");
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 1, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, new Pipe());
@@ -51,114 +51,93 @@ public class SubsystemCameras extends Subsystem {
 	
 	private class Pipe extends VisionCameraHelper.Pipeline {
 		
-		private Mat rgbThresholdOutput = new Mat();
-		private Mat blurOutput = new Mat();
-		private Mat cutToContourOutput = new Mat();
-		private Mat isolateTapeOutput = new Mat();
-		private Mat findCornersOutput = new Mat();
-		private Mat cornersInput = new Mat();
-		private Mat closestInput = new Mat();
-		private Mat closestOutput = new Mat();
+		private Mat mat1 = new Mat();
+		private Mat mat2 = new Mat();
+		private Mat mat3 = new Mat();
+
+		private double[] rgbThresholdRed = {0.0, 250.0};
+		private double[] rgbThresholdGreen = {75.0, 255.0};
+		private double[] rgbThresholdBlue = {0.0, 250.0};
+
+		private double blurRadius = 6.0;
+		
 		private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
+		
 		private ArrayList<MatOfPoint2f> convexHullsOutput = new ArrayList<MatOfPoint2f>();
-		private ArrayList<MatOfPoint2f> amandaCornersInputCnts = new ArrayList<MatOfPoint2f>();
 		
-		private Rect[] findCornersAndrewRects = new Rect[100];
-		private RotatedRect[] findCornersRects = new RotatedRect[100];
-		private RotatedRect leftTape = new RotatedRect();
-		private RotatedRect rightTape = new RotatedRect();
-		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
+		private Rect[] findCornersAndrewRects = new Rect[20];
+		private RotatedRect[] findCornersRects = new RotatedRect[20];
 		
-		//Point[rectangle] leftmost=first [point 1-4] start top left- listed clockwise
-		private Point[][] andrewCornersOutput = new Point[100][4];
-		private Point[][] amandaCornersOutput = new Point[100][4];
-		//private ArrayList<Point> andrewCornersOutput = new ArrayList<Point>();
-		//private Point[][] andrewCornersOutput = new Point[20][4];
-		private Mat andrewCornersImageOutput = new Mat();
+		private RotatedRect[] sizeFilterRRects = new RotatedRect[10];
+		private Rect[] sizeFilterRects = new Rect[10];
 		
-		//point[rectangle][corner] narrows down after getting corners output to ONLY tape corners, 3 rectangles max and 4 corners
-		private int tapeMarkNumber = 3;
-		private Point[][] tapeMarks = new Point[tapeMarkNumber][4];
+		private RotatedRect[][] rRectPairs = new RotatedRect[4][2];
+		private Rect[][] rectPairs = new Rect[4][2];
 		
-		//Point[rectangle][corner], once two pieces of tape are narrowed down, used to direct robot!! 
-		Point[][] tapeTargets = new Point[2][4];
-		
-		//pixel size tolerance, 0.1 right now but will change
-		//its about as much tolerance as ken has for us ;)
-		double tolerance = 100;
-		
-		
-		
-		private int threshold = 200;
-		
-		//if Harris Corners is a thing we gon use
-		//private Mat harrisOutput = new Mat();
-	    
-	    
 		public Mat process(Mat input) {
+			
+			System.out.println("Running pipeline");
+			
+			//Clear stuff
+			findContoursOutput.clear();
+			convexHullsOutput.clear();
+			//Arrays.fill(findCornersAndrewRects, null);
+			//Arrays.fill(findCornersRects, null);
+			Arrays.fill(sizeFilterRRects, null);
+			Arrays.fill(sizeFilterRects, null);
+			for (int i=0; i<4; i++) {
+				for (int j=0; j<2; j++) {
+					rRectPairs[i][j] = null;
+					rectPairs[i][j] = null;
+				}
+			}
+			mat1 = new Mat();
+			mat2 = new Mat();
+			mat3 = new Mat();
+			
 			//Step rgbThresholdInput:
-			Mat rgbThresholdInput = input;
-			double[] rgbThresholdRed = {150.0, 255.0};
-			double[] rgbThresholdGreen = {220.0, 255.0};
-			double[] rgbThresholdBlue = {150.0, 255.0};
-			rgbThreshold(rgbThresholdInput, rgbThresholdRed, rgbThresholdGreen, rgbThresholdBlue, rgbThresholdOutput);
+			rgbThreshold(input, rgbThresholdRed, rgbThresholdGreen, rgbThresholdBlue, mat1);
 
 			// Step Blur:
-			Mat blurInput = rgbThresholdOutput;
-			double blurRadius = 6.006007151560739;
-			blur(blurInput, blurRadius, blurOutput);
+			blur(mat1, blurRadius, mat2);
 
 			// Step Find_Contours:
-			Mat findContoursInput = blurOutput;
-			boolean findContoursExternalOnly = false;
-			findContours(findContoursInput, findContoursExternalOnly, findContoursOutput);
+			findContours(mat2, false, findContoursOutput);
 
 			// Step Convex_Hulls:
-			ArrayList<MatOfPoint> convexHullsContours = findContoursOutput;
-			convexHulls(convexHullsContours, convexHullsOutput);
+			convexHulls(findContoursOutput, convexHullsOutput);
 			
 			//Cut image to convex hulls
 			//cutToContour(input, convexHullsOutput, cutToContourOutput);
 			
 			//Find andrew and amanda corners
-			Imgproc.cvtColor(blurOutput, cornersInput, 8); //8 = GRAY2BGR
+			Imgproc.cvtColor(mat2, mat1, 8); //8 = GRAY2BGR
 			Arrays.fill(findCornersRects, null);
-			findCorners(cornersInput, convexHullsOutput, andrewCornersOutput, amandaCornersOutput, findCornersRects, findCornersAndrewRects, findCornersOutput);
-			for (int i = 0; i < findCornersRects.length && findCornersRects[i] != null; i++) {
-				System.out.println(findCornersRects[i].center);
-				//prints center of all rotated rects found
-			}
-			
+			findCorners(mat1, convexHullsOutput, findCornersRects, findCornersAndrewRects, mat3);
 			
 			//Filter corners that are too small
-			Mat sizeFilterOutput = new Mat();
-			RotatedRect[] sizeFilterRRects = new RotatedRect[100];
-			Rect[] sizeFilterRects = new Rect[100];
-			rRectSizeFilter(findCornersOutput, findCornersRects, findCornersAndrewRects, 200, sizeFilterOutput, sizeFilterRRects, sizeFilterRects);
+			rRectSizeFilter(mat3, findCornersRects, findCornersAndrewRects, 200, mat1, sizeFilterRRects, sizeFilterRects);
 			
-			return sizeFilterOutput;
+			//return sizeFilterOutput;
+			findPairs(mat1, sizeFilterRRects, sizeFilterRects, mat3, rRectPairs, rectPairs/*, coolPairs*/);
 			
-
-			/*Mat pairsOutput = new Mat();
-			RotatedRect[][] rRectPairs = new RotatedRect[50][2];
-			Rect[][] rectPairs = new Rect[50][2];
-			findPairs(sizeFilterOutput, sizeFilterRRects, sizeFilterRects, pairsOutput, rRectPairs, rectPairs);
-			
+			if (rectPairs[0][0] == null) {
+				System.out.println("No rectPairs!");
+				return mat3;
+			}
+			if (rectPairs[1][0] == null) {
+				drawFieldMarkers(mat3, rRectPairs[0], mat1);
+				return mat1;
+			}
+			/*
 			Mat closestOutput = new Mat();
 			RotatedRect[] closestRPair = new RotatedRect[2];
 			Rect[] closestPair = new Rect[2];
 			closestPair(pairsOutput, rRectPairs, rectPairs, closestOutput, closestRPair, closestPair);
-			
-			
-			return pairsOutput;*/
-			
-			/*//Find closest tape and its pair
-			Hopefully we never see this again (unless you can get it to work)
-			
-			closestInput = findCornersOutput;
-			findClosestTape(closestInput, findCornersRects, leftTape, rightTape, closestOutput);
-			
-			return closestOutput;*/
+			drawFieldMarkers(closestOutput, closestRPair, fieldMarkerOutput);
+			*/
+			//System.out.println(rectPairs[1][0]);
+			return mat3;
 		}
 		
 		//IMG PROCESSING AND FILTERS START HERE
@@ -170,8 +149,7 @@ public class SubsystemCameras extends Subsystem {
 		 * @param blue The min and max blue.
 		 * @param output The image in which to store the output.
 		 */
-		private void rgbThreshold(Mat input, double[] red, double[] green, double[] blue,
-			Mat out) {
+		private void rgbThreshold(Mat input, double[] red, double[] green, double[] blue, Mat out) {
 			Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2RGB);
 			Core.inRange(out, new Scalar(red[0], green[0], blue[0]),
 				new Scalar(red[1], green[1], blue[1]), out);
@@ -234,25 +212,14 @@ public class SubsystemCameras extends Subsystem {
 			}
 		}
 		
-		private void cutToContour(Mat input, ArrayList<MatOfPoint> inputContours, Mat output) {
-			for(int i=0; i< inputContours.size();i++){
-	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
-	                Rect rect = Imgproc.boundingRect(inputContours.get(i));
-	                if (rect.height > 28){
-	                    Imgproc.rectangle(input, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(0,0,255));
-	                    output = input.submat(rect.x, rect.x + rect.height, rect.x, rect.x + rect.width);
-	                }
-	            }
-	        }
-	    }
-		private void findAndrewCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] corners, Rect[] rects, Mat output) {
+		private void findAndrewCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Rect[] rects, Mat output) {
 			input.copyTo(output);
 			Rect rect = new Rect();
 			int n = 0;
-			//Point[][] corners = new Point[20][4];
-			final Scalar circleColor = new Scalar(255, 0, 0);
+			Point[][] corners = new Point[50][4];
+			//final Scalar circleColor = new Scalar(255, 0, 0);
 			for(int i=0; i< inputContours.size(); i++) { //For every contour
-	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 && n < 20){
 	            	rect = Imgproc.boundingRect(inputContours.get(n)); //Find the rectangle with the corners
 	            	rects[n] = rect;
 					corners[n][0] = new Point(rect.x, rect.y); //Define the corners
@@ -272,15 +239,15 @@ public class SubsystemCameras extends Subsystem {
 			}
 		}	
 		
-		private void findAmandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] corners, RotatedRect[] rRectArray, Mat output) { 
+		private void findAmandaCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, RotatedRect[] rRectArray, Mat output) { 
 			Mat cornerPoints = new Mat();
 			Point[] vertices = new Point[4]; 
-			
+			int found = 0;
 			input.copyTo(output);
 			RotatedRect rRect = null;
 			//System.out.printf("size: %d\n", inputContours.size());
 			for (int i = 0; i < inputContours.size(); i++) {
-	            if (Imgproc.contourArea(inputContours.get(i)) > 50 ){
+	            if (Imgproc.contourArea(inputContours.get(i)) > 50 && found < 20){
 	            	rRect = Imgproc.minAreaRect(inputContours.get(i));
 	            	rRectArray[i] = rRect; //creates array to pass into tape finding stuff
 					Imgproc.boxPoints(rRect, cornerPoints);
@@ -288,127 +255,17 @@ public class SubsystemCameras extends Subsystem {
 		        	//angles[i] = rRect.angle;
 		        	for (int j = 0; j < 4; j++){  
 		            	Imgproc.line(output, vertices[j], vertices[(j+1)%4], new Scalar(150,150,255,255), 3);
-		            	corners[i][j] = vertices[j];
 		            }
+		        	found++;
 	            }
 			}
 		}
 		
-		private void findCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, Point[][] andrewCorners, Point[][] amandaCorners, RotatedRect[] rRectArray, Rect[] rectArray, Mat output) {
+		private void findCorners(Mat input, ArrayList<MatOfPoint2f> inputContours, RotatedRect[] rRectArray, Rect[] rectArray, Mat output) {
 			input.copyTo(output);
 			Mat andrewOutput = new Mat();
-			findAndrewCorners(input, inputContours, andrewCorners, rectArray, andrewOutput);
-			findAmandaCorners(andrewOutput, inputContours, amandaCorners, rRectArray, output);
-		}
-		
-		//isolate tape first with the in line stuff and then use this to determine left or right
-		private void findClosestTape(Mat input, RotatedRect[] rRects, RotatedRect targetLeft, RotatedRect targetRight, Mat output) {
-			int size;
-			input.copyTo(output);
-			//System.out.println("Ran correctly!");
-			for (size=0; size < rRects.length; size++) {
-				if (rRects[size] == null)
-					break;
-			}
-			System.out.println(size);
-			if (size < 2) {
-				System.out.println("Insufficient (<2) rrects found! Stopping findClosestTape...");
-				return;
-			}
-			if (size > 10) {
-				System.out.println("Too many (>10) rrects found - could crash code! Stopping findClosestTape...");
-				return;
-			}
-			Point[] vertices = new Point[4];
-			//finds largest rotated rectangle, or the one that you are closest to
-			double maxHeight = rRects[0].size.height;
-			RotatedRect closestRect = null;
-			for(int i=1; i<size; i++) {	
-				if(rRects[i].size.height > maxHeight) {
-					maxHeight = rRects[i].size.height;
-					closestRect = rRects[i];
-				}
-				System.out.println(maxHeight);
-			}
-			
-			//figures out if you're seeing a right tape or a left tape
-			if (closestRect.angle<45) {
-				targetLeft = closestRect;
-				//targetRight=rRects[size-1];
-				//cycles through until it finds a rotated rect to the right of original
-				/*for(int i=0; i<size; i++) {
-					if(rRects[i].center.x>targetLeft.center.x) {
-						targetRight= rRects[i];
-						break; //Breaks after finds one directly to the right
-					}
-				}*/
-			}
-			else {
-				targetRight = closestRect;
-				/*targetLeft = rRects[0];
-				for(int i=size - 1; i>0; i--) {
-					if(rRects[i].center.x<targetRight.center.x) {
-						targetLeft= rRects[i];
-						break; //Breaks after finds one directly to the left
-					}
-				}*/
-			}
-			for (int i=0; i<4; i++) { //Draws the best 2 amanda rectangles as blue
-				/*targetLeft.points(vertices);
-            	Imgproc.line(output, vertices[i], vertices[(i+1)%4], new Scalar(255,0,0,255), 5);
-				targetRight.points(vertices);
-            	Imgproc.line(output, vertices[i], vertices[(i+1)%4], new Scalar(255,0,0,255), 5);*/
-			}
-			//we could adjust so that the target rect right or left is in the right location and then look for
-			//the one next to it which would now be either
-		}
-		
-		//uses midpoints of tape to see if they are in line, if they are in line, it is likely they are tape
-		
-		private int findTape(Point corners[][]) {
-			double centerHeights[] = new double[20];
-			int midpointsFound = 0;
-			int cornersFound = 0;
-			int[] validCorners = new int[20];
-			for (int i = 0; i < 20; i++)
-				validCorners[i] = 0;
-			int x = 0;
-			for (int i = 0; i < 0; i++) {
-				if (andrewCornersOutput[i][0] != null)
-					cornersFound++;
-			}
-			//finds center heights on rectangles left to right and then compares
-			for (int i = 0; i < cornersFound; i++) {
-				//finds midpoint of y leg of all rectangles
-				centerHeights[i] = (andrewCornersOutput[i][0].y + andrewCornersOutput[i][2].y) / 2;
-				midpointsFound++;
-			}
-			for (int i = 1; i < midpointsFound; i++) {
-				for (int j = 0; j < i; j++) {
-					//sees if centers of rectangles are approximately same height
-					if (Math.abs(centerHeights[i]-centerHeights[j])<tolerance) {
-						if (validCorners[i] == 0) {
-							tapeMarks[i][x]= andrewCornersOutput[i][x];
-							x++;
-							validCorners[i] = 1;
-						}
-						if (validCorners[j] == 0) {
-							tapeMarks[j][x]= andrewCornersOutput[j][x];
-							x++;
-							validCorners[j] = 1;
-						}
-					}
-					//System.out.println(andrewCornersOutput[i][0]);
-					try {
-						TimeUnit.SECONDS.sleep(1);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					System.out.println(tapeMarks[0][0]);
-				}
-			}
-			return x;
+			findAndrewCorners(input, inputContours, rectArray, andrewOutput);
+			findAmandaCorners(andrewOutput, inputContours, rRectArray, output);
 		}
 		
 		//Takes all corner shapes removes all that are below a certain perimeter
@@ -418,7 +275,7 @@ public class SubsystemCameras extends Subsystem {
 			inputImage.copyTo(outputImage);
 			for (int i = 0; i < input.length && input[i] != null; i++) {
 				input[i].points(corners);
-				if (getPerimeter(corners) >= minimum) {
+				if (getPerimeter(corners) >= minimum && n < 10) {
 					output[n] = input[i];
 					andrewOutput[n] = andrewInput[i];
 					output[n].points(corners);
@@ -431,15 +288,16 @@ public class SubsystemCameras extends Subsystem {
 		}
 		
 		//Takes in rRects and finds pairs of rRects
-		private void findPairs(Mat inputImage, RotatedRect[] input, Rect[] andrewInput, Mat outputImage, RotatedRect[][] output, Rect[][] andrewOutput) {
+		private void findPairs(Mat inputImage, RotatedRect[] input, Rect[] andrewInput, Mat outputImage, RotatedRect[][] output, Rect[][] andrewOutput/*, Mat coolOutput*/) {
 			int n = 0;
-			inputImage.copyTo(outputImage);
 			Point[] corners = new Point[4];
+			inputImage.copyTo(outputImage);
 			for (int i = 1; i < input.length && input[i] != null; i++) {
 				for (int j = i - 1; j >= 0; j--) {
 					//I love this next line of code its so elegant
-					if (withinRange(input[i].center.y, input[j].center.y, 25.0) && withinRange(input[i].angle + input[j].angle, 90.0, 5.0) && withinRange(andrewInput[i].height, andrewInput[j].height, 50.0)) {
+					if (n < 4 && withinRange(input[i].center.y, input[j].center.y, 25.0) /*&& withinRange(input[i].angle + input[j].angle, 90.0, 10.0)*/ && withinRange(andrewInput[i].height, andrewInput[j].height, 150.0)) {
 						//Ain't that just beautiful? Anyways, back to your regularly scheduled programming
+						//System.out.println(input[i].angle + input[j].angle);
 						output[n][0] = input[i];
 						output[n][1] = input[j];
 						andrewOutput[n][0] = andrewInput[i];
@@ -448,8 +306,10 @@ public class SubsystemCameras extends Subsystem {
 						for (int x = 0; x < 4; x++) {
 							input[i].points(corners);
 							Imgproc.line(outputImage, corners[x], corners[(x+1)%4], new Scalar(255,0,0,255), 7);
+							//Imgproc.line(coolOutput, corners[x], corners[(x+1)%4], new Scalar(255,0,0,255), 7);
 							input[j].points(corners);
 							Imgproc.line(outputImage, corners[x], corners[(x+1)%4], new Scalar(255,0,0,255), 7);
+							//Imgproc.line(coolOutput, corners[x], corners[(x+1)%4], new Scalar(255,0,0,255), 7);
 						}
 					}
 				}
@@ -494,6 +354,9 @@ public class SubsystemCameras extends Subsystem {
 			double distance = Math.sqrt( (yDiff*yDiff)+(xDiff*xDiff));
 			return distance;
 		}		
+		/*private double getAngle() {
+			
+		}*/
 		
 		//measures whether robot is directly in front of tape marks
 		//this is a public method because we should probably make the robot move and adjust elsewhere
@@ -513,13 +376,50 @@ public class SubsystemCameras extends Subsystem {
 			}
 		}*/
 
+		public void drawFieldMarkers(Mat input, RotatedRect[] pairs, Mat output) {
+			input.copyTo(output);
+			double midpoint = (pairs[0].center.x + pairs[1].center.x)/2;
+			Scalar target = new Scalar(255,125,100,255);
+			Point[][] corners = new Point[2][4];
+			Point[] topLefts = new Point[2];
+			Point[] topRights = new Point[2];
+			topLefts[0] = corners[0][0];
+			topLefts[1] = corners[1][0];
+			pairs[0].points(corners[0]);
+			pairs[1].points(corners[1]);
+			for (int i=0; i<2; i++) {
+				for (int j=1; j<4; j++) {
+					if (corners[i][j].x > pairs[i].center.x && corners[i][j].y < pairs[i].center.y) {
+						topRights[i] = corners[i][j];
+						break;
+					}
+				}
+			}
+			for (int i=0; i<2; i++) {
+				for (int j=1; j<4; j++) {
+					if (corners[i][j].x < pairs[i].center.x && corners[i][j].y < pairs[i].center.y) {
+						topLefts[i] = corners[i][j];
+						break;
+					}
+				}
+			}
+			double xScale = Math.abs(topRights[0].x-topLefts[1].x)/8;
+			double yScale = ((Math.abs(topRights[0].y-topLefts[0].y)*2) + (Math.abs(topRights[1].y-topLefts[1].y)*2)) / 2;
+			Point center = new Point(midpoint, topRights[0].y-(4.7*yScale)-(8.25*yScale));
+			Point rectTopRight = new Point(midpoint+(8.25*xScale), topRights[0].y-(4.7*yScale));
+			Point rectBotLeft = new Point(midpoint-(8.25*xScale), topRights[0].y-(4.7*yScale)-(16.5*yScale));
+			Size size = new Size(rectTopRight.x-rectBotLeft.x, rectTopRight.y-rectBotLeft.y);
+			RotatedRect outline = new RotatedRect(center, size, 0);
+			Scalar circle = new Scalar(255,175,150,255);
+			Imgproc.ellipse(output, outline, circle);
+			Imgproc.line(output, new Point(midpoint,0), new Point(midpoint,360), target, 5);
+		}
 		
-		private double getDistance() {
+		/*private double getDistance() {
 			double distance = 0; //0 is placeholder for now
 			//use camera to see how large tape appears when robot is in correct location
 			//compare rectangle size irl to pixel size
 			return distance;
-		}
-		
+		}*/
 	}
 }
