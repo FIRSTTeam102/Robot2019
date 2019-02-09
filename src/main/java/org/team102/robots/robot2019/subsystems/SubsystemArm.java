@@ -21,7 +21,7 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.lib.ArduinoConnection;
+import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
