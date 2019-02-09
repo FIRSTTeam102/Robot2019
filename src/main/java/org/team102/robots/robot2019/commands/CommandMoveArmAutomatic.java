@@ -29,7 +29,7 @@ public class CommandMoveArmAutomatic extends Command {
 	private int elbowSetpoint, wristSetpoint;
 	
 	public CommandMoveArmAutomatic(int elbowSetpoint, int wristSetpoint) {
-		super("Move arm to: { Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + "}");
+		super("Move arm to: { Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + " }");
 		requires(Robot.arm);
 		
 		this.elbowSetpoint = elbowSetpoint;

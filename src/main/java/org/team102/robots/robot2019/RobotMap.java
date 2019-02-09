@@ -22,6 +22,9 @@ package org.team102.robots.robot2019;
 
 public class RobotMap {
 	
+	public static final double LOW_TIME = 30;
+	
+	public static final double CARGO_MANIP_ROLLER_SPEED = .5;
 	public static final double ARM_ELBOW_SPEED = .5;
 	public static final double ARM_WRIST_SPEED = .5;
 	

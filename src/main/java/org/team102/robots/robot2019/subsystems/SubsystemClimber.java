@@ -40,4 +40,8 @@ public class SubsystemClimber  extends Subsystem {
 	protected void initDefaultCommand() {
 		
 	}
+	
+	public void setClimberExtended(boolean extended) {
+		climber.set(extended);
+	}
 }

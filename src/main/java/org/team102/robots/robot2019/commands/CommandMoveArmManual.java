@@ -47,13 +47,11 @@ public class CommandMoveArmManual extends Command {
 	
 	@Override
 	public void end() {
-		super.end();
 		done();
 	}
 	
 	@Override
 	public void interrupted() {
-		super.interrupted();
 		done();
 	}
 	

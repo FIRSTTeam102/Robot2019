@@ -20,6 +20,7 @@
 
 package org.team102.robots.robot2019;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class OI {
@@ -30,5 +31,9 @@ public class OI {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
 		
 		Robot.driverNotif.initOIPortions();
+	}
+	
+	public double getTimeRemaining() {
+		return Math.max(0, DriverStation.getInstance().getMatchTime());
 	}
 }

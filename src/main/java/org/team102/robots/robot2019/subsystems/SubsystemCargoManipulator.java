@@ -34,11 +34,26 @@ public class SubsystemCargoManipulator  extends Subsystem {
 		super("Cargo Manipulator");
 		
 		roller = new WPI_TalonSRX(RobotMap.CAN_TALON_CARGO_MANIP_ROLLER);
+		roller.setSafetyEnabled(false);
 		addChild("Cargo Roller", roller);
 	}
 
 	@Override
 	protected void initDefaultCommand() {
 		
+	}
+	
+	public void setRoller(boolean reverse) {
+		double speed = RobotMap.CARGO_MANIP_ROLLER_SPEED;
+			
+		if(reverse) {
+			speed *= -1;
+		}
+		
+		roller.set(speed);
+	}
+	
+	public void stopRoller() {
+		roller.set(0);
 	}
 }
