@@ -60,19 +60,25 @@ public class SubsystemArm extends Subsystem {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		armArduino = new ArduinoConnection(RobotMap.SERIAL_PORT_ID_ARM_ARDUINO);
-		armArduino.setLineListener(this::onArduinoLineReceived);
-		addChild("LIDAR Control Arduino", armArduino);
+		armArduino = ArduinoConnection.lookUpByWhois(RobotMap.ARM_ARDUINO_WHOIS_RESPONSE);
+		if(armArduino == null) {
+			System.out.println("Warning: Arm sensor arduino not found!");
+		} else {
+			armArduino.setLineListener(this::onArduinoLineReceived);
+			addChild("LIDAR Control Arduino", armArduino);
+		}
 		
 		setArduinoCommTime();
 	}
 	
 	@Override
 	public void periodic() {
-		armArduino.update();
+		if(armArduino != null) {
+			armArduino.update();
+		}
 		
 		double lastCommTime = getTimeSinceLastArduinoComm();
-		if(lastCommTime > 1 && lastCommTime % 5 < .03) {
+		if(lastCommTime > 1 && lastCommTime % 1 < .03) {
 			System.out.println("Warning: Last Arduino comm time was " + lastCommTime + " seconds ago!");
 		}
 		
@@ -108,6 +114,9 @@ public class SubsystemArm extends Subsystem {
 		
 		elbow.set(elbowSpeed);
 		wrist.set(wristSpeed);
+		
+		System.out.println("Wrist: " + distanceWrist);
+		System.out.println("Elbow: " + distanceElbow);
 	}
 	
 	@Override
