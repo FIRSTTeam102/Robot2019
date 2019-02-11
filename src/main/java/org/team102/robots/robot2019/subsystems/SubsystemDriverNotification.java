@@ -74,17 +74,26 @@ public class SubsystemDriverNotification extends Subsystem {
 				.withProperties(PROP_HIDE_LABELS);
 		
 		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
-		
 		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
-		VisionCameraHelper.advertiseServerToShuffleboard(videoOutput, driverInfoTab).withPosition(2, 0).withSize(3, 3);
 		
+		boolean streamSet = false;
 		for(VideoSource src : Robot.cameras.visibleVideoOutputs) {
 			if(src != null) {
-				selectCameraLayout.add(new CommandSetDSVideoOutput(src.getName())).withWidget(BuiltInWidgets.kCommand);
+				String name = src.getName();
+				selectCameraLayout.add(new CommandSetDSVideoOutput(name)).withWidget(BuiltInWidgets.kCommand);
+				
+				if(!streamSet) {
+					setVideoStream(name);
+					streamSet = true;
+				}
 			}
 		}
 		
-		setVideoStream(Robot.cameras.visibleVideoOutputs.get(0).getName());
+		if(streamSet) {
+			VisionCameraHelper.advertiseServerToShuffleboard(videoOutput, driverInfoTab).withPosition(2, 0).withSize(3, 3);
+		} else {
+			System.out.println("Warning: No video streams present! Skipping video output to the driver station.");
+		}
 	}
 	
 	public void setVideoStream(String name) {
