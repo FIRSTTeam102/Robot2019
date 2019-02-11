@@ -126,19 +126,24 @@ public class VisionCameraHelper {
 			return null;
 		}
 		
-		UsbCamera cam = new UsbCamera(name, deviceID);
-		
-		safeSetResolution(cam, width, height);
-		cam.setFPS(fps);
-		cam.setBrightness(brightness);
-		
-		if(autoCapture) {
-			CameraServer.getInstance().startAutomaticCapture(cam);
-		} else {
-			CameraServer.getInstance().addCamera(cam);
+		try {
+			UsbCamera cam = new UsbCamera(name, deviceID);
+			
+			safeSetResolution(cam, width, height);
+			cam.setFPS(fps);
+			cam.setBrightness(brightness);
+			
+			if(autoCapture) {
+				CameraServer.getInstance().startAutomaticCapture(cam);
+			} else {
+				CameraServer.getInstance().addCamera(cam);
+			}
+			
+			return cam;
+		} catch(Exception e) {
+			System.err.println("Camera \"" + name + "\" was not found.");
+			return null;
 		}
-		
-		return cam;
 	}
 	
 	/**
