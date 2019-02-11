@@ -47,6 +47,8 @@ public class RioSerialImpl implements ArduinoConnection.SerialImpl {
 	public RioSerialImpl(SerialPort.Port portType) {
 		port = new SerialPort(9600, portType, 8, SerialPort.Parity.kNone, SerialPort.StopBits.kOne);
 		port.setFlowControl(SerialPort.FlowControl.kNone);
+		
+		this.portType = portType;
 	}
 	
 	@Override
