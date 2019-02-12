@@ -53,6 +53,14 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry selectedStreamName;
 	private MjpegServer videoOutput;
 	
+	private NetworkTableEntry armElbowStatus;
+	private NetworkTableEntry armWristStatus;
+	private NetworkTableEntry armOverallStatus;
+	
+	private NetworkTableEntry frontCenteringInfo;
+	private NetworkTableEntry rearCenteringInfo;
+	private NetworkTableEntry centeringStatus;
+	
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
@@ -65,6 +73,22 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		timeLeftPane = timeLayout.add("Time Remaining", "").getEntry();
 		lowTimeNotifier = timeLayout.add("Low Time", false).getEntry();
+		
+		ShuffleboardLayout centeringStatusLayout = driverInfoTab
+				.getLayout("Centering", BuiltInLayouts.kList)
+				.withPosition(5, 0).withSize(1, 3);
+		
+		frontCenteringInfo = centeringStatusLayout.add("Front", 0).withWidget(BuiltInWidgets.kNumberBar).getEntry();
+		rearCenteringInfo = centeringStatusLayout.add("Rear", 0).withWidget(BuiltInWidgets.kNumberBar).getEntry();
+		centeringStatus = centeringStatusLayout.add("Status", "").getEntry();
+		
+		ShuffleboardLayout armStatusLayout = driverInfoTab
+				.getLayout("Arm Status", BuiltInLayouts.kList)
+				.withPosition(6, 0).withSize(2, 2);
+		
+		armElbowStatus = armStatusLayout.add("Status: Elbow", "").getEntry();
+		armWristStatus = armStatusLayout.add("Status: Wrist", "").getEntry();
+		armOverallStatus = armStatusLayout.add("Overall", "").getEntry();
 	}
 	
 	public void initOIPortions() {
@@ -137,6 +161,14 @@ public class SubsystemDriverNotification extends Subsystem {
 				blinkNotification();
 			}
 		}
+		
+		armElbowStatus.setString(Robot.arm.getElbowStatus());
+		armWristStatus.setString(Robot.arm.getWristStatus());
+		armOverallStatus.setString(Robot.arm.getOverallStatus());
+		
+		frontCenteringInfo.setNumber(Robot.centering.getFrontDSValue());
+		rearCenteringInfo.setNumber(Robot.centering.getRearDSValue());
+		centeringStatus.setString(Robot.centering.getStatus());
 	}
 	
 	private void onBeginningOfLowTime() {
