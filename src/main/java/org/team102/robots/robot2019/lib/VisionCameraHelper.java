@@ -28,6 +28,7 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoCamera;
 import edu.wpi.cscore.VideoMode;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -50,6 +51,21 @@ public class VisionCameraHelper {
 	public static void safeSetResolution(VideoSource src, int width, int height) {
 		if(Robot.isReal()) {
 			src.setResolution(width, height);
+		}
+	}
+	
+	/**
+	 * Because setting the brightness on certain cameras causes an "unsupported setting" crash, this is a method that will attempt to set it, but fail cleanly if it doesn't work.
+	 * @param cam The camera
+	 * @param brightness The brightness
+	 */
+	public static void safeSetBrightness(VideoCamera cam, int brightness) {
+		if(brightness != -1) {
+			try {
+				cam.setExposureManual(brightness);
+			} catch(Exception e) {
+				System.out.println("Warning: Failed to set the exposure (brightness) on camera \"" + cam.getName() + "\". If this camera is being used for vision, that might be a problem!");
+			}
 		}
 	}
 	
@@ -116,7 +132,7 @@ public class VisionCameraHelper {
 	 * @param width The width of the stream
 	 * @param height The height of the stream
 	 * @param fps The FPS of the stream
-	 * @param brightness The brightness of the camera
+	 * @param brightness The brightness of the camera, or -1 to not set the brightness
 	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
 	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
 	 */
@@ -131,7 +147,7 @@ public class VisionCameraHelper {
 			
 			safeSetResolution(cam, width, height);
 			cam.setFPS(fps);
-			cam.setExposureManual(brightness);
+			safeSetBrightness(cam, brightness);
 			
 			if(autoCapture) {
 				CameraServer.getInstance().startAutomaticCapture(cam);
