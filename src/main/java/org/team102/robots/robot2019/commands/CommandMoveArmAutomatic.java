@@ -21,24 +21,24 @@
 package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
+import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CommandMoveArmAutomatic extends Command {
 	
-	private int elbowSetpoint, wristSetpoint;
+	private ArmSetpoint setpoint;
 	
-	public CommandMoveArmAutomatic(int elbowSetpoint, int wristSetpoint) {
-		super("Move arm to: { Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + " }");
+	public CommandMoveArmAutomatic(ArmSetpoint setpoint) {
+		super("Move arm to: " + setpoint);
 		requires(Robot.arm);
 		
-		this.elbowSetpoint = elbowSetpoint;
-		this.wristSetpoint = wristSetpoint;
+		this.setpoint = setpoint;
 	}
 	
 	@Override
 	public void initialize() {
-		Robot.arm.setSetpoints(elbowSetpoint, wristSetpoint);
+		Robot.arm.setSetpoint(setpoint);
 	}
 	
 	@Override

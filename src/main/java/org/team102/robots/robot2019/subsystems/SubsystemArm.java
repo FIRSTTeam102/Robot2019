@@ -45,9 +45,11 @@ public class SubsystemArm extends Subsystem {
 	private boolean isInManualMode = false;
 	private boolean manualModeIsWrist, manualModeIsReverse;
 	
-	private boolean hasSetpoint = false;
-	private int elbowSetpoint = 0;
-	private int wristSetpoint = 0;
+	private ArmSetpoint setpoint;
+	
+	private String elbowStatus = "Not updated yet?";
+	private String wristStatus = "Not updated yet?";
+	private String overallStatus = "Not updated yet?";
 	
 	public SubsystemArm() {
 		super("Arm");
@@ -69,6 +71,18 @@ public class SubsystemArm extends Subsystem {
 		}
 		
 		setArduinoCommTime();
+	}
+	
+	public String getElbowStatus() {
+		return elbowStatus;
+	}
+	
+	public String getWristStatus() {
+		return wristStatus;
+	}
+	
+	public String getOverallStatus() {
+		return overallStatus;
 	}
 	
 	@Override
@@ -95,28 +109,40 @@ public class SubsystemArm extends Subsystem {
 				elbowSpeed *= -1;
 				wristSpeed *= -1;
 			}
-		} else if(hasSetpoint) {
+			
+			overallStatus = "Moving manually";
+		} else if(hasSetpoint()) {
+			boolean elbowInRange = isElbowInRange();
+			boolean wristInRange = isWristInRange();
+			
 			elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
 			wristSpeed = RobotMap.ARM_WRIST_SPEED;
 			
-			if(isElbowInRange()) {
+			if(elbowInRange) {
 				elbowSpeed = 0;
-			} else if(distanceElbow > elbowSetpoint) {
+			} else if(distanceElbow > setpoint.elbowSetpoint) {
 				elbowSpeed *= -1;
 			}
 			
-			if(isWristInRange()) {
+			if(wristInRange) {
 				wristSpeed = 0;
-			} else if(distanceWrist > wristSetpoint) {
+			} else if(distanceWrist > setpoint.wristSetpoint) {
 				wristSpeed *= -1;
 			}
+			
+			if(elbowInRange && wristInRange) {
+				overallStatus = "At";
+			} else {
+				overallStatus = "Moving to";
+			}
+			
+			overallStatus += (" setpoint " + setpoint.name);
+		} else {
+			overallStatus = "Idle";
 		}
 		
 		elbow.set(elbowSpeed);
 		wrist.set(wristSpeed);
-		
-		System.out.println("Wrist: " + distanceWrist);
-		System.out.println("Elbow: " + distanceElbow);
 	}
 	
 	@Override
@@ -133,34 +159,48 @@ public class SubsystemArm extends Subsystem {
 		
 		try {
 			distanceElbow = Integer.parseInt(parts[0]);
+			boolean elbowInRange = distanceElbow != -1;
 			
 			int distanceWristLower = Integer.parseInt(parts[1]);
 			int distanceWristUpper = Integer.parseInt(parts[2]);
-			boolean wristLowerOutOfRange = distanceWristLower == -1;
-			boolean wristUpperOutOfRange = distanceWristUpper == -1;
+			boolean wristLowerInRange = distanceWristLower != -1;
+			boolean wristUpperInRange = distanceWristUpper != -1;
 			
-			if(!wristLowerOutOfRange && !wristUpperOutOfRange) {
-				System.out.println("Warning: For some reason, both distance sensors for the wrist can see the end effector! This shouldn't be possible!");
-				System.out.print("We'll use the smaller distance, which is from the ");
-				
+			boolean ignoreWristLower = false;
+			boolean ignoreWristUpper = false;
+			
+			if(wristLowerInRange && wristUpperInRange) {
 				if(distanceWristLower < distanceWristUpper) {
-					wristUpperOutOfRange = true;
-					System.out.print("lower");
+					ignoreWristLower = true;
 				} else {
-					wristLowerOutOfRange = true;
-					System.out.print("upper");
+					ignoreWristUpper = true;
 				}
-				
-				System.out.println(" sensor.");
-				System.out.println();
 			}
 			
-			if(wristLowerOutOfRange && wristUpperOutOfRange) {
+			if((!wristLowerInRange || ignoreWristLower) && (!wristUpperInRange && ignoreWristUpper)) {
 				distanceWrist = 0;
-			} else if(wristUpperOutOfRange) {
+			} else if(wristLowerInRange && !ignoreWristLower) {
 				distanceWrist = -distanceWristLower;
 			} else {
 				distanceWrist = distanceWristUpper;
+			}
+			
+			if(!wristLowerInRange && !wristUpperInRange) {
+				wristStatus = "OK (Centered)";
+			} else if(wristLowerInRange != wristUpperInRange) {
+				wristStatus = "OK (Range: " + distanceWrist + ")";
+			} else if(ignoreWristUpper && !ignoreWristLower) {
+				wristStatus = "Both in range, using lower";
+			} else if(ignoreWristLower && !ignoreWristUpper) {
+				wristStatus = "Both in range, using upper";
+			} else {
+				wristStatus = "Impossible state (Please report this)";
+			}
+			
+			if(elbowInRange) {
+				elbowStatus = "OK (Range: " + distanceElbow + ")";
+			} else {
+				elbowStatus = "Out of range";
 			}
 			
 			setArduinoCommTime();
@@ -187,19 +227,28 @@ public class SubsystemArm extends Subsystem {
 		isInManualMode = false;
 	}
 	
-	public void setSetpoints(int elbowSetpoint, int wristSetpoint) {
-		hasSetpoint = true;
-		
-		this.elbowSetpoint = elbowSetpoint;
-		this.wristSetpoint = wristSetpoint;
+	public void setSetpoint(ArmSetpoint setpoint) {
+		this.setpoint = setpoint;
+	}
+	
+	public boolean hasSetpoint() {
+		return setpoint != null;
 	}
 	
 	private boolean isElbowInRange() {
-		return Math.abs(distanceElbow - elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
+		if(hasSetpoint()) {
+			return Math.abs(distanceElbow - setpoint.elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
+		} else {
+			return true;
+		}
 	}
 	
 	private boolean isWristInRange() {
-		return Math.abs(distanceWrist - wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
+		if(hasSetpoint()) {
+			return Math.abs(distanceWrist - setpoint.wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
+		} else {
+			return true;
+		}
 	}
 	
 	public boolean isWithinMarginOfErrorOfSetpoints() {
@@ -217,6 +266,10 @@ public class SubsystemArm extends Subsystem {
 			this.isExtended = isExtended;
 			this.elbowSetpoint = elbowSetpoint;
 			this.wristSetpoint = wristSetpoint;
+		}
+		
+		public String toString() {
+			return "{ Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + " }";
 		}
 	}
 }
