@@ -172,6 +172,14 @@ public class ArduinoConnection extends SendableBase implements Closeable, AutoCl
 		Timer.delay(1.75);
 	}
 	
+	/**
+	 * This does the same thing as {@link #close()}
+	 */
+	@Override
+	public void free() {
+		close();
+	}
+	
 	@Override
 	public void close() {
 		portImpl.close();

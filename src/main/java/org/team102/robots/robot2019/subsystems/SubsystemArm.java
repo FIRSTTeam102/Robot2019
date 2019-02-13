@@ -21,21 +21,16 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
+import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.command.Subsystem;
 
-public class SubsystemArm extends Subsystem {
-	
-	private ArduinoConnection armArduino;
+public class SubsystemArm extends SubsystemWithArduino {
 	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
-	
-	private long lastArduinoCommTime;
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
@@ -52,7 +47,7 @@ public class SubsystemArm extends Subsystem {
 	private String overallStatus = "Not updated yet?";
 	
 	public SubsystemArm() {
-		super("Arm");
+		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
 		wrist = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_WRIST);
 		elbow = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_ELBOW);
@@ -61,16 +56,6 @@ public class SubsystemArm extends Subsystem {
 		
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
-		
-		armArduino = ArduinoConnection.lookUpByWhois(RobotMap.ARM_ARDUINO_WHOIS_RESPONSE);
-		if(armArduino == null) {
-			System.out.println("Warning: Arm sensor arduino not found!");
-		} else {
-			armArduino.setLineListener(this::onArduinoLineReceived);
-			addChild("LIDAR Control Arduino", armArduino);
-		}
-		
-		setArduinoCommTime();
 	}
 	
 	public String getElbowStatus() {
@@ -87,14 +72,7 @@ public class SubsystemArm extends Subsystem {
 	
 	@Override
 	public void periodic() {
-		if(armArduino != null) {
-			armArduino.update();
-		}
-		
-		double lastCommTime = getTimeSinceLastArduinoComm();
-		if(lastCommTime > 1 && lastCommTime % 1 < .03) {
-			System.out.println("Warning: Last Arduino comm time was " + lastCommTime + " seconds ago!");
-		}
+		super.periodic();
 		
 		double elbowSpeed = 0, wristSpeed = 0;
 		
@@ -154,7 +132,7 @@ public class SubsystemArm extends Subsystem {
 		extender.set(active);
 	}
 	
-	private void onArduinoLineReceived(String line) {
+	protected void onArduinoLineReceived(String line) {
 		String[] parts = line.split(",");
 		
 		try {
@@ -202,19 +180,9 @@ public class SubsystemArm extends Subsystem {
 			} else {
 				elbowStatus = "Out of range";
 			}
-			
-			setArduinoCommTime();
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
 		}
-	}
-	
-	private void setArduinoCommTime() {
-		lastArduinoCommTime = System.currentTimeMillis();
-	}
-	
-	public double getTimeSinceLastArduinoComm() {
-		return (System.currentTimeMillis() - lastArduinoCommTime) / 1e3D;
 	}
 	
 	public void setArmManual(boolean isWrist, boolean isReverse) {
