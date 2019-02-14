@@ -96,12 +96,12 @@ public class VisionCameraHelper {
 	 * @param transferFunc The transfer function
 	 * @param name The name for the thread
 	 */
-	public static void startTransferThread(Runnable transferFunc, String name) {
+	public static Thread startTransferThread(Runnable transferFunc, String name) {
 		Thread runner = new Thread(() -> {
 			Threads.setCurrentThreadPriority(true, 10);
 			boolean lastFrameErrored = false;
 			
-			while(true) {
+			while(!Thread.interrupted()) {
 				try {
 					transferFunc.run();
 				} catch(Exception e) {
@@ -121,6 +121,8 @@ public class VisionCameraHelper {
 		
 		runner.setDaemon(true);
 		runner.start();
+		
+		return runner;
 	}
 	
 	/**
@@ -178,13 +180,13 @@ public class VisionCameraHelper {
 		}
 		
 		CvSink input = CameraServer.getInstance().getVideo(camera);
-		CvSource[] output = new CvSource[1]; // It's an array to avoid the final-or-effectively-final requirement for lambda methods
+		CvSource output = null;
 		
 		if(outputName != null) {
-			output[0] = new CvSource(outputName, VideoMode.PixelFormat.kBGR, width, height, 30); // It will advertise this output, but it won't actually create a server, so it's fine
+			output = new CvSource(outputName, VideoMode.PixelFormat.kBGR, width, height, 30); // It will advertise this output, but it won't actually create a server, so it's fine
 			
 			if(autoCapture) {
-				CameraServer.getInstance().startAutomaticCapture(output[0]);
+				CameraServer.getInstance().startAutomaticCapture(output);
 			}
 		}
 		
@@ -192,32 +194,82 @@ public class VisionCameraHelper {
 		pipelineRunnerThread.setDaemon(true);
 		pipelineRunnerThread.start();
 		
-		Mat[] frameBuff = { new Mat() };
-		startTransferThread(() -> {
-			input.grabFrame(frameBuff[0]);
-			pipeline.supplyInput(frameBuff[0]);
-			
-			if(output[0] != null) {
-				Mat outputFrame = pipeline.getOutput();
-				
-				if(!(outputFrame == null || outputFrame.empty())) {
-					output[0].putFrame(outputFrame);
-				}
-			}
-		}, "Vision Pipeline: " + pipeline);
+		pipeline.initSrcAndDest(input, output);
+		pipeline.unpause();
 		
-		return output[0];
+		return output;
 	}
 	
 	/**
 	 * An interface to be implemented by any vision pipeline
 	 */
 	public static abstract class Pipeline implements Runnable {
+		private CvSink src = null;
+		private CvSource dest = null;
+		
 		private Mat lastInput = null;
 		private Mat lastOutput = null;
 		private int inputs = 0;
 		
 		private Object frameLock = new Object();
+		
+		private Thread currTransferThread = null;
+		
+		private void initSrcAndDest(CvSink src, CvSource dest) {
+			if(this.src == null) {
+				this.src = src;
+			}
+			
+			if(this.dest == null) {
+				this.dest = dest;
+			}
+		}
+		
+		public final void pause() {
+			if(!isPaused()) {
+				currTransferThread.interrupt();
+				
+				try {
+					currTransferThread.join();
+				} catch(Exception e) {
+					System.out.println("Warning: Failed to wait for the transfer thread for the pipeline " + hashCode() + " to stop.");
+				}
+				
+				currTransferThread = null;
+			}
+		}
+		
+		public final void unpause() {
+			if(isPaused()) {
+				Mat[] frameBuff = { new Mat() };
+				currTransferThread = startTransferThread(() -> {
+					if(src != null) {
+						src.grabFrame(frameBuff[0]);
+						supplyInput(frameBuff[0]);
+					}
+					
+					if(dest != null) {
+						Mat outputFrame = getOutput();
+						
+						if(!(outputFrame == null || outputFrame.empty())) {
+							dest.putFrame(outputFrame);
+						}
+					}
+				}, "Vision Pipeline: " + this + " : " + System.nanoTime());
+			}
+		}
+		
+		public final void togglePause() {
+			if(isPaused()) {
+				unpause();
+			} else {
+				pause();
+			}
+		}
+		
+		public final boolean isPaused() {
+			return currTransferThread == null;
+		}
 		
 		/**
 		 * The main pipeline processing method
@@ -226,7 +278,7 @@ public class VisionCameraHelper {
 		 */
 		public abstract Mat process(Mat input);
 		
-		public void run() {
+		public final void run() {
 			while(true) {
 				if(inputs > 0) {
 					if(inputs > 5) {
