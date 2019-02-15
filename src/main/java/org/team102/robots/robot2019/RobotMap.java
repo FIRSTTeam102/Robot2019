@@ -26,6 +26,8 @@ public class RobotMap {
 	
 	public static final double CENTERING_ALLOWABLE_ERROR = .01;
 	
+	public static final double CAMERA_LIGHT_BRIGHTNESS = 1;
+	
 	public static final String ARM_ARDUINO_WHOIS_RESPONSE = "arm-sensors";
 	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
 	public static final String LIGHTS_ARDUINO_WHOIS_RESPONSE = "lcl-r1";

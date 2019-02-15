@@ -23,22 +23,22 @@ package org.team102.robots.robot2019.subsystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
+import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
 
-public class SubsystemCameras extends Subsystem {
+public class SubsystemCameras extends SubsystemWithArduino {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
 	
 	public SubsystemCameras() {
-		super("Cameras");
+		super("Cameras", RobotMap.LIGHTS_ARDUINO_WHOIS_RESPONSE, "Vision Light Control");
+		setLights(false);
 		
 		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
 		visibleVideoOutputs.add(visionCamera);
@@ -47,7 +47,23 @@ public class SubsystemCameras extends Subsystem {
 		visibleVideoOutputs.add(pipelineOutput);
 	}
 	
-	protected void initDefaultCommand() {}
+	@Override protected void initDefaultCommand() {} // This is left intentionally empty
+	@Override protected void onArduinoLineReceived(String line) {} // This is left intentionally empty
+	
+	public void setLightBrightness(double brightness) {
+		int rawBrightness = Math.min(Math.max((int)Math.round(brightness * 255), 0), 255);
+		sendLineToArduino("LED:" + rawBrightness);
+	}
+	
+	public void setLights(boolean on) {
+		double brightness = 0;
+		
+		if(on) {
+			brightness = RobotMap.CAMERA_LIGHT_BRIGHTNESS;
+		}
+		
+		setLightBrightness(brightness);
+	}
 	
 	private class Pipe extends VisionCameraHelper.Pipeline {
 		
