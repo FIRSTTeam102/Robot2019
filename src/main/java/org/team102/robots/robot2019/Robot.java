@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {}
 	
 	public void autonomousInit() {}
-	public void autononousPeriodic() {}
+	public void autonomousPeriodic() {}
 	
 	public void disabledInit() {}
 	public void disabledPeriodic() {}
