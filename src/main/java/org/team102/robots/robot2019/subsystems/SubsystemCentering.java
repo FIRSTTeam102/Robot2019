@@ -87,9 +87,9 @@ public class SubsystemCentering extends SubsystemWithArduino {
 	@Override
 	protected void onArduinoLineReceived(String line) {
 		try {
-			if(line.toUpperCase(Locale.ROOT).startsWith("F:")) {
+			if(line.toUpperCase(Locale.ROOT).startsWith("F: ")) {
 				frontSensorVal = parseVal(line);
-			} else if(line.toUpperCase(Locale.ROOT).startsWith("B:")) {
+			} else if(line.toUpperCase(Locale.ROOT).startsWith("B: ")) {
 				rearSensorVal = parseVal(line);
 			} else {
 				throw new UnsupportedOperationException("Unknown prefix on line");
@@ -100,7 +100,7 @@ public class SubsystemCentering extends SubsystemWithArduino {
 	}
 	
 	private static double parseVal(String line) {
-		return Integer.parseInt(line.substring(2)) / 2000D - 1;
+		return Integer.parseInt(line.substring(3)) / 2000D - 1;
 	}
 	
 	public static enum MoveDirection {
