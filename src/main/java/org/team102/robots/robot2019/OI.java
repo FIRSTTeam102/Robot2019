@@ -20,15 +20,19 @@
 
 package org.team102.robots.robot2019;
 
+import org.team102.robots.robot2019.lib.CustomOperatorConsole;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class OI {
 	
 	public Joystick driverJoystick;
+	public CustomOperatorConsole opConsole;
 	
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
+		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
 		
 		Robot.driverNotif.initOIPortions();
 	}

@@ -41,6 +41,7 @@ public class RobotMap {
 	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1;
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
+	public static final int JOYSTICK_ID_OPERATOR = 1;
 	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
