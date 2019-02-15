@@ -38,6 +38,7 @@ public class RobotMap {
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
+	public static final int CAMERA_DRIVER = 1;
 	
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 0;
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;

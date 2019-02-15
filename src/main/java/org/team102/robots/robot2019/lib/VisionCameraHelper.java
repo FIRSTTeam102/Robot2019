@@ -146,6 +146,8 @@ public class VisionCameraHelper {
 		}
 	}
 	
+
+	
 	/**
 	 * Starts an OpenCV vision pipeline
 	 * @param camera The camera to be used as input
@@ -170,6 +172,7 @@ public class VisionCameraHelper {
 			if(autoCapture) {
 				CameraServer.getInstance().startAutomaticCapture(output[0]);
 			}
+		
 		}
 		
 		Thread pipelineRunnerThread = new Thread(pipeline, "Vision runner: Pipeline " + pipeline);
@@ -203,12 +206,16 @@ public class VisionCameraHelper {
 		
 		private Object frameLock = new Object();
 		
+	
+		
 		/**
 		 * The main pipeline processing method
 		 * @param input The frame of video to be processed
 		 * @return The frame of video, after being processed
 		 */
 		public abstract Mat process(Mat input);
+		
+	
 		
 		public void run() {
 			while(true) {
@@ -244,5 +251,6 @@ public class VisionCameraHelper {
 				return lastOutput;
 			}
 		}
-	}
+		
+		}
 }

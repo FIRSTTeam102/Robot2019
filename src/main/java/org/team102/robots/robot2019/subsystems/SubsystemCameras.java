@@ -29,27 +29,40 @@ import org.opencv.core.*;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.opencv.imgproc.Imgproc;
 
 public class SubsystemCameras extends Subsystem {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
+
+	UsbCamera driverCam = new UsbCamera("Driver Camera", RobotMap.CAMERA_DRIVER);
+	CameraServer server = CameraServer.getInstance();
 	
 	public SubsystemCameras() {
 		super("Cameras");
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 50, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, new Pipe());
 		visibleVideoOutputs.add(pipelineOutput);
+		visibleVideoOutputs.add(driverCam);
+
 	}
 	
 	protected void initDefaultCommand() {}
+
+		
 	
+	
+//all vision processing on our vision camera	
 	private class Pipe extends VisionCameraHelper.Pipeline {
+	
 		
 		private Mat mat1 = new Mat();
 		private Mat mat2 = new Mat();
@@ -58,6 +71,10 @@ public class SubsystemCameras extends Subsystem {
 		private double[] rgbThresholdRed = {0.0, 250.0};
 		private double[] rgbThresholdGreen = {75.0, 255.0};
 		private double[] rgbThresholdBlue = {0.0, 250.0};
+		
+		private double[] rgbThresholdHue = {100.0, 140.0};
+		private double[] rgbThresholdSaturation = {100.0, 255.0};
+		private double[] rgbThresholdValue = {100.0, 255.0};
 
 		private double blurRadius = 6.0;
 		
@@ -65,14 +82,14 @@ public class SubsystemCameras extends Subsystem {
 		
 		private ArrayList<MatOfPoint2f> convexHullsOutput = new ArrayList<MatOfPoint2f>();
 		
-		private Rect[] findCornersAndrewRects = new Rect[20];
-		private RotatedRect[] findCornersRects = new RotatedRect[20];
+		private Rect[] findCornersAndrewRects = new Rect[40];
+		private RotatedRect[] findCornersRects = new RotatedRect[40];
 		
-		private RotatedRect[] sizeFilterRRects = new RotatedRect[10];
-		private Rect[] sizeFilterRects = new Rect[10];
+		private RotatedRect[] sizeFilterRRects = new RotatedRect[20];
+		private Rect[] sizeFilterRects = new Rect[20];
 		
-		private RotatedRect[][] rRectPairs = new RotatedRect[4][2];
-		private Rect[][] rectPairs = new Rect[4][2];
+		private RotatedRect[][] rRectPairs = new RotatedRect[5][2];
+		private Rect[][] rectPairs = new Rect[5][2];
 		
 		public Mat process(Mat input) {
 			
@@ -96,7 +113,7 @@ public class SubsystemCameras extends Subsystem {
 			mat3 = new Mat();
 			
 			//Step rgbThresholdInput:
-			rgbThreshold(input, rgbThresholdRed, rgbThresholdGreen, rgbThresholdBlue, mat1);
+			rgbThreshold(input, rgbThresholdHue, rgbThresholdSaturation, rgbThresholdValue, mat1);
 
 			// Step Blur:
 			blur(mat1, blurRadius, mat2);
@@ -129,6 +146,7 @@ public class SubsystemCameras extends Subsystem {
 				drawFieldMarkers(mat3, rRectPairs[0], mat1);
 				return mat1;
 			}
+			
 			/*
 			Mat closestOutput = new Mat();
 			RotatedRect[] closestRPair = new RotatedRect[2];
@@ -137,7 +155,8 @@ public class SubsystemCameras extends Subsystem {
 			drawFieldMarkers(closestOutput, closestRPair, fieldMarkerOutput);
 			*/
 			//System.out.println(rectPairs[1][0]);
-			return mat3;
+			
+			return mat1;
 		}
 		
 		//IMG PROCESSING AND FILTERS START HERE
@@ -150,9 +169,10 @@ public class SubsystemCameras extends Subsystem {
 		 * @param output The image in which to store the output.
 		 */
 		private void rgbThreshold(Mat input, double[] red, double[] green, double[] blue, Mat out) {
-			Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2RGB);
+			Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(out, new Scalar(red[0], green[0], blue[0]),
 				new Scalar(red[1], green[1], blue[1]), out);
+			Imgproc.cvtColor(out, out, Imgproc.COLOR_HSV2RGB);
 		}
 
 		/**
@@ -414,12 +434,5 @@ public class SubsystemCameras extends Subsystem {
 			Imgproc.ellipse(output, outline, circle);
 			Imgproc.line(output, new Point(midpoint,0), new Point(midpoint,360), target, 5);
 		}
-		
-		/*private double getDistance() {
-			double distance = 0; //0 is placeholder for now
-			//use camera to see how large tape appears when robot is in correct location
-			//compare rectangle size irl to pixel size
-			return distance;
-		}*/
 	}
 }

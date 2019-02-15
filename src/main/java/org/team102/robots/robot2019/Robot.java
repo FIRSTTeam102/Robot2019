@@ -20,7 +20,7 @@
 
 package org.team102.robots.robot2019;
 
-import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
+//import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
 import org.team102.robots.robot2019.subsystems.*;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
 	}
 	
 	public void robotInit() {
-		ArduinoConnection.findArduinos();
+		//ArduinoConnection.findArduinos();
 		
 		driveTrain = new SubsystemDriveTrain();
 		arm = new SubsystemArm();
