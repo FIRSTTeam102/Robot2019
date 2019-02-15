@@ -70,28 +70,21 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 			}
 			
 			input.replace("\n", " ");
-			String port = null;
 			
-			outer:
 			for(String token : input.split("\\s+")) {
 				for(String prefix : serialPortPrefixes) {
 					if(token.startsWith(prefix)) {
-						port = token;
-						break outer;
+						if(token.endsWith(":")) {
+							token = token.substring(0, token.length() - 1);
+						}
+						
+						if(token.startsWith("tty")) {
+							token = ("/dev/" + token);
+						}
+						
+						ports.add(token);
 					}
 				}
-			}
-			
-			if(port != null) {
-				if(port.endsWith(":")) {
-					port = port.substring(0, port.length() - 1);
-				}
-				
-				if(port.startsWith("tty")) {
-					port = ("/dev/" + port);
-				}
-				
-				ports.add(port);
 			}
 		} catch(Exception e) {
 			System.err.println("Failed to list serial ports: ");
