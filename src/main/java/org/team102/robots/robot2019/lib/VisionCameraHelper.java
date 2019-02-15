@@ -195,8 +195,6 @@ public class VisionCameraHelper {
 		pipelineRunnerThread.start();
 		
 		pipeline.initSrcAndDest(input, output);
-		pipeline.unpause();
-		
 		return output;
 	}
 	

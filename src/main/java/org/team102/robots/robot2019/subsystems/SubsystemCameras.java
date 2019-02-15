@@ -35,15 +35,17 @@ import org.opencv.imgproc.Imgproc;
 public class SubsystemCameras extends SubsystemWithArduino {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
+	private VisionCameraHelper.Pipeline pipe;
 	
 	public SubsystemCameras() {
 		super("Cameras", RobotMap.LIGHTS_ARDUINO_WHOIS_RESPONSE, "Vision Light Control");
-		setLights(false);
+		pipe = new Pipe();
 		
 		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
 		visibleVideoOutputs.add(visionCamera);
 		
-		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, new Pipe());
+		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, pipe);
+		setPipelineActive(true);
 		visibleVideoOutputs.add(pipelineOutput);
 	}
 	
@@ -63,6 +65,16 @@ public class SubsystemCameras extends SubsystemWithArduino {
 		}
 		
 		setLightBrightness(brightness);
+	}
+	
+	public void setPipelineActive(boolean on) {
+		if(pipe.isPaused() && on) {
+			pipe.unpause();
+		} else if(!pipe.isPaused() && !on) {
+			pipe.pause();
+		}
+		
+		setLights(on);
 	}
 	
 	private class Pipe extends VisionCameraHelper.Pipeline {
