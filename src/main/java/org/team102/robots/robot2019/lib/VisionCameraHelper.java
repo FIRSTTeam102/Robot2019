@@ -43,6 +43,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public class VisionCameraHelper {
 	
 	/**
+	 * Cause OpenCV and CSCore to be loaded manually
+	 */
+	public static void loadOpenCV() {
+		CameraServerJNI.forceLoad();
+	}
+	
+	/**
 	 * Because setting resolution on desktop causes a crash, this will set the resolution, but only on a real RoboRIO
 	 * @param src The camera or other video source
 	 * @param width The desired width

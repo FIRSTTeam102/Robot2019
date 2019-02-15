@@ -39,6 +39,8 @@ public class SubsystemCameras extends SubsystemWithArduino {
 	
 	public SubsystemCameras() {
 		super("Cameras", RobotMap.LIGHTS_ARDUINO_WHOIS_RESPONSE, "Vision Light Control");
+		VisionCameraHelper.loadOpenCV();
+		
 		pipe = new Pipe();
 		
 		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
