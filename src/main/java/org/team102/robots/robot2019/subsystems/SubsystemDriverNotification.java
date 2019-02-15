@@ -166,8 +166,8 @@ public class SubsystemDriverNotification extends Subsystem {
 		armWristStatus.setString(Robot.arm.getWristStatus());
 		armOverallStatus.setString(Robot.arm.getOverallStatus());
 		
-		frontCenteringInfo.setNumber(Robot.centering.getFrontDSValue());
-		rearCenteringInfo.setNumber(Robot.centering.getRearDSValue());
+		frontCenteringInfo.setNumber(Robot.centering.getFrontValue());
+		rearCenteringInfo.setNumber(Robot.centering.getRearValue());
 		centeringStatus.setString(Robot.centering.getStatus());
 	}
 	
