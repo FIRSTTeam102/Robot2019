@@ -25,6 +25,9 @@ public class RobotMap {
 	public static final double LOW_TIME = 30;
 	
 	public static final double CENTERING_ALLOWABLE_ERROR = .01;
+	public static final double CENTERING_SPEED_FRONT_OR_BACK = .1;
+	public static final double CENTERING_SPEED_LEFT_OR_RIGHT = .1;
+	public static final double CENTERING_SPEED_ROTATION = .1;
 	
 	public static final double CAMERA_LIGHT_BRIGHTNESS = 1;
 	
