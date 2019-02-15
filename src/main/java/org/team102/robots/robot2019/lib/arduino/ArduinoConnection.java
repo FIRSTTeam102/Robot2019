@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public class ArduinoConnection extends SerialConnection {
 	private static HashMap<String, ArduinoConnection> locatedArduinos = new HashMap<>();
 	
-	private String eol = "" + (char)10;
+	private String eol = "" + (char)13;
 	
 	private ArrayList<String> lines = new ArrayList<>();
 	private Consumer<String> lineListener = null;

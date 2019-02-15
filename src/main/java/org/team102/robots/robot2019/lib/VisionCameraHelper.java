@@ -84,7 +84,7 @@ public class VisionCameraHelper {
 			}
 		});
 		
-		NetworkTableInstance.getDefault().getTable("/CameraPublisher/" + srv.getName()).getEntry("streams").setStringArray(new String[] {
+		NetworkTableInstance.getDefault().getTable("/CameraPublisher/" + name).getEntry("streams").setStringArray(new String[] {
 				"mjpg:http://" + CameraServerJNI.getHostname() + ".local:" + srv.getPort() + "/?action=stream"
 		});
 		
