@@ -25,36 +25,35 @@ import java.util.ArrayList;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.command.Subsystem;
-import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.HttpCamera;
-import edu.wpi.cscore.VideoSource;
+
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-public class SubsystemCameras extends Subsystem/*WithArduino*/ {
+public class SubsystemCameras extends Subsystem {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
-	//private VisionCameraHelper.Pipeline pipe;
+	private VisionCameraHelper.Pipeline pipe;
 	
 	public SubsystemCameras() {
-		super("Cameras");//, RobotMap.LIGHTS_ARDUINO_WHOIS_RESPONSE, "Vision Light Control");
+		super("Cameras");
 		VisionCameraHelper.loadOpenCV();
 		
-		//pipe = new Pipe();
+		if(RobotMap.DEBUG_USE_LOCAL_PIPELINE) {
+			pipe = new Pipe();
+		}
 		
 		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera(/*"Vision Camera"*/"Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
 		visibleVideoOutputs.add(visionCamera);
 		
-		/*VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, pipe);
-		setPipelineActive(true);
-	visibleVideoOutputs.add(pipelineOutput);*/
-		
-		HttpCamera piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
-		visibleVideoOutputs.add(piVisionOutput);
+		if(pipe == null) {
+			HttpCamera piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
+			visibleVideoOutputs.add(piVisionOutput);
+		} else {
+			VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, pipe);
+			pipe.unpause();
+			visibleVideoOutputs.add(pipelineOutput);
+		}
 	}
 	
 	@Override protected void initDefaultCommand() {} // This is left intentionally empty
