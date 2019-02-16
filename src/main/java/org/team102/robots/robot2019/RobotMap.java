@@ -48,9 +48,10 @@ public class RobotMap {
 	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_COMMIT = null; // TODO configure this
 	public static final ArmSetpoint ARM_SETPOINT_FLOOR_CARGO = null; // TODO configure this
 	
-	public static final RumbleSeries RUMBLE_ARM_AT_SETPOINT = new RumbleSeries().addSoft(.2);
-	public static final RumbleSeries RUMBLE_LOW_TIME = new RumbleSeries().addRough(.1).addBreak(.1).addRough(.1);
+	public static final RumbleSeries RUMBLE_ARM_AT_SETPOINT = new RumbleSeries().addSoft(.5);
+	public static final RumbleSeries RUMBLE_LOW_TIME = new RumbleSeries().addRough(.2).addBreak(.1).addRough(.2);
 	public static final RumbleSeries RUMBLE_NOT_ENOUGH_TIME = new RumbleSeries().addRough(.5);
+	public static final RumbleSeries RUMBLE_PROGRESS = new RumbleSeries().addSoft(.2);
 	
 	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP = 1;
 	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE = 2;
@@ -102,6 +103,7 @@ public class RobotMap {
 	public static final int[] OP_CONTROLLER_PATTERN_SET_PURPLE_BUTTON = { OP_CONTROLLER_PATTERN_FLASH_PURPLE, OP_CONTROLLER_PATTERN_SOLID_PURPLE };
 	
 	public static final double JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER = .25; // TODO configure this
+	public static final double JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME = 2; // TODO configure this
 	
 	public static final double LOW_TIME = 30;
 	

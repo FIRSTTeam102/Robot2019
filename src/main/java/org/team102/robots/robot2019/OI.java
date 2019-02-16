@@ -20,20 +20,22 @@
 
 package org.team102.robots.robot2019;
 
-import org.team102.robots.robot2019.commands.CommandUseArmSetpoint;
+import org.team102.robots.robot2019.commands.CommandClimb;
 import org.team102.robots.robot2019.commands.CommandMoveArmManual;
 import org.team102.robots.robot2019.commands.CommandSetCargoManip;
 import org.team102.robots.robot2019.commands.CommandSetHatchManip;
+import org.team102.robots.robot2019.commands.CommandUseArmSetpoint;
 import org.team102.robots.robot2019.lib.CommonIDs;
 import org.team102.robots.robot2019.lib.CustomOperatorConsole;
 import org.team102.robots.robot2019.lib.commandsAndTrigger.AxisTrigger;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.CommandPlayRumble;
 import org.team102.robots.robot2019.lib.commandsAndTrigger.LogicGateTrigger;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.TimedTrigger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.POVButton;
-import edu.wpi.first.wpilibj.command.PrintCommand;
 
 public class OI {
 	
@@ -72,8 +74,8 @@ public class OI {
 		// Driver A: When pressed, extend the hatch ejector, when released, contract it.
 		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
 		
-		// TODO put in the driver control for climbing
-		new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER).whenPressed(new PrintCommand("test"));
+		// Driver DPad Up for a certain amount of time: Climb
+		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false)).whenActive(new CommandClimb());
 		
 		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
 		LogicGateTrigger.or(
@@ -89,7 +91,13 @@ public class OI {
 	}
 	
 	public double getTimeRemaining() {
-		return Math.max(0, DriverStation.getInstance().getMatchTime());
+		double time = DriverStation.getInstance().getMatchTime();
+		
+		if(time == -1) {
+			return 120;
+		} else {
+			return time;
+		}
 	}
 	
 	public static AxisTrigger getTriggerForAxis(Joystick js, int axis) {
