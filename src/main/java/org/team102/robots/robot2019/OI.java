@@ -20,6 +20,8 @@
 
 package org.team102.robots.robot2019;
 
+import org.team102.robots.robot2019.commands.CommandMoveArmAutomatic;
+import org.team102.robots.robot2019.commands.CommandMoveArmManual;
 import org.team102.robots.robot2019.lib.CustomOperatorConsole;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,6 +35,30 @@ public class OI {
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
 		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
+		
+		/* TODO add this all in when we have the actual setpoints
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_HATCH_TOP));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_HATCH_MIDDLE));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_BOTTOM).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_HATCH_BOTTOM));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_TOP).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_CARGO_TOP));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_MIDDLE).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_CARGO_MIDDLE));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_BOTTOM).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_ROCKET_CARGO_BOTTOM));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_CARGO_SHIP_CARGO));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_HATCH).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_CARGO_SHIP_HATCH));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_DOWN).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_FLOOR_HATCH_DOWN));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_UP).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_FLOOR_HATCH_UP));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_FLOOR_CARGO));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_LOADING_STATION_HATCH).whenPressed(new CommandMoveArmAutomatic(RobotMap.ARM_SETPOINT_LOADING_STATION_HATCH));
+		*/
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN).whileHeld(new CommandMoveArmManual(false, true));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP).whileHeld(new CommandMoveArmManual(false, false));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN).whileHeld(new CommandMoveArmManual(true, true));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP).whileHeld(new CommandMoveArmManual(true, false));
 		
 		Robot.driverNotif.initOIPortions();
 	}

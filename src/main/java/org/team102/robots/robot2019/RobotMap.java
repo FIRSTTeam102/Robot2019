@@ -22,6 +22,27 @@ package org.team102.robots.robot2019;
 
 public class RobotMap {
 	
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP = 1;
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE = 2;
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_BOTTOM = 3;
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_TOP = 4;
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_MIDDLE = 5;
+	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_BOTTOM = 6;
+	
+	public static final int OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO = 9;
+	public static final int OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_HATCH = 12;
+	
+	public static final int OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_DOWN = 13;
+	public static final int OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_UP = 14;
+	public static final int OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO = 16;
+	
+	public static final int OP_CONTROLLER_BUTTON_ID_LOADING_STATION_HATCH = 15;
+	
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN = 17;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP = 18;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN = 19;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP = 20;
+	
 	public static final double LOW_TIME = 30;
 	
 	public static final double CENTERING_ALLOWABLE_ERROR = .01;
