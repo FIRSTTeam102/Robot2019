@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
+import edu.wpi.cscore.HttpCamera;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -48,6 +49,9 @@ public class SubsystemCameras extends Subsystem/*WithArduino*/ {
 		
 		VideoSource armCamera = VisionCameraHelper.openAndVerifyCamera("Arm Camera", RobotMap.CAMERA_ID_ARM, 480, 360, 15, 15, false);
 		visibleVideoOutputs.add(armCamera);
+		
+		HttpCamera piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
+		visibleVideoOutputs.add(piVisionOutput);
 	}
 	
 	@Override protected void initDefaultCommand() {} // This is left intentionally empty
