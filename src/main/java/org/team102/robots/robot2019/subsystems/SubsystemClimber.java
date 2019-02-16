@@ -20,6 +20,7 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
 
 import edu.wpi.first.wpilibj.Solenoid;
@@ -43,5 +44,23 @@ public class SubsystemClimber  extends Subsystem {
 	
 	public void setClimberExtended(boolean extended) {
 		climber.set(extended);
+	}
+	
+	public boolean hasEnoughTimeToClimb() {
+		return Robot.oi.getTimeRemaining() >= RobotMap.CLIMBER_EXTENSION_TIME;
+	}
+	
+	public boolean isClimbing() {
+		return climber.get();
+	}
+	
+	public String getStatus() {
+		if(isClimbing()) {
+			return "CLIMBING!";
+		} else if(hasEnoughTimeToClimb()) {
+			return "Ready";
+		} else {
+			return "Not enough time!!";
+		}
 	}
 }

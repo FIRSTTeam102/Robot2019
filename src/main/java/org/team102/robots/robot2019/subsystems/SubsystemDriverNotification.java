@@ -61,6 +61,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry rearCenteringInfo;
 	private NetworkTableEntry centeringStatus;
 	
+	private NetworkTableEntry climberStatus;
+	
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
@@ -89,6 +91,11 @@ public class SubsystemDriverNotification extends Subsystem {
 		armElbowStatus = armStatusLayout.add("Status: Elbow", "").getEntry();
 		armWristStatus = armStatusLayout.add("Status: Wrist", "").getEntry();
 		armOverallStatus = armStatusLayout.add("Overall", "").getEntry();
+		
+		climberStatus = driverInfoTab
+				.add("Climber Status", "")
+				.withPosition(6, 2).withSize(2, 1)
+				.getEntry();
 	}
 	
 	public void initOIPortions() {
@@ -165,6 +172,8 @@ public class SubsystemDriverNotification extends Subsystem {
 		frontCenteringInfo.setNumber(Robot.centering.getFrontValue());
 		rearCenteringInfo.setNumber(Robot.centering.getRearValue());
 		centeringStatus.setString(Robot.centering.getStatus());
+		
+		climberStatus.setString(Robot.climber.getStatus());
 	}
 	
 	private void blinkNotification() {

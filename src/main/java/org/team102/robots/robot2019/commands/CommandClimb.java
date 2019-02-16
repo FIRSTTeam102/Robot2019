@@ -20,7 +20,7 @@ public class CommandClimb extends ConditionalCommand {
 	}
 
 	protected boolean condition() {
-		return Robot.oi.getTimeRemaining() >= RobotMap.CLIMBER_EXTENSION_TIME;
+		return Robot.climber.hasEnoughTimeToClimb();
 	}
 	
 	public static class CommandOnTriedToClimbWithoutEnoughTime extends CommandGroup {
