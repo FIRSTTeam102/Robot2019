@@ -172,8 +172,10 @@ public class SubsystemDriverNotification extends Subsystem {
 	}
 	
 	private void updateOpConsoleLights(double time) {
-		double timePerStage = RobotMap.LOW_TIME / RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN.length;
-		int countdownStage = (int)Math.floor((time - RobotMap.LOW_TIME) / timePerStage);
+		int numStages = RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN.length;
+		double timePerStage = RobotMap.LOW_TIME / numStages;
+		
+		int countdownStage = numStages - (int)Math.ceil(Math.max(time, .01) / timePerStage);
 		
 		if(countdownStage != prevCountdownStage) {
 			prevCountdownStage = countdownStage;
