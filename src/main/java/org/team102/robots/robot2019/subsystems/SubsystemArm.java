@@ -21,21 +21,16 @@
 package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
+import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.command.Subsystem;
 
-public class SubsystemArm extends Subsystem {
-	
-	private ArduinoConnection armArduino;
+public class SubsystemArm extends SubsystemWithArduino {
 	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
-	
-	private long lastArduinoCommTime;
 	
 	private WPI_TalonSRX wrist;
 	private WPI_TalonSRX elbow;
@@ -45,12 +40,14 @@ public class SubsystemArm extends Subsystem {
 	private boolean isInManualMode = false;
 	private boolean manualModeIsWrist, manualModeIsReverse;
 	
-	private boolean hasSetpoint = false;
-	private int elbowSetpoint = 0;
-	private int wristSetpoint = 0;
+	private ArmSetpoint setpoint;
+	
+	private String elbowStatus = "Not updated yet?";
+	private String wristStatus = "Not updated yet?";
+	private String overallStatus = "Not updated yet?";
 	
 	public SubsystemArm() {
-		super("Arm");
+		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
 		wrist = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_WRIST);
 		elbow = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_ELBOW);
@@ -59,28 +56,23 @@ public class SubsystemArm extends Subsystem {
 		
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
-		
-		armArduino = ArduinoConnection.lookUpByWhois(RobotMap.ARM_ARDUINO_WHOIS_RESPONSE);
-		if(armArduino == null) {
-			System.out.println("Warning: Arm sensor arduino not found!");
-		} else {
-			armArduino.setLineListener(this::onArduinoLineReceived);
-			addChild("LIDAR Control Arduino", armArduino);
-		}
-		
-		setArduinoCommTime();
+	}
+	
+	public String getElbowStatus() {
+		return elbowStatus;
+	}
+	
+	public String getWristStatus() {
+		return wristStatus;
+	}
+	
+	public String getOverallStatus() {
+		return overallStatus;
 	}
 	
 	@Override
 	public void periodic() {
-		if(armArduino != null) {
-			armArduino.update();
-		}
-		
-		double lastCommTime = getTimeSinceLastArduinoComm();
-		if(lastCommTime > 1 && lastCommTime % 1 < .03) {
-			System.out.println("Warning: Last Arduino comm time was " + lastCommTime + " seconds ago!");
-		}
+		super.periodic();
 		
 		double elbowSpeed = 0, wristSpeed = 0;
 		
@@ -95,28 +87,40 @@ public class SubsystemArm extends Subsystem {
 				elbowSpeed *= -1;
 				wristSpeed *= -1;
 			}
-		} else if(hasSetpoint) {
+			
+			overallStatus = "Moving manually";
+		} else if(hasSetpoint()) {
+			boolean elbowInRange = isElbowInRange();
+			boolean wristInRange = isWristInRange();
+			
 			elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
 			wristSpeed = RobotMap.ARM_WRIST_SPEED;
 			
-			if(isElbowInRange()) {
+			if(elbowInRange) {
 				elbowSpeed = 0;
-			} else if(distanceElbow > elbowSetpoint) {
+			} else if(distanceElbow > setpoint.elbowSetpoint) {
 				elbowSpeed *= -1;
 			}
 			
-			if(isWristInRange()) {
+			if(wristInRange) {
 				wristSpeed = 0;
-			} else if(distanceWrist > wristSetpoint) {
+			} else if(distanceWrist > setpoint.wristSetpoint) {
 				wristSpeed *= -1;
 			}
+			
+			if(elbowInRange && wristInRange) {
+				overallStatus = "At";
+			} else {
+				overallStatus = "Moving to";
+			}
+			
+			overallStatus += (" setpoint " + setpoint.name);
+		} else {
+			overallStatus = "Idle";
 		}
 		
 		elbow.set(elbowSpeed);
 		wrist.set(wristSpeed);
-		
-		System.out.println("Wrist: " + distanceWrist);
-		System.out.println("Elbow: " + distanceElbow);
 	}
 	
 	@Override
@@ -128,53 +132,57 @@ public class SubsystemArm extends Subsystem {
 		extender.set(active);
 	}
 	
-	private void onArduinoLineReceived(String line) {
+	protected void onArduinoLineReceived(String line) {
 		String[] parts = line.split(",");
 		
 		try {
 			distanceElbow = Integer.parseInt(parts[0]);
+			boolean elbowInRange = distanceElbow != -1;
 			
 			int distanceWristLower = Integer.parseInt(parts[1]);
 			int distanceWristUpper = Integer.parseInt(parts[2]);
-			boolean wristLowerOutOfRange = distanceWristLower == -1;
-			boolean wristUpperOutOfRange = distanceWristUpper == -1;
+			boolean wristLowerInRange = distanceWristLower != -1;
+			boolean wristUpperInRange = distanceWristUpper != -1;
 			
-			if(!wristLowerOutOfRange && !wristUpperOutOfRange) {
-				System.out.println("Warning: For some reason, both distance sensors for the wrist can see the end effector! This shouldn't be possible!");
-				System.out.print("We'll use the smaller distance, which is from the ");
-				
+			boolean ignoreWristLower = false;
+			boolean ignoreWristUpper = false;
+			
+			if(wristLowerInRange && wristUpperInRange) {
 				if(distanceWristLower < distanceWristUpper) {
-					wristUpperOutOfRange = true;
-					System.out.print("lower");
+					ignoreWristLower = true;
 				} else {
-					wristLowerOutOfRange = true;
-					System.out.print("upper");
+					ignoreWristUpper = true;
 				}
-				
-				System.out.println(" sensor.");
-				System.out.println();
 			}
 			
-			if(wristLowerOutOfRange && wristUpperOutOfRange) {
+			if((!wristLowerInRange || ignoreWristLower) && (!wristUpperInRange && ignoreWristUpper)) {
 				distanceWrist = 0;
-			} else if(wristUpperOutOfRange) {
+			} else if(wristLowerInRange && !ignoreWristLower) {
 				distanceWrist = -distanceWristLower;
 			} else {
 				distanceWrist = distanceWristUpper;
 			}
 			
-			setArduinoCommTime();
+			if(!wristLowerInRange && !wristUpperInRange) {
+				wristStatus = "OK (Centered)";
+			} else if(wristLowerInRange != wristUpperInRange) {
+				wristStatus = "OK (Range: " + distanceWrist + ")";
+			} else if(ignoreWristUpper && !ignoreWristLower) {
+				wristStatus = "Both in range, using lower";
+			} else if(ignoreWristLower && !ignoreWristUpper) {
+				wristStatus = "Both in range, using upper";
+			} else {
+				wristStatus = "Impossible state (Please report this)";
+			}
+			
+			if(elbowInRange) {
+				elbowStatus = "OK (Range: " + distanceElbow + ")";
+			} else {
+				elbowStatus = "Out of range";
+			}
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
 		}
-	}
-	
-	private void setArduinoCommTime() {
-		lastArduinoCommTime = System.currentTimeMillis();
-	}
-	
-	public double getTimeSinceLastArduinoComm() {
-		return (System.currentTimeMillis() - lastArduinoCommTime) / 1e3D;
 	}
 	
 	public void setArmManual(boolean isWrist, boolean isReverse) {
@@ -187,19 +195,28 @@ public class SubsystemArm extends Subsystem {
 		isInManualMode = false;
 	}
 	
-	public void setSetpoints(int elbowSetpoint, int wristSetpoint) {
-		hasSetpoint = true;
-		
-		this.elbowSetpoint = elbowSetpoint;
-		this.wristSetpoint = wristSetpoint;
+	public void setSetpoint(ArmSetpoint setpoint) {
+		this.setpoint = setpoint;
+	}
+	
+	public boolean hasSetpoint() {
+		return setpoint != null;
 	}
 	
 	private boolean isElbowInRange() {
-		return Math.abs(distanceElbow - elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
+		if(hasSetpoint()) {
+			return Math.abs(distanceElbow - setpoint.elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
+		} else {
+			return true;
+		}
 	}
 	
 	private boolean isWristInRange() {
-		return Math.abs(distanceWrist - wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
+		if(hasSetpoint()) {
+			return Math.abs(distanceWrist - setpoint.wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
+		} else {
+			return true;
+		}
 	}
 	
 	public boolean isWithinMarginOfErrorOfSetpoints() {
@@ -217,6 +234,10 @@ public class SubsystemArm extends Subsystem {
 			this.isExtended = isExtended;
 			this.elbowSetpoint = elbowSetpoint;
 			this.wristSetpoint = wristSetpoint;
+		}
+		
+		public String toString() {
+			return "{ Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + " }";
 		}
 	}
 }

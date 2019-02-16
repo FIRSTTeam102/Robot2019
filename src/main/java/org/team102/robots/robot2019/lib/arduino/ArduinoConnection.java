@@ -20,102 +20,53 @@
 
 package org.team102.robots.robot2019.lib.arduino;
 
-import java.io.Closeable;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import org.team102.robots.robot2019.Robot;
-
-import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * A connection to an Arduino via a serial port
  */
-public class ArduinoConnection extends SendableBase implements Closeable, AutoCloseable {
-	public static ArrayList<String> serialPortPrefixes = new ArrayList<>();
+public class ArduinoConnection extends SerialConnection {
 	private static HashMap<String, ArduinoConnection> locatedArduinos = new HashMap<>();
 	
-	static {
-		serialPortPrefixes.add("COM");
-		serialPortPrefixes.add("tty");
-	}
-	
-	private String eol = "" + (char)10;
-	
-	private SerialImpl portImpl;
-	private String dataBuff = "";
+	private String eol = "" + (char)13;
 	
 	private ArrayList<String> lines = new ArrayList<>();
 	private Consumer<String> lineListener = null;
 	
-	private static String getListSerialPortsCommand() {
-		if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("window")) {
-			return System.getenv("windir") + "\\System32\\mode.com";
-		} else {
-			return "dmesg";
-		}
+	/**
+	 * Performs a WHOIS lookup on whatever serial ports are connected
+	 */
+	public static void findArduinos() {
+		findArduinos(false);
 	}
 	
 	/**
-	 * Performs a WHOIS lookup on however many serial ports
-	 * @param numSerialPortsToSearch How many serial ports to search
+	 * Performs a WHOIS lookup on whatever serial ports are connected
+	 * @param debugPrint Whether or not to print out all serial data, for debugging purposes
 	 */
-	public static void findArduinos() {
+	public static void findArduinos(boolean debugPrint) {
 		System.out.println("Finding Arduinos...");
 		
-		try {
-			Process proc = Runtime.getRuntime().exec(getListSerialPortsCommand());
-			InputStream stream = proc.getInputStream();
-			String input = "";
+		for(String port : findSerialPorts()) {
+			System.out.print("On serial port \"" + port + "\": ");
 			
-			while(proc.isAlive() || stream.available() > 0) {
-				input += (char)stream.read();
+			String name = findArduino(port, debugPrint);
+			if(name == null) {
+				System.out.println("No Arduino.");
+			} else {
+				System.out.println("Found Arduino \"" + name + "\".");
 			}
-			
-			input.replace("\n", " ");
-			String port = null;
-			
-			outer:
-			for(String token : input.split("\\s+")) {
-				for(String prefix : serialPortPrefixes) {
-					if(token.startsWith(prefix)) {
-						port = token;
-						break outer;
-					}
-				}
-			}
-			
-			if(port != null) {
-				if(port.endsWith(":")) {
-					port = port.substring(0, port.length() - 1);
-				}
-				
-				if(port.startsWith("tty")) {
-					port = ("/dev/" + port);
-				}
-				
-				System.out.print("On serial port \"" + port + "\": ");
-				
-				String name = findArduino(port);
-				if(name == null) {
-					System.out.println("No Arduino.");
-				} else {
-					System.out.println("Found Arduino \"" + name + "\".");
-				}
-			}
-		} catch(Exception e) {
-			System.err.println("Failed to list serial ports: ");
-			e.printStackTrace();
 		}
 	}
 	
-	private static String findArduino(String port) {
+	private static String findArduino(String port, boolean debugPrint) {
 		ArduinoConnection conn = new ArduinoConnection(port);
 		
 		conn.write("WHOIS");
@@ -126,6 +77,10 @@ public class ArduinoConnection extends SendableBase implements Closeable, AutoCl
 		String reply = null;
 		if(conn.hasLines()) {
 			for(String str = conn.getLine(); str != null; str = conn.getLine()) {
+				if(debugPrint) {
+					System.out.println(" >> " + str);
+				}
+				
 				if(str.toUpperCase(Locale.ROOT).startsWith("IAM ")) {
 					reply = str.substring(4);
 					break;
@@ -162,19 +117,7 @@ public class ArduinoConnection extends SendableBase implements Closeable, AutoCl
 	 * @param portID The name of the serial port, i.e. {@code /dev/tty0}
 	 */
 	public ArduinoConnection(String portID) {
-		if(Robot.isReal()) {
-			portImpl = new RioSerialImpl(portID);
-		} else {
-			portImpl = new DesktopSerialImpl(portID);
-		}
-		
-		// Magic sleep time to make sure we can actually write some data
-		Timer.delay(1.75);
-	}
-	
-	@Override
-	public void close() {
-		portImpl.close();
+		super(portID);
 	}
 	
 	/**
@@ -237,33 +180,22 @@ public class ArduinoConnection extends SendableBase implements Closeable, AutoCl
 	 * @param line The line
 	 */
 	public void write(String line) {
-		byte[] buff = (line + eol).getBytes(Charset.forName("ASCII"));
-		portImpl.write(buff);
+		write((line + eol).getBytes(Charset.forName("ASCII")));
 	}
 	
-	/**
-	 * Polls the serial port for new data from the Arduino
-	 */
 	public void update() {
-		int bytesAvailable = portImpl.bytesAvailable();
+		super.update();
 		
-		if(bytesAvailable > 0) {
-			//byte[] buff = new byte[bytesAvailable];
-			//port.readBytes(buff, bytesAvailable);
-			byte[] buff = portImpl.read(bytesAvailable);
-			
-			dataBuff += new String(buff);
-		}
-		
+		String dataBuff = getReadData();
 		if(dataBuff.contains(eol)) {
 			boolean useLastToken = dataBuff.endsWith(eol);
 			String[] tokens = dataBuff.split(eol);
 			int max = tokens.length - 1;
 			
 			if(useLastToken) {
-				dataBuff = "";
+				clearReadData();
 			} else {
-				dataBuff = tokens[max];
+				setReadData(tokens[max]);
 				max--;
 			}
 			
@@ -283,21 +215,9 @@ public class ArduinoConnection extends SendableBase implements Closeable, AutoCl
 	
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addBooleanProperty("serialPortConnected", portImpl::isOpen, null);
+		super.initSendable(builder);
+		
 		builder.addDoubleProperty("numUnprocessedLines", lines::size, null);
 		builder.addBooleanProperty("hasLineListener", this::hasLineListener, null);
-		builder.addStringProperty("serialPortID", portImpl::getName, null);
-	}
-	
-	static interface SerialImpl {
-		boolean isOpen();
-		String getName();
-		
-		int bytesAvailable();
-		
-		void write(byte[] data);
-		byte[] read(int len);
-		
-		void close();
 	}
 }

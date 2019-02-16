@@ -24,7 +24,14 @@ public class RobotMap {
 	
 	public static final double LOW_TIME = 30;
 	
+	public static final double CENTERING_ALLOWABLE_ERROR = .01;
+	
+	public static final double CAMERA_LIGHT_BRIGHTNESS = 1;
+	
 	public static final String ARM_ARDUINO_WHOIS_RESPONSE = "arm-sensors";
+	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
+	public static final String LIGHTS_ARDUINO_WHOIS_RESPONSE = "lcl-r1";
+	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
 	public static final double CARGO_MANIP_ROLLER_SPEED = .5;
 	public static final double ARM_ELBOW_SPEED = .5;
@@ -40,15 +47,15 @@ public class RobotMap {
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
 	public static final int CAMERA_DRIVER = 1;
 	
-	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 0;
+	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 2;
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;
-	public static final int CAN_TALON_DRIVE_TRAIN_REAR_LEFT = 2;
+	public static final int CAN_TALON_DRIVE_TRAIN_REAR_LEFT = 4;
 	public static final int CAN_TALON_DRIVE_TRAIN_REAR_RIGHT = 3;
 	
-	public static final int CAN_TALON_ARM_ELBOW = 4;
-	public static final int CAN_TALON_ARM_WRIST = 5;
+	public static final int CAN_TALON_ARM_ELBOW = 5;
+	public static final int CAN_TALON_ARM_WRIST = 6;
 	
-	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 6;
+	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 7;
 	
 	public static final int SOLENOID_ARM_EXTENDER = 0;
 	

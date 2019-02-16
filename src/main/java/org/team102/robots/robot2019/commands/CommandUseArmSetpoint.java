@@ -34,7 +34,7 @@ public class CommandUseArmSetpoint extends CommandGroup {
 		}
 		
 		// Then move the elbow and wrist to the correct distances
-		addSequential(new CommandMoveArmAutomatic(setpoint.elbowSetpoint, setpoint.wristSetpoint));
+		addSequential(new CommandMoveArmAutomatic(setpoint));
 		
 		if(setpoint.isExtended) { // Extend it if we're supposed to.
 			addSequential(new CommandExtendArm(true));

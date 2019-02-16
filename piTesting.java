@@ -1,96 +1,211 @@
-/*
- * The code for FRC Team #102's robot for the 2019 game, Destination: Deep Space
- * Copyright (C) 2019  Robotics Fund Inc.
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
- * Contact us at: firstteam102@gmail.com
- */
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
-package org.team102.robots.robot2019.subsystems;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
-import org.opencv.core.*;
-import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.lib.VisionCameraHelper;
-import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
-import edu.wpi.cscore.CvSink;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.vision.VisionPipeline;
+import edu.wpi.first.vision.VisionThread;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+
 import org.opencv.imgproc.Imgproc;
 
-public class SubsystemCameras extends SubsystemWithArduino {
-	
-	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
-	private VisionCameraHelper.Pipeline pipe;
-	
-	public SubsystemCameras() {
-		super("Cameras", RobotMap.LIGHTS_ARDUINO_WHOIS_RESPONSE, "Vision Light Control");
-		VisionCameraHelper.loadOpenCV();
-		
-		pipe = new Pipe();
-		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Vision Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 50, false);
-		visibleVideoOutputs.add(visionCamera);
-		
-		VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, pipe);
-		setPipelineActive(true);
-		visibleVideoOutputs.add(pipelineOutput);
+import org.opencv.core.*;
 
-	}
-	
-	@Override protected void initDefaultCommand() {} // This is left intentionally empty
-	@Override protected void onArduinoLineReceived(String line) {} // This is left intentionally empty
-	
-	public void setLightBrightness(double brightness) {
-		int rawBrightness = Math.min(Math.max((int)Math.round(brightness * 255), 0), 255);
-		sendLineToArduino("LED:" + rawBrightness);
-	}
-	
-	public void setLights(boolean on) {
-		double brightness = 0;
-		
-		if(on) {
-			brightness = RobotMap.CAMERA_LIGHT_BRIGHTNESS;
-		}
-		
-		setLightBrightness(brightness);
-	}
-	
-	public void setPipelineActive(boolean on) {
-		if(pipe.isPaused() && on) {
-			pipe.unpause();
-		} else if(!pipe.isPaused() && !on) {
-			pipe.pause();
-		}
-		
-		setLights(on);
-	}
-	
-//all vision processing on our vision camera	
-	private class Pipe extends VisionCameraHelper.Pipeline {
-	
-		
-		private Mat mat1 = new Mat();
-		private Mat mat2 = new Mat();
-		private Mat mat3 = new Mat();
+   /*JSON format:
+   {
+       "team": 102,
+       "ntmode": <"client" or "server", "client" if unspecified>
+       "cameras": [
+           {
+               "name": "rPi Camera 0"
+               "path": "/dev/video0"
+               "pixel format": <"MJPEG", "YUYV", etc>   // optional
+               "width": 320		                // optional
+               "height": 240		                // optional
+               "fps": 30	                        // optional
+               "brightness": 3    			// optional
+               //"white balance": <"auto", "hold", value> // optional
+               //"exposure": <"auto", "hold", value>      // optional
+               //"properties": [{"name":"connect_verbose","value":1},{"name":"contrast","value":100},{"name":"saturation","value":50},{"name":"red_balance","value":1000},{"name":"blue_balance","value":1000},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":1},{"name":"sharpness","value":50},{"name":"color_effects","value":0},{"name":"rotate","value":0},{"name":"color_effects_cbcr","value":32896},{"name":"video_bitrate_mode","value":0},{"name":"video_bitrate","value":10000000},{"name":"repeat_sequence_header","value":false},{"name":"h264_i_frame_period","value":60},{"name":"h264_level","value":11},{"name":"h264_profile","value":4},{"name":"auto_exposure","value":0},{"name":"exposure_time_absolute","value":1000},{"name":"exposure_dynamic_framerate","value":false},{"name":"auto_exposure_bias","value":12},{"name":"white_balance_auto_preset","value":1},{"name":"image_stabilization","value":false},{"name":"iso_sensitivity","value":0},{"name":"iso_sensitivity_auto","value":1},{"name":"exposure_metering_mode","value":0},{"name":"scene_mode","value":0},{"name":"compression_quality","value":30}],
+               "stream": {                              // optional
+               //    "properties": [
+               //        {
+               //            "name": <stream property name>
+               //            "value": <stream property value>
+               //        }
+               //    ]
+               }
+           }
+       ]
+   }*/
+
+
+
+
+public final class piTesting {
+  private static String configFile = "/boot/frc.json";
+
+  @SuppressWarnings("MemberName")
+  public static class CameraConfig {
+    public String name;
+    public String path;
+    public JsonObject config;
+    public JsonElement streamConfig;
+  }
+
+  public static int team;
+  public static boolean server;
+  public static List<CameraConfig> cameraConfigs = new ArrayList<>();
+
+  //private Main() {
+  //}
+
+  /**
+   * Report parse error.
+   */
+  public static void parseError(String str) {
+    System.err.println("config error in '" + configFile + "': " + str);
+  }
+
+  /**
+   * Read single camera configuration.
+   */
+  public static boolean readCameraConfig(JsonObject config) {
+    CameraConfig cam = new CameraConfig();
+
+    // name
+    JsonElement nameElement = config.get("name");
+    if (nameElement == null) {
+      parseError("could not read camera name");
+      return false;
+    }
+    cam.name = nameElement.getAsString();
+
+    // path
+    JsonElement pathElement = config.get("path");
+    if (pathElement == null) {
+      parseError("camera '" + cam.name + "': could not read path");
+      return false;
+    }
+    cam.path = pathElement.getAsString();
+
+    // stream properties
+    cam.streamConfig = config.get("stream");
+
+    cam.config = config;
+
+    cameraConfigs.add(cam);
+    return true;
+  }
+
+  /**
+   * Read configuration file.
+   */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
+  public static boolean readConfig() {
+    // parse file
+    JsonElement top;
+    try {
+      top = new JsonParser().parse(Files.newBufferedReader(Paths.get(configFile)));
+    } catch (IOException ex) {
+      System.err.println("could not open '" + configFile + "': " + ex);
+      return false;
+    }
+
+    // top level must be an object
+    if (!top.isJsonObject()) {
+      parseError("must be JSON object");
+      return false;
+    }
+    JsonObject obj = top.getAsJsonObject();
+
+    // team number
+    JsonElement teamElement = obj.get("team");
+    if (teamElement == null) {
+      parseError("could not read team number");
+      return false;
+    }
+    team = teamElement.getAsInt();
+
+    // ntmode (optional)
+    if (obj.has("ntmode")) {
+      String str = obj.get("ntmode").getAsString();
+      if ("client".equalsIgnoreCase(str)) {
+        server = false;
+      } else if ("server".equalsIgnoreCase(str)) {
+        server = true;
+      } else {
+        parseError("could not understand ntmode value '" + str + "'");
+      }
+    }
+
+    // cameras
+    JsonElement camerasElement = obj.get("cameras");
+    if (camerasElement == null) {
+      parseError("could not read cameras");
+      return false;
+    }
+    JsonArray cameras = camerasElement.getAsJsonArray();
+    for (JsonElement camera : cameras) {
+      if (!readCameraConfig(camera.getAsJsonObject())) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Start running the camera.
+   */
+  public static VideoSource startCamera(CameraConfig config, CameraServer inst) {
+    System.out.println("Starting camera '" + config.name + "' on " + config.path);
+    inst = CameraServer.getInstance();
+    UsbCamera camera = new UsbCamera(config.name, config.path);
+    MjpegServer server = inst.startAutomaticCapture(camera);
+    
+    
+    Gson gson = new GsonBuilder().create();
+
+    camera.setConfigJson(gson.toJson(config.config));
+    camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
+
+    if (config.streamConfig != null) {
+      server.setConfigJson(gson.toJson(config.streamConfig));
+    }
+
+    return camera;
+  }
+  
+
+  /**
+   * Example pipeline.
+   */
+  public static class MyPipeline implements VisionPipeline {
 
 		private double[] rgbThresholdRed = {0.0, 250.0};
 		private double[] rgbThresholdGreen = {75.0, 255.0};
@@ -115,8 +230,9 @@ public class SubsystemCameras extends SubsystemWithArduino {
 		private RotatedRect[][] rRectPairs = new RotatedRect[5][2];
 		private Rect[][] rectPairs = new Rect[5][2];
 		
-		public Mat process(Mat input) {
+		public void process(Mat mat) {
 			
+			//Mat mat1 = new Mat();
 			System.out.println("Running pipeline");
 			
 			//Clear stuff
@@ -132,43 +248,41 @@ public class SubsystemCameras extends SubsystemWithArduino {
 					rectPairs[i][j] = null;
 				}
 			}
-			mat1 = new Mat();
-			mat2 = new Mat();
-			mat3 = new Mat();
 			
 			//Step rgbThresholdInput:
-			rgbThreshold(input, rgbThresholdHue, rgbThresholdSaturation, rgbThresholdValue, mat1);
+			rgbThreshold(mat, rgbThresholdHue, rgbThresholdSaturation, rgbThresholdValue, mat);
 
 			// Step Blur:
-			blur(mat1, blurRadius, mat2);
+			blur(mat, blurRadius, mat);
 
 			// Step Find_Contours:
-			findContours(mat2, false, findContoursOutput);
+			findContours(mat, false, findContoursOutput);
 
 			// Step Convex_Hulls:
 			convexHulls(findContoursOutput, convexHullsOutput);
 			
-			//Cut image to convex hulls
-			//cutToContour(input, convexHullsOutput, cutToContourOutput);
-			
 			//Find andrew and amanda corners
-			Imgproc.cvtColor(mat2, mat1, 8); //8 = GRAY2BGR
+			//Imgproc.cvtColor(mat2, mat1, 8); //8 = GRAY2BGR
 			Arrays.fill(findCornersRects, null);
-			findCorners(mat1, convexHullsOutput, findCornersRects, findCornersAndrewRects, mat3);
+			findCorners(mat, convexHullsOutput, findCornersRects, findCornersAndrewRects, mat);
 			
 			//Filter corners that are too small
-			rRectSizeFilter(mat3, findCornersRects, findCornersAndrewRects, 200, mat1, sizeFilterRRects, sizeFilterRects);
+			rRectSizeFilter(mat, findCornersRects, findCornersAndrewRects, 200, mat, sizeFilterRRects, sizeFilterRects);
 			
 			//return sizeFilterOutput;
-			findPairs(mat1, sizeFilterRRects, sizeFilterRects, mat3, rRectPairs, rectPairs/*, coolPairs*/);
+			findPairs(mat, sizeFilterRRects, sizeFilterRects, mat, rRectPairs, rectPairs/*, coolPairs*/);
 			
 			if (rectPairs[0][0] == null) {
 				System.out.println("No rectPairs!");
-				return mat3;
+				//return mat3;
+				//mat = mat3;
+				//mat1 = mat;
 			}
 			if (rectPairs[1][0] == null) {
-				drawFieldMarkers(mat3, rRectPairs[0], mat1);
-				return mat1;
+				drawFieldMarkers(mat, rRectPairs[0], mat);
+				//return mat1;
+				//mat = mat1;
+				//mat1 = mat;
 			}
 			
 			/*
@@ -180,7 +294,9 @@ public class SubsystemCameras extends SubsystemWithArduino {
 			*/
 			//System.out.println(rectPairs[1][0]);
 			
-			return mat1;
+			//return mat1;
+			//mat = mat1;
+			//mat1 = mat;
 		}
 		
 		//IMG PROCESSING AND FILTERS START HERE
@@ -196,6 +312,7 @@ public class SubsystemCameras extends SubsystemWithArduino {
 			Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(out, new Scalar(red[0], green[0], blue[0]),
 				new Scalar(red[1], green[1], blue[1]), out);
+			Imgproc.cvtColor(out, out, Imgproc.COLOR_HSV2RGB);
 		}
 
 		/**
@@ -275,10 +392,10 @@ public class SubsystemCameras extends SubsystemWithArduino {
 					Imgproc.circle(output, new Point(rect.x, rect.y + rect.height), 5, circleColor);*/
 		        	for (int j = 0; j < 4; j++){  
 		        		//System.out.printf("%d %d %d %d\n", vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y);
-		            	Imgproc.line(output, corners[n][j], corners[n][(j+1)%4], new Scalar(0,255,0,255), 3);
+		            		Imgproc.line(output, corners[n][j], corners[n][(j+1)%4], new Scalar(0,255,0,255), 3);
 		        	}
-	            	n++;
-	            }
+	            		n++;
+	            	}
 			}
 		}	
 		
@@ -458,4 +575,63 @@ public class SubsystemCameras extends SubsystemWithArduino {
 			Imgproc.line(output, new Point(midpoint,0), new Point(midpoint,360), target, 5);
 		}
 	}
+
+  /**
+   * Main.
+   */
+  public static void main(String... args) {
+    if (args.length > 0) {
+      configFile = args[0];
+    }
+
+    // read configuration
+    if (!readConfig()) {
+      return;
+    }
+
+    // start NetworkTables
+    NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+    if (server) {
+      System.out.println("Setting up NetworkTables server");
+      ntinst.startServer();
+    } else {
+      System.out.println("Setting up NetworkTables client for team " + team);
+      ntinst.startClientTeam(team);
+    }
+
+    // start cameras
+    List<VideoSource> cameras = new ArrayList<>();
+    CameraServer inst;
+    for (CameraConfig cameraConfig : cameraConfigs) {
+      cameras.add(startCamera(cameraConfig, inst));
+    }
+    
+    CvSink cvSink = inst.getVideo();
+    CvSource outputStream = CameraServer.getInstance().putVideo("Camera", 160, 120);
+
+    Mat source = new Mat();
+    Mat output = new Mat();
+
+	MyPipeline pipe = new MyPipeline();
+    // start image processing on camera 0 if present
+    if (cameras.size() >= 1) {
+      VisionThread visionThread = new VisionThread(cameras.get(0),
+    		new MyPipeline(), pipeline -> {
+    			cvSink.grabFrame(source);
+    			pipeline.process(source);
+	            outputStream.putFrame(source);
+      });
+      visionThread.start();
+    }
+
+    // loop forever
+    while (true) {
+      try {
+    	Thread.sleep(10000);
+
+      } catch (InterruptedException ex) {
+        return;
+      }
+    }
+  }
 }
