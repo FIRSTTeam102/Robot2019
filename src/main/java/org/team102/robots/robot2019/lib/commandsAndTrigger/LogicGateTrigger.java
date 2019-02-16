@@ -18,7 +18,6 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-
 package org.team102.robots.robot2019.lib.commandsAndTrigger;
 
 import java.util.function.Supplier;
