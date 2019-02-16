@@ -20,20 +20,91 @@
 
 package org.team102.robots.robot2019;
 
+import org.team102.robots.robot2019.commands.CommandClimb;
+import org.team102.robots.robot2019.commands.CommandMoveArmManual;
+import org.team102.robots.robot2019.commands.CommandSetCargoManip;
+import org.team102.robots.robot2019.commands.CommandSetHatchManip;
+import org.team102.robots.robot2019.commands.CommandUseArmSetpoint;
+import org.team102.robots.robot2019.lib.CommonIDs;
+import org.team102.robots.robot2019.lib.CustomOperatorConsole;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.AxisTrigger;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.CommandPlayRumble;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.LogicGateTrigger;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.TimedTrigger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.buttons.POVButton;
 
 public class OI {
 	
 	public Joystick driverJoystick;
+	public CustomOperatorConsole opConsole;
 	
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
+		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
+	}
+	
+	@SuppressWarnings("resource") // Because otherwise it would complain about all the joystick buttons not being closed, even though there is no good reason why they should be closed.
+	public void init() {
+		// All button assignments on the operator console should be fairly self-explanatory
+		// While progressing, they will light up the LEDs on the Operator Console the color of their buttons
 		
-		Robot.driverNotif.initOIPortions();
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_BOTTOM).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_TOP).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_MIDDLE).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_BOTTOM).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_CARGO_SHIP_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_OR_LOADING_STATION_HATCH).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_CARGO_SHIP_OR_LOADING_STATION_HATCH, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_ABOVE_POSITION).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_HATCH_ABOVE_POSITION, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_COMMIT).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_HATCH_COMMIT, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO).whenPressed(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
+		
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN).whileHeld(new CommandMoveArmManual(false, true));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP).whileHeld(new CommandMoveArmManual(false, false));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN).whileHeld(new CommandMoveArmManual(true, true));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP).whileHeld(new CommandMoveArmManual(true, false));
+		
+		// Driver A: When pressed, extend the hatch ejector, when released, contract it.
+		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
+		
+		// Driver DPad Up for a certain amount of time: Climb
+		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false)).whenActive(new CommandClimb());
+		
+		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
+		LogicGateTrigger.or(
+				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_LEFT_BUMPER),
+				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_LEFT_TRIGGER)
+		).whileActive(new CommandSetCargoManip(true));
+		
+		// Driver right bumper or right trigger: When pressed, start up the cargo roller going in, when released, stop it.
+		LogicGateTrigger.or(
+				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_RIGHT_BUMPER),
+				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER)
+		).whileActive(new CommandSetCargoManip(false));
 	}
 	
 	public double getTimeRemaining() {
-		return Math.max(0, DriverStation.getInstance().getMatchTime());
+		double time = DriverStation.getInstance().getMatchTime();
+		
+		if(time == -1) {
+			return 120;
+		} else {
+			return time;
+		}
+	}
+	
+	public static AxisTrigger getTriggerForAxis(Joystick js, int axis) {
+		return AxisTrigger.forGreaterThan(js, axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
+	}
+	
+	public void setOpConsoleIdlePattern() {
+		opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SCROLLING_ORANGE);
 	}
 }

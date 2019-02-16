@@ -59,16 +59,15 @@ public final class CommonIDs {
 	/** Positions for a POV/Hat/DPad switch */
 	public static final class POVSwitch {
 		/** POV is unpressed */		public static final int NOT_PRESSED = -1;
-		/** POV is center-pressed*/	public static final int CENTER = 0;
 		
-		/** 0 degrees */	public static final int UP_CENTER = 1;
-		/** 45 degrees */	public static final int UP_RIGHT = 2;
-		/** 90 degrees */	public static final int CENTER_RIGHT = 3;
-		/** 135 degrees */	public static final int DOWN_RIGHT = 4;
-		/** 180 degrees */	public static final int DOWN_CENTER = 5;
-		/** 225 degrees */	public static final int DOWN_LEFT = 6;
-		/** 270 degrees */	public static final int CENTER_LEFT = 7;
-		/** 315 degrees */	public static final int UP_LEFT = 8;
+		/** 0 degrees */	public static final int UP_CENTER = 0;
+		/** 45 degrees */	public static final int UP_RIGHT = 45;
+		/** 90 degrees */	public static final int CENTER_RIGHT = 90;
+		/** 135 degrees */	public static final int DOWN_RIGHT = 135;
+		/** 180 degrees */	public static final int DOWN_CENTER = 180;
+		/** 225 degrees */	public static final int DOWN_LEFT = 225;
+		/** 270 degrees */	public static final int CENTER_LEFT = 270;
+		/** 315 degrees */	public static final int UP_LEFT = 315;
 		
 		/**
 		 * Is this a valid POV ID?

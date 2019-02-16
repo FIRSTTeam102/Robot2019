@@ -47,8 +47,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry lowTimeNotifier;
 	private NetworkTableEntry timeLeftPane;
 	
-	private boolean lowTimeTriggered = false;
 	private int notificationBlinkTime = 0;
+	private int prevCountdownStage = -1;
 	
 	private NetworkTableEntry selectedStreamName;
 	private MjpegServer videoOutput;
@@ -60,6 +60,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry frontCenteringInfo;
 	private NetworkTableEntry rearCenteringInfo;
 	private NetworkTableEntry centeringStatus;
+	
+	private NetworkTableEntry climberStatus;
 	
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
@@ -89,6 +91,11 @@ public class SubsystemDriverNotification extends Subsystem {
 		armElbowStatus = armStatusLayout.add("Status: Elbow", "").getEntry();
 		armWristStatus = armStatusLayout.add("Status: Wrist", "").getEntry();
 		armOverallStatus = armStatusLayout.add("Overall", "").getEntry();
+		
+		climberStatus = driverInfoTab
+				.add("Climber Status", "")
+				.withPosition(6, 2).withSize(2, 1)
+				.getEntry();
 	}
 	
 	public void initOIPortions() {
@@ -148,18 +155,14 @@ public class SubsystemDriverNotification extends Subsystem {
 		timeLeftPane.setString("Time Remaining: " + ROUNDING_FORMATTER.format(time));
 		
 		if(time <= RobotMap.LOW_TIME && RobotState.isOperatorControl() && RobotState.isEnabled()) {
-			if(!lowTimeTriggered) {
-				lowTimeTriggered = true;
-				
-				onBeginningOfLowTime();
-			}
-			
 			notificationBlinkTime++;
 			if(notificationBlinkTime >= 15) {
 				notificationBlinkTime = 0;
 				
 				blinkNotification();
 			}
+			
+			updateOpConsoleLights(time);
 		}
 		
 		armElbowStatus.setString(Robot.arm.getElbowStatus());
@@ -169,13 +172,25 @@ public class SubsystemDriverNotification extends Subsystem {
 		frontCenteringInfo.setNumber(Robot.centering.getFrontValue());
 		rearCenteringInfo.setNumber(Robot.centering.getRearValue());
 		centeringStatus.setString(Robot.centering.getStatus());
-	}
-	
-	private void onBeginningOfLowTime() {
-		// TODO rummble controller
+		
+		climberStatus.setString(Robot.climber.getStatus());
 	}
 	
 	private void blinkNotification() {
 		lowTimeNotifier.setBoolean(!lowTimeNotifier.getBoolean(false));
+	}
+	
+	private void updateOpConsoleLights(double time) {
+		int numStages = RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN.length;
+		double timePerStage = RobotMap.LOW_TIME / numStages;
+		
+		int countdownStage = numStages - (int)Math.ceil(Math.max(time, .01) / timePerStage);
+		
+		if(countdownStage != prevCountdownStage) {
+			prevCountdownStage = countdownStage;
+			RobotMap.RUMBLE_LOW_TIME.play(Robot.oi.driverJoystick);
+		}
+		
+		Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 	}
 }

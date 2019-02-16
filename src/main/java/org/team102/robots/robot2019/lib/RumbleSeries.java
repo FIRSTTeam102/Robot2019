@@ -33,7 +33,7 @@ public class RumbleSeries {
 	/** The {@link Rumble rumbles} in order */
 	private ArrayList<Rumble> rumbles = new ArrayList<Rumble>();
 	/** The amount of time to play each rumble for */
-	private ArrayList<Float> times = new ArrayList<Float>();
+	private ArrayList<Double> times = new ArrayList<>();
 	
 	/**
 	 * Adds a {@link Rumble} to the series, and returns itself for ease of constructing
@@ -41,7 +41,7 @@ public class RumbleSeries {
 	 * @param time How long to add it for, in seconds
 	 * @return itself, for ease of construction
 	 */
-	public RumbleSeries addRumble(Rumble rumble, float time) {
+	public RumbleSeries addRumble(Rumble rumble, double time) {
 		rumbles.add(rumble);
 		times.add(time);
 		
@@ -53,28 +53,28 @@ public class RumbleSeries {
 	 * @param time How long to add it for, in seconds
 	 * @return itself, for ease of construction
 	 */
-	public RumbleSeries addSoft(float time) { return addRumble(Rumble.SOFT, time); }
+	public RumbleSeries addSoft(double time) { return addRumble(Rumble.SOFT, time); }
 	
 	/**
 	 * Adds a {@link Rumble#ROUGH rough} {@link Rumble} for the specified amount of time
 	 * @param time How long to add it for, in seconds
 	 * @return itself, for ease of construction
 	 */
-	public RumbleSeries addRough(float time) { return addRumble(Rumble.ROUGH, time); }
+	public RumbleSeries addRough(double time) { return addRumble(Rumble.ROUGH, time); }
 	
 	/**
 	 * Adds a {@link Rumble#BOTH both} {@link Rumble} for the specified amount of time
 	 * @param time How long to add it for, in seconds
 	 * @return itself, for ease of construction
 	 */
-	public RumbleSeries addBoth(float time) { return addRumble(Rumble.BOTH, time); }
+	public RumbleSeries addBoth(double time) { return addRumble(Rumble.BOTH, time); }
 	
 	/**
 	 * Adds a {@link Rumble#BREAK gap} for the specified amount of time
 	 * @param time How long to add it for, in seconds
 	 * @return itself, for ease of construction
 	 */
-	public RumbleSeries addBreak(float time) { return addRumble(Rumble.BREAK, time); }
+	public RumbleSeries addBreak(double time) { return addRumble(Rumble.BREAK, time); }
 	
 	/**
 	 * Plays the rumble to the specified {@link GenericHID joystick}, asynchronously
@@ -113,9 +113,9 @@ public class RumbleSeries {
 	/**
 	 * @return How long it would take to play this {@link RumbleSeries}
 	 */
-	public float getTotalTime() {
-		float time = 0;
-		for(Float d : times) time += d;
+	public double getTotalTime() {
+		double time = 0;
+		for(Double d : times) time += d;
 		
 		return time;
 	}

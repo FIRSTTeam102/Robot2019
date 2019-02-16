@@ -28,7 +28,6 @@ import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 public class SubsystemCentering extends SubsystemWithArduino {
 	
 	private double frontSensorVal, rearSensorVal;
-	private boolean enabled = true;
 	
 	public SubsystemCentering() {
 		super("Centering", RobotMap.CENTERING_ARDUINO_WHOIS_RESPONSE, "Centering Sensor Control");
@@ -37,22 +36,6 @@ public class SubsystemCentering extends SubsystemWithArduino {
 	@Override
 	protected void initDefaultCommand() {
 		
-	}
-	
-	public boolean isEnabled() {
-		return enabled;
-	}
-	
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-	
-	public void enable() {
-		setEnabled(true);
-	}
-	
-	public void disable() {
-		setEnabled(false);
 	}
 	
 	public double getFrontValue() {
@@ -77,7 +60,7 @@ public class SubsystemCentering extends SubsystemWithArduino {
 		boolean frontCentered = isCentered(front);
 		boolean rearCentered = isCentered(rear);
 		
-		if(!isEnabled() || (frontCentered && rearCentered)) {
+		if(frontCentered && rearCentered) {
 			return MoveDirection.NONE;
 		} else if(frontCentered) {
 			return MoveDirection.FRONT;
@@ -104,9 +87,9 @@ public class SubsystemCentering extends SubsystemWithArduino {
 	@Override
 	protected void onArduinoLineReceived(String line) {
 		try {
-			if(line.toUpperCase(Locale.ROOT).startsWith("F:")) {
+			if(line.toUpperCase(Locale.ROOT).startsWith("F: ")) {
 				frontSensorVal = parseVal(line);
-			} else if(line.toUpperCase(Locale.ROOT).startsWith("B:")) {
+			} else if(line.toUpperCase(Locale.ROOT).startsWith("B: ")) {
 				rearSensorVal = parseVal(line);
 			} else {
 				throw new UnsupportedOperationException("Unknown prefix on line");
@@ -117,7 +100,7 @@ public class SubsystemCentering extends SubsystemWithArduino {
 	}
 	
 	private static double parseVal(String line) {
-		return Integer.parseInt(line.substring(2)) / 2000D - 1;
+		return Integer.parseInt(line.substring(3)) / 2000D - 1;
 	}
 	
 	public static enum MoveDirection {
