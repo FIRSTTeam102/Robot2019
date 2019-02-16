@@ -7,22 +7,12 @@ import edu.wpi.first.wpilibj.command.Command;
 public class CommandSetCargoManip extends Command {
 	
 	private boolean isReverse;
-	private boolean hasTimeout = false;
 	
 	public CommandSetCargoManip(boolean isReverse) {
-		this(isReverse, -1);
-	}
-	
-	public CommandSetCargoManip(boolean isReverse, double timeout) {
-		super("Set Cargo Manipulator: { reverse: " + isReverse + ", timeout: " + timeout + " }");
+		super("Set Cargo Manipulator: " + (isReverse ? "Reverse" : "Forward"));
 		requires(Robot.cargoManip);
 		
 		this.isReverse = isReverse;
-		
-		if(timeout > 0) {
-			setTimeout(timeout);
-			hasTimeout = true;
-		}
 	}
 	
 	@Override
@@ -46,10 +36,6 @@ public class CommandSetCargoManip extends Command {
 	
 	@Override
 	protected boolean isFinished() {
-		if(hasTimeout) {
-			return isTimedOut();
-		} else {
-			return false;
-		}
+		return false;
 	}
 }

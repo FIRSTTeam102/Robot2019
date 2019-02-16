@@ -2,21 +2,36 @@ package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.command.Command;
 
-public class CommandSetHatchManip extends InstantCommand {
+public class CommandSetHatchManip extends Command {
 
-	private boolean extended;
-	
-	public CommandSetHatchManip(boolean extended) {
-		super("Set Hatch Manipulator: " + (extended ? "Extended" : "Contracted"));
+	public CommandSetHatchManip() {
+		super("Set Hatch Manipulator");
 		requires(Robot.hatchManip);
-		
-		this.extended = extended;
 	}
 	
 	@Override
 	public void initialize() {
-		Robot.hatchManip.setEjector(extended);
+		Robot.hatchManip.setEjector(true);
+	}
+	
+	private void done() {
+		Robot.hatchManip.setEjector(false);
+	}
+	
+	@Override
+	public void end() {
+		done();
+	}
+	
+	@Override
+	public void interrupted() {
+		done();
+	}
+	
+	@Override
+	protected boolean isFinished() {
+		return false;
 	}
 }
