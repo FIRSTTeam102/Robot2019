@@ -48,6 +48,7 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry timeLeftPane;
 	
 	private int notificationBlinkTime = 0;
+	private int prevCountdownStage = -1;
 	
 	private NetworkTableEntry selectedStreamName;
 	private MjpegServer videoOutput;
@@ -173,6 +174,11 @@ public class SubsystemDriverNotification extends Subsystem {
 	private void updateOpConsoleLights(double time) {
 		double timePerStage = RobotMap.LOW_TIME / RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN.length;
 		int countdownStage = (int)Math.floor((time - RobotMap.LOW_TIME) / timePerStage);
+		
+		if(countdownStage != prevCountdownStage) {
+			prevCountdownStage = countdownStage;
+			RobotMap.RUMBLE_LOW_TIME.play(Robot.oi.driverJoystick);
+		}
 		
 		Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 	}
