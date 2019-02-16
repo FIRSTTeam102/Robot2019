@@ -27,6 +27,7 @@ import org.team102.robots.robot2019.lib.commandsAndTrigger.CommandSetOpConsoleLi
 import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.PrintCommand;
 
 public class CommandUseArmSetpoint extends CommandGroup {
 	
@@ -35,21 +36,25 @@ public class CommandUseArmSetpoint extends CommandGroup {
 	}
 	
 	public CommandUseArmSetpoint(ArmSetpoint setpoint, int[] controllerLightPatterns) {
-		super("Use Arm Setpoint: " + setpoint.name);
+		super("Use Arm Setpoint: " + (setpoint == null ? "(no setpoint given)" : setpoint.name));
 		
 		if(controllerLightPatterns != null) { // If we have light patterns to use, use the first one for "in progress".
 			addSequential(new CommandSetOpConsoleLightPattern(Robot.oi.opConsole, controllerLightPatterns[0]));
 		}
 		
-		if(!setpoint.isExtended) { // If it isn't supposed to be extended, contract it first, so it doesn't hit anything.
-			addSequential(new CommandExtendArm(false));
-		}
-		
-		// Then move the elbow and wrist to the correct distances
-		addSequential(new CommandMoveArmAutomatic(setpoint));
-		
-		if(setpoint.isExtended) { // Extend it if we're supposed to.
-			addSequential(new CommandExtendArm(true));
+		if(setpoint == null) {
+			addSequential(new PrintCommand("Warning: The setpoint given has not yet been assigned!"));
+		} else {
+			if(!setpoint.isExtended) { // If it isn't supposed to be extended, contract it first, so it doesn't hit anything.
+				addSequential(new CommandExtendArm(false));
+			}
+			
+			// Then move the elbow and wrist to the correct distances
+			addSequential(new CommandMoveArmAutomatic(setpoint));
+			
+			if(setpoint.isExtended) { // Extend it if we're supposed to.
+				addSequential(new CommandExtendArm(true));
+			}
 		}
 		
 		if(controllerLightPatterns != null) { // If we have light patterns to use, use the second one for "done", and also assume that we're doing this from the a button (not automatically), so rumble that we're done, too
