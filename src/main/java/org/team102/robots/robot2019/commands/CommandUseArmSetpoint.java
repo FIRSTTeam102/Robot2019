@@ -20,24 +20,36 @@
 
 package org.team102.robots.robot2019.commands;
 
-import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
+import org.team102.robots.robot2019.ArmStatus;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 public class CommandUseArmSetpoint extends CommandGroup {
 	
-	public CommandUseArmSetpoint(ArmSetpoint setpoint) {
+	public CommandUseArmSetpoint(ArmStatus setpoint) {
 		super("Use Arm Setpoint: " + setpoint.name);
 		
-		if(!setpoint.isExtended) { // If it isn't supposed to be extended, contract it first, so it doesn't hit anything.
+		if(!setpoint.isExtended) { // If the arm isn't supposed to be extended, contract it first, so it doesn't hit anything.
 			addSequential(new CommandExtendArm(false));
+		}
+		
+		if(!setpoint.isHatchEjectorExtended) { // It the hatch ejector isn't supposed to be extended, contract it first, so it doesn't mess anything up or hit anything
+			addSequential(new CommandSetHatchManip(false));
 		}
 		
 		// Then move the elbow and wrist to the correct distances
 		addSequential(new CommandMoveArmAutomatic(setpoint));
 		
-		if(setpoint.isExtended) { // Extend it if we're supposed to.
+		if(setpoint.isExtended) { // Extend the arm if we're supposed to.
 			addSequential(new CommandExtendArm(true));
+		}
+		
+		if(setpoint.isHatchEjectorExtended) { // Extend the hatch ejector if we're supposed to
+			addSequential(new CommandSetHatchManip(true));
+		}
+		
+		if(setpoint.cargoRollerActiveTime > 0) { // Set the cargo roller at the end, either forward or reverse, as applicable
+			addSequential(new CommandSetCargoManip(setpoint.isCargoRollerReverse, setpoint.cargoRollerActiveTime));
 		}
 	}
 }
