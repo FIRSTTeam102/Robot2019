@@ -141,6 +141,15 @@ public class SubsystemArm extends SubsystemWithArduino {
 			
 			int distanceWristLower = Integer.parseInt(parts[1]);
 			int distanceWristUpper = Integer.parseInt(parts[2]);
+			
+			if(distanceWristLower > RobotMap.ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE) {
+				distanceWristLower = -1;
+			}
+			
+			if(distanceWristUpper > RobotMap.ARM_WRIST_UPPER_MAXIMUM_RECORDABLE_DISTANCE) {
+				distanceWristUpper = -1;
+			}
+			
 			boolean wristLowerInRange = distanceWristLower != -1;
 			boolean wristUpperInRange = distanceWristUpper != -1;
 			
