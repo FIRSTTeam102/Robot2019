@@ -45,24 +45,24 @@ public class RobotMap {
 	
 	public static final double LOW_TIME = 30;
 	
-	public static final double CENTERING_ALLOWABLE_ERROR = .01;
-	public static final double CENTERING_SPEED_FRONT_OR_BACK = .1;
-	public static final double CENTERING_SPEED_LEFT_OR_RIGHT = .1;
-	public static final double CENTERING_SPEED_ROTATION = .1;
+	public static final double CENTERING_ALLOWABLE_ERROR = .01; // TODO configure this
+	public static final double CENTERING_SPEED_FRONT_OR_BACK = .1; // TODO configure this
+	public static final double CENTERING_SPEED_LEFT_OR_RIGHT = .1; // TODO configure this
+	public static final double CENTERING_SPEED_ROTATION = .1; // TODO configure this
 	
-	public static final double CAMERA_LIGHT_BRIGHTNESS = 1;
+	public static final double CAMERA_LIGHT_BRIGHTNESS = 1; // TODO configure this
 	
 	public static final String ARM_ARDUINO_WHOIS_RESPONSE = "arm-sensors";
 	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
 	public static final String LIGHTS_ARDUINO_WHOIS_RESPONSE = "lcl-r1";
 	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
-	public static final double CARGO_MANIP_ROLLER_SPEED = .5;
-	public static final double ARM_ELBOW_SPEED = .5;
-	public static final double ARM_WRIST_SPEED = .5;
+	public static final double CARGO_MANIP_ROLLER_SPEED = .5; // TODO configure this
+	public static final double ARM_ELBOW_SPEED = .5; // TODO configure this
+	public static final double ARM_WRIST_SPEED = .5; // TODO configure this
 	
-	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1;
-	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1;
+	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
+	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	public static final int JOYSTICK_ID_OPERATOR = 1;
@@ -81,10 +81,10 @@ public class RobotMap {
 	
 	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 7;
 	
-	public static final int SOLENOID_ARM_EXTENDER = 0;
+	public static final int SOLENOID_ARM_EXTENDER = 0; // TODO configure this
 	
-	public static final int SOLENOID_HATCH_MANIP_EJECTOR_1 = 1;
-	public static final int SOLENOID_HATCH_MANIP_EJECTOR_2 = 2;
+	public static final int SOLENOID_HATCH_MANIP_EJECTOR_1 = 1; // TODO configure this
+	public static final int SOLENOID_HATCH_MANIP_EJECTOR_2 = 2; // TODO configure this
 	
-	public static final int SOLENOID_CLIMBER = 3;
+	public static final int SOLENOID_CLIMBER = 3; // TODO configure this
 }
