@@ -25,22 +25,29 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_TOP = null;
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_MIDDLE = null;
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_BOTTOM = null;
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_TOP = null;
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_MIDDLE = null;
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_BOTTOM = null;
+	public static final double DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED = .1; // TODO configure this
 	
-	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_CARGO = null;
-	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_OR_LOADING_STATION_HATCH = null;
+	public static final double CLIMBER_EXTENSION_TIME = 10; // TODO configure this
+	public static final double CLIMBER_WAIT_BEFORE_DRIVE_TIME = 5; // TODO configure this
+	public static final double CLIMBER_DRIVE_FORWARD_TIME = 5; // TODO configure this
 	
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_ABOVE_POSITION = null;
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_COMMIT = null;
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_CARGO = null;
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_TOP = null;  // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_MIDDLE = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_BOTTOM = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_TOP = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_MIDDLE = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_BOTTOM = null; // TODO configure this
+	
+	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_CARGO = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_OR_LOADING_STATION_HATCH = null; // TODO configure this
+	
+	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_ABOVE_POSITION = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_COMMIT = null; // TODO configure this
+	public static final ArmSetpoint ARM_SETPOINT_FLOOR_CARGO = null; // TODO configure this
 	
 	public static final RumbleSeries RUMBLE_ARM_AT_SETPOINT = new RumbleSeries().addSoft(.2);
 	public static final RumbleSeries RUMBLE_LOW_TIME = new RumbleSeries().addRough(.1).addBreak(.1).addRough(.1);
+	public static final RumbleSeries RUMBLE_NOT_ENOUGH_TIME = new RumbleSeries().addRough(.5);
 	
 	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP = 1;
 	public static final int OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE = 2;
