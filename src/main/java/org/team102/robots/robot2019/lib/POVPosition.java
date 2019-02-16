@@ -21,6 +21,7 @@
 package org.team102.robots.robot2019.lib;
 
 import org.team102.robots.robot2019.lib.CommonIDs.POVSwitch;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.POVButton;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
