@@ -32,17 +32,21 @@ import org.team102.robots.robot2019.lib.commandsAndTrigger.LogicGateTrigger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
+import edu.wpi.first.wpilibj.buttons.POVButton;
+import edu.wpi.first.wpilibj.command.PrintCommand;
 
 public class OI {
 	
 	public Joystick driverJoystick;
 	public CustomOperatorConsole opConsole;
 	
-	@SuppressWarnings("resource") // Because otherwise it would complain about all the joystick buttons not being closed, even though there is no good reason why they should be closed.
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
 		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
-		
+	}
+	
+	@SuppressWarnings("resource") // Because otherwise it would complain about all the joystick buttons not being closed, even though there is no good reason why they should be closed.
+	public void init() {
 		// All button assignments on the operator console should be fairly self-explanatory
 		// While progressing, they will light up the LEDs on the Operator Console the color of their buttons
 		
@@ -69,6 +73,7 @@ public class OI {
 		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
 		
 		// TODO put in the driver control for climbing
+		new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER).whenPressed(new PrintCommand("test"));
 		
 		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
 		LogicGateTrigger.or(
@@ -81,8 +86,6 @@ public class OI {
 				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_RIGHT_BUMPER),
 				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER)
 		).whileActive(new CommandSetCargoManip(false));
-		
-		Robot.driverNotif.initOIPortions();
 	}
 	
 	public double getTimeRemaining() {

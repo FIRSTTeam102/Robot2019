@@ -57,6 +57,8 @@ public class Robot extends TimedRobot {
 		driverNotif = new SubsystemDriverNotification();
 		
 		oi = new OI();
+		driverNotif.initOIPortions();
+		oi.init();
 	}
 	
 	@Override
