@@ -47,9 +47,6 @@ public class SubsystemCameras extends Subsystem/*WithArduino*/ {
 		setPipelineActive(true);
 		visibleVideoOutputs.add(pipelineOutput);*/
 		
-		VideoSource armCamera = VisionCameraHelper.openAndVerifyCamera("Arm Camera", RobotMap.CAMERA_ID_ARM, 480, 360, 15, 15, false);
-		visibleVideoOutputs.add(armCamera);
-		
 		HttpCamera piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
 		visibleVideoOutputs.add(piVisionOutput);
 	}
