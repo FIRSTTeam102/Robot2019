@@ -20,16 +20,16 @@
 
 package org.team102.robots.robot2019.commands;
 
-import org.team102.robots.robot2019.ArmStatus;
 import org.team102.robots.robot2019.Robot;
+import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CommandMoveArmAutomatic extends Command {
 	
-	private ArmStatus setpoint;
+	private ArmSetpoint setpoint;
 	
-	public CommandMoveArmAutomatic(ArmStatus setpoint) {
+	public CommandMoveArmAutomatic(ArmSetpoint setpoint) {
 		super("Move arm to: " + setpoint);
 		requires(Robot.arm);
 		

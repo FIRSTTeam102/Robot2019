@@ -20,7 +20,6 @@
 
 package org.team102.robots.robot2019.subsystems;
 
-import org.team102.robots.robot2019.ArmStatus;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
@@ -41,7 +40,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private boolean isInManualMode = false;
 	private boolean manualModeIsWrist, manualModeIsReverse;
 	
-	private ArmStatus setpoint;
+	private ArmSetpoint setpoint;
 	
 	private String elbowStatus = "Not updated yet?";
 	private String wristStatus = "Not updated yet?";
@@ -196,7 +195,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 		isInManualMode = false;
 	}
 	
-	public void setSetpoint(ArmStatus setpoint) {
+	public void setSetpoint(ArmSetpoint setpoint) {
 		this.setpoint = setpoint;
 	}
 	
@@ -222,5 +221,23 @@ public class SubsystemArm extends SubsystemWithArduino {
 	
 	public boolean isWithinMarginOfErrorOfSetpoints() {
 		return isElbowInRange() && isWristInRange();
+	}
+	
+	public static class ArmSetpoint {
+		
+		public final String name;
+		public final boolean isExtended;
+		public final int elbowSetpoint, wristSetpoint;
+		
+		public ArmSetpoint(String name, boolean isExtended, int elbowSetpoint, int wristSetpoint) {
+			this.name = name;
+			this.isExtended = isExtended;
+			this.elbowSetpoint = elbowSetpoint;
+			this.wristSetpoint = wristSetpoint;
+		}
+		
+		public String toString() {
+			return "{ Elbow: " + elbowSetpoint + ", Wrist: " + wristSetpoint + " }";
+		}
 	}
 }
