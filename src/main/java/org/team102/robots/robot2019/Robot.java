@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
 		TimedRobot.startRobot(Robot::new);
 	}
 	
+	@Override
 	public void robotInit() {
 		ArduinoConnection.findArduinos();
 		
@@ -58,19 +59,40 @@ public class Robot extends TimedRobot {
 		oi = new OI();
 	}
 	
+	@Override
 	public void robotPeriodic() {
 		Scheduler.getInstance().run();
 	}
 	
-	public void teleopInit() {}
+	@Override
+	public void teleopInit() {
+		oi.setOpConsoleIdlePattern();
+	}
+	
+	@Override
 	public void teleopPeriodic() {}
 	
-	public void autonomousInit() {}
+	@Override
+	public void autonomousInit() {
+		oi.setOpConsoleIdlePattern();
+	}
+	
+	@Override
 	public void autonomousPeriodic() {}
 	
-	public void disabledInit() {}
+	@Override
+	public void disabledInit() {
+		oi.setOpConsoleIdlePattern();
+	}
+	
+	@Override
 	public void disabledPeriodic() {}
 	
-	public void testInit() {}
+	@Override
+	public void testInit() {
+		oi.setOpConsoleIdlePattern();
+	}
+	
+	@Override
 	public void testPeriodic() {}
 }

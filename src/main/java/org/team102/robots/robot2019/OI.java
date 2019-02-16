@@ -66,4 +66,8 @@ public class OI {
 	public double getTimeRemaining() {
 		return Math.max(0, DriverStation.getInstance().getMatchTime());
 	}
+	
+	public void setOpConsoleIdlePattern() {
+		opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SCROLLING_ORANGE);
+	}
 }
