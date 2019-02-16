@@ -47,7 +47,6 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry lowTimeNotifier;
 	private NetworkTableEntry timeLeftPane;
 	
-	private boolean lowTimeTriggered = false;
 	private int notificationBlinkTime = 0;
 	
 	private NetworkTableEntry selectedStreamName;
@@ -148,18 +147,14 @@ public class SubsystemDriverNotification extends Subsystem {
 		timeLeftPane.setString("Time Remaining: " + ROUNDING_FORMATTER.format(time));
 		
 		if(time <= RobotMap.LOW_TIME && RobotState.isOperatorControl() && RobotState.isEnabled()) {
-			if(!lowTimeTriggered) {
-				lowTimeTriggered = true;
-				
-				onBeginningOfLowTime();
-			}
-			
 			notificationBlinkTime++;
 			if(notificationBlinkTime >= 15) {
 				notificationBlinkTime = 0;
 				
 				blinkNotification();
 			}
+			
+			updateOpConsoleLights(time);
 		}
 		
 		armElbowStatus.setString(Robot.arm.getElbowStatus());
@@ -171,11 +166,14 @@ public class SubsystemDriverNotification extends Subsystem {
 		centeringStatus.setString(Robot.centering.getStatus());
 	}
 	
-	private void onBeginningOfLowTime() {
-		// TODO rummble controller
-	}
-	
 	private void blinkNotification() {
 		lowTimeNotifier.setBoolean(!lowTimeNotifier.getBoolean(false));
+	}
+	
+	private void updateOpConsoleLights(double time) {
+		double timePerStage = RobotMap.LOW_TIME / RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN.length;
+		int countdownStage = (int)Math.floor((time - RobotMap.LOW_TIME) / timePerStage);
+		
+		Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 	}
 }
