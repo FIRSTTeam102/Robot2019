@@ -62,7 +62,7 @@ public class SubsystemDriveTrain extends Subsystem {
 	}
 	
 	public void drive(double frontBack, double leftRight, double rotation) {
-		drive.driveCartesian(leftRight, frontBack, rotation);
+		drive.driveCartesian(-frontBack, leftRight, rotation);
 	}
 	
 	public void driveWithJoystick(Joystick joy) {
