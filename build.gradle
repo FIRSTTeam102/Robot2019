@@ -35,7 +35,7 @@ build {
 }
 
 if(project.hasProperty("enable-warnings")) {
-	def debugCompilerWarnings = ["-Xlint:unchecked", "-Xlint:deprecation"]
+	def debugCompilerWarnings = ["-Xlint:all"]
 	
 	tasks.withType(JavaCompile).configureEach {
 		if(options.compilerArgs == null) {
