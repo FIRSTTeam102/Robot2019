@@ -21,6 +21,7 @@
 package org.team102.robots.robot2019;
 
 import org.team102.robots.robot2019.commands.CommandClimb;
+import org.team102.robots.robot2019.commands.CommandExtendArm;
 import org.team102.robots.robot2019.commands.CommandMoveArmManual;
 import org.team102.robots.robot2019.commands.CommandSetCargoManip;
 import org.team102.robots.robot2019.commands.CommandSetHatchManip;
@@ -90,6 +91,10 @@ public class OI {
 		).whileActive(new CommandSetCargoManip(true));
 		
 		setOpConsoleDisabledPattern();
+		
+		JoystickButton jb = opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_UNUSED);
+		jb.whenPressed(new CommandExtendArm(true));
+		jb.whenReleased(new CommandExtendArm(false));
 	}
 	
 	public double getTimeRemaining() {
