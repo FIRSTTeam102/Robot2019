@@ -71,10 +71,10 @@ public class RobotMap {
 	
 	public static final int OP_CONTROLLER_BUTTON_ID_UNUSED = 16;
 	
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN = 17;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP = 18;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN = 19;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP = 20;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP = 17;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN = 18;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP = 19;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN = 20;
 	
 	public static final int OP_CONTROLLER_PATTERN_OFF = 0;
 	public static final int OP_CONTROLLER_PATTERN_SCROLLING_ORANGE = 1;
@@ -84,17 +84,17 @@ public class RobotMap {
 	public static final int OP_CONTROLLER_PATTERN_COUNTDOWN_6_ON = 4;
 	public static final int OP_CONTROLLER_PATTERN_COUNTDOWN_8_ON = 5;
 	
-	public static final int OP_CONTROLLER_PATTERN_FLASH_RED = 6;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_GREEN = 8;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_BLUE = 10;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_YELLOW = 12;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_PURPLE = 14;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_RED = 6;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_GREEN = 8;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_BLUE = 10;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_YELLOW = 12;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_PURPLE = 14;
 	
-	public static final int OP_CONTROLLER_PATTERN_SOLID_RED = 7;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_GREEN = 9;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_BLUE = 11;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_YELLOW = 13;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_PURPLE = 15;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_RED = 7;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_GREEN = 9;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_BLUE = 11;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_YELLOW = 13;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_PURPLE = 15;
 	
 	public static final int[] OP_CONTROLLER_PATTERN_SET_COUNTDOWN = { OP_CONTROLLER_PATTERN_COUNTDOWN_2_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_4_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_6_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_8_ON };
 	
