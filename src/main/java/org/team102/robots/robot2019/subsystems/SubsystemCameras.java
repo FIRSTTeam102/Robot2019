@@ -27,7 +27,6 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.cscore.HttpCamera;
-
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemCameras extends Subsystem {
@@ -46,7 +45,7 @@ public class SubsystemCameras extends Subsystem {
 			camBrightness = 15;
 		}
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 30, camBrightness, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 30, camBrightness, true, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		if(pipe == null) {
