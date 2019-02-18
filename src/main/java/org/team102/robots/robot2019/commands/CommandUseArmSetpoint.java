@@ -28,6 +28,7 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.PrintCommand;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 
 public class CommandUseArmSetpoint extends CommandGroup {
 	
@@ -60,6 +61,14 @@ public class CommandUseArmSetpoint extends CommandGroup {
 		if(controllerLightPatterns != null) { // If we have light patterns to use, use the second one for "done", and also assume that we're doing this from the a button (not automatically), so rumble that we're done, too
 			addSequential(new CommandSetOpConsoleLightPattern(Robot.oi.opConsole, controllerLightPatterns[1]));
 			addSequential(new CommandPlayRumble(Robot.oi.driverJoystick, RobotMap.RUMBLE_ARM_AT_SETPOINT, false));
+			
+			addSequential(new WaitCommand(2));
+			addSequential(new CommandSetOpConsoleLightPattern(Robot.oi.opConsole, RobotMap.OP_CONTROLLER_PATTERN_OFF));
 		}
+	}
+	
+	@Override
+	public void interrupted() {
+		Robot.oi.setOpConsoleIdlePattern();
 	}
 }
