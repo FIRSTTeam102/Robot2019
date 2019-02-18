@@ -148,9 +148,6 @@ public class RobotMap {
 	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 7;
 	
 	public static final int SOLENOID_ARM_EXTENDER = 0; // TODO configure this
-	
-	public static final int SOLENOID_HATCH_MANIP_EJECTOR_1 = 1; // TODO configure this
-	public static final int SOLENOID_HATCH_MANIP_EJECTOR_2 = 2; // TODO configure this
-	
+	public static final int SOLENOID_HATCH_MANIP_EJECTOR = 1; // TODO configure this
 	public static final int SOLENOID_CLIMBER = 3; // TODO configure this
 }

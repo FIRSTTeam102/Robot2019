@@ -27,16 +27,13 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class SubsystemHatchManipulator  extends Subsystem {
 	
-	private Solenoid ejector1;
-	private Solenoid ejector2;
+	private Solenoid ejector;
 	
 	public SubsystemHatchManipulator() {
 		super("Hatch Manipulator");
 		
-		ejector1 = new Solenoid(RobotMap.SOLENOID_HATCH_MANIP_EJECTOR_1);
-		ejector2 = new Solenoid(RobotMap.SOLENOID_HATCH_MANIP_EJECTOR_2);
-		addChild("Ejection Cylinder 1", ejector1);
-		addChild("Ejection Cylinder 2", ejector2);
+		ejector = new Solenoid(RobotMap.SOLENOID_HATCH_MANIP_EJECTOR);
+		addChild("Ejection Cylinders", ejector);
 	}
 	
 	@Override
@@ -45,7 +42,6 @@ public class SubsystemHatchManipulator  extends Subsystem {
 	}
 	
 	public void setEjector(boolean extended) {
-		ejector1.set(extended);
-		ejector2.set(extended);
+		ejector.set(extended);
 	}
 }
