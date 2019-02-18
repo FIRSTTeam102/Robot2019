@@ -131,7 +131,9 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	 * This does the same thing as {@link #close()}
 	 */
 	@Override
+	@Deprecated
 	public void free() {
+		super.free();
 		close();
 	}
 	

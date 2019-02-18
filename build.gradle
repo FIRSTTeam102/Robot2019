@@ -34,6 +34,18 @@ build {
 	}
 }
 
+if(project.hasProperty("enable-warnings")) {
+	def debugCompilerWarnings = ["-Xlint:unchecked", "-Xlint:deprecation"]
+	
+	tasks.withType(JavaCompile).configureEach {
+		if(options.compilerArgs == null) {
+			options.compilerArgs = debugCompilerWarnings
+		} else {
+			options.compilerArgs.addAll(debugCompilerWarnings)
+		}
+	}
+}
+
 void checkForRobotClass() {
 	def hasRobotClass = false
 	
