@@ -43,7 +43,7 @@ public class SubsystemDriverNotification extends Subsystem {
 	public static final DecimalFormat ROUNDING_FORMATTER = new DecimalFormat("#.#");
 	
 	private ShuffleboardTab driverInfoTab;
-	
+	private ShuffleboardTab visionInfoTab;
 	private NetworkTableEntry lowTimeNotifier;
 	private NetworkTableEntry timeLeftPane;
 	
@@ -62,11 +62,12 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry centeringStatus;
 	
 	private NetworkTableEntry climberStatus;
-	
+		
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
 		driverInfoTab = Shuffleboard.getTab("Driver Information");
+		visionInfoTab = Shuffleboard.getTab("Vision Information");
 		
 		ShuffleboardLayout timeLayout = driverInfoTab
 				.getLayout("Time", BuiltInLayouts.kList)
@@ -96,6 +97,38 @@ public class SubsystemDriverNotification extends Subsystem {
 				.add("Climber Status", "")
 				.withPosition(6, 2).withSize(2, 1)
 				.getEntry();
+		
+		//vision layout starts here
+		ShuffleboardLayout HSVLowLayout = visionInfoTab
+				.getLayout("HSVLow", BuiltInLayouts.kList)
+				.withPosition(2,0).withSize(2,3);
+		
+		ShuffleboardLayout HSVHighLayout = visionInfoTab
+				.getLayout("HSVHigh", BuiltInLayouts.kList)
+				.withPosition(4,0).withSize(2,3);
+		
+		ShuffleboardLayout cameraSettings = visionInfoTab
+				.getLayout("cameraSettings", BuiltInLayouts.kList)
+				.withPosition(6,1).withSize(2, 3);
+		
+		
+		
+		//starting values, 29, 75, 150
+		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider);
+		
+		//starting values 64, 255, 255
+		HSVHighLayout.add("HueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("HueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("HueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		
+		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("shuttterSpeed",5000).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("sharpness", 60).withWidget(BuiltInWidgets.kNumberSlider);
+		
+		//image display
 	}
 	
 	public void initOIPortions() {
@@ -103,6 +136,14 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getLayout("Video Selector", BuiltInLayouts.kList)
 				.withPosition(0, 1).withSize(2, 2)
 				.withProperties(PROP_HIDE_LABELS);
+		
+		NetworkTableEntry piCamToggle = visionInfoTab
+				.add("piCamSelector", false)
+				.withPosition(0, 2).withSize(2,2)
+				.getEntry();
+		
+		MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
+		VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
 		
 		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
 		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
