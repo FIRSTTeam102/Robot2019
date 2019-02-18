@@ -46,7 +46,7 @@ public class SubsystemCameras extends Subsystem {
 			camBrightness = 15;
 		}
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, camBrightness, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 30, camBrightness, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		if(pipe == null) {

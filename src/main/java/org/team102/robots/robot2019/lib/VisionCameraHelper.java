@@ -166,7 +166,9 @@ public class VisionCameraHelper {
 			
 			return cam;
 		} catch(Exception e) {
-			System.err.println("Camera \"" + name + "\" was not found.");
+			System.err.println("Camera \"" + name + "\" was not found: ");
+			e.printStackTrace();
+			
 			return null;
 		}
 	}
