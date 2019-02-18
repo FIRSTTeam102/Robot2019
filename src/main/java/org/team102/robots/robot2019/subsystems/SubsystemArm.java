@@ -84,7 +84,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 			}
 			
 			if(manualModeIsReverse) {
-				elbowSpeed *= -1;
+				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
 				wristSpeed *= -1;
 			}
 			
@@ -99,7 +99,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 			if(elbowInRange) {
 				elbowSpeed = 0;
 			} else if(distanceElbow > setpoint.elbowSetpoint) {
-				elbowSpeed *= -1;
+				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
 			}
 			
 			if(wristInRange) {
