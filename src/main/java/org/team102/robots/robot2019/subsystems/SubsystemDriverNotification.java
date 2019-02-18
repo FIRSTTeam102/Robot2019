@@ -119,9 +119,9 @@ public class SubsystemDriverNotification extends Subsystem {
 		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider);
 		
 		//starting values 64, 255, 255
-		HSVHighLayout.add("HueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVHighLayout.add("HueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVHighLayout.add("HueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("hueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
 		
 		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider);
 		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider);
@@ -233,9 +233,9 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		if(countdownStage != prevCountdownStage) {
 			prevCountdownStage = countdownStage;
+			
 			RobotMap.RUMBLE_LOW_TIME.play(Robot.oi.driverJoystick);
+			Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 		}
-		
-		Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 	}
 }
