@@ -32,6 +32,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class SubsystemCameras extends Subsystem {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
+	private VideoSource piVisionOutput;
+	
 	private VisionCameraHelper.Pipeline pipe;
 	
 	public SubsystemCameras() {
@@ -49,7 +51,7 @@ public class SubsystemCameras extends Subsystem {
 		visibleVideoOutputs.add(visionCamera);
 		
 		if(pipe == null) {
-			HttpCamera piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
+			piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
 			visibleVideoOutputs.add(piVisionOutput);
 		} else {
 			VideoSource pipelineOutput = VisionCameraHelper.startPipeline(visionCamera, 320, 240, "Vision Pipeline", false, pipe);
