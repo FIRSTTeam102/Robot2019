@@ -105,6 +105,10 @@ public class OI {
 	}
 	
 	public void setOpConsoleIdlePattern() {
+		opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_OFF);
+	}
+	
+	public void setOpConsoleDisabledPattern() {
 		opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SCROLLING_ORANGE);
 	}
 }

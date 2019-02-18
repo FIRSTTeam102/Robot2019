@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
 	
 	@Override
 	public void disabledInit() {
-		oi.setOpConsoleIdlePattern();
+		oi.setOpConsoleDisabledPattern();
 	}
 	
 	@Override
