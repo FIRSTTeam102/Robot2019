@@ -116,7 +116,6 @@ public class RobotMap {
 	
 	public static final String ARM_ARDUINO_WHOIS_RESPONSE = "arm-sensors";
 	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
-	public static final String LIGHTS_ARDUINO_WHOIS_RESPONSE = "lcl-r1";
 	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
 	public static final double CARGO_MANIP_ROLLER_SPEED = .5; // TODO configure this
