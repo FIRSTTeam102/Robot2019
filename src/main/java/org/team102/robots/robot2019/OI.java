@@ -24,6 +24,7 @@ import org.team102.robots.robot2019.commands.CommandClimb;
 import org.team102.robots.robot2019.commands.CommandExtendArm;
 import org.team102.robots.robot2019.commands.CommandMoveArmManual;
 import org.team102.robots.robot2019.commands.CommandSetCargoManip;
+import org.team102.robots.robot2019.commands.CommandSetClimber;
 import org.team102.robots.robot2019.commands.CommandSetHatchManip;
 import org.team102.robots.robot2019.commands.CommandUseArmSetpoint;
 import org.team102.robots.robot2019.lib.CommonIDs;
@@ -76,7 +77,14 @@ public class OI {
 		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
 		
 		// Driver DPad Up for a certain amount of time: Climb
-		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false)).whenActive(new CommandClimb());
+		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME)
+				.withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false))
+				.whenActive(new CommandClimb());
+		
+		// Driver DPad Down for a certain (longer) amount of time: Retract climber
+		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.DOWN_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME)
+				.withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false))
+				.whenActive(new CommandSetClimber(false));
 		
 		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
 		LogicGateTrigger.or(
@@ -90,11 +98,11 @@ public class OI {
 				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER)
 		).whileActive(new CommandSetCargoManip(true));
 		
-		setOpConsoleDisabledPattern();
-		
 		JoystickButton jb = opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_UNUSED);
 		jb.whenPressed(new CommandExtendArm(true));
 		jb.whenReleased(new CommandExtendArm(false));
+		
+		setOpConsoleDisabledPattern();
 	}
 	
 	public double getTimeRemaining() {

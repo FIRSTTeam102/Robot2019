@@ -104,8 +104,9 @@ public class RobotMap {
 	public static final int[] OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON = { OP_CONTROLLER_PATTERN_FLASH_YELLOW, OP_CONTROLLER_PATTERN_SOLID_YELLOW };
 	public static final int[] OP_CONTROLLER_PATTERN_SET_PURPLE_BUTTON = { OP_CONTROLLER_PATTERN_FLASH_PURPLE, OP_CONTROLLER_PATTERN_SOLID_PURPLE };
 	
-	public static final double JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER = .25; // TODO configure this
-	public static final double JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME = 2; // TODO configure this
+	public static final double JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER = .25;
+	public static final double JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME = 2;
+	public static final double JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME = 5;
 	
 	public static final double LOW_TIME = 30;
 	
