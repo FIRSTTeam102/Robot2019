@@ -39,11 +39,14 @@ public class SubsystemCameras extends Subsystem {
 		super("Cameras");
 		VisionCameraHelper.loadOpenCV();
 		
+		int camBrightness = -1;
+		
 		if(RobotMap.DEBUG_USE_LOCAL_PIPELINE) {
 			pipe = new Pipe();
+			camBrightness = 15;
 		}
 		
-		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera(/*"Vision Camera"*/"Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, 15, false);
+		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 480, 360, 15, camBrightness, false);
 		visibleVideoOutputs.add(visionCamera);
 		
 		if(pipe == null) {
