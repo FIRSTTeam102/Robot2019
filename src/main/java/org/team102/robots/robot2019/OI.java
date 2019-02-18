@@ -81,13 +81,15 @@ public class OI {
 		LogicGateTrigger.or(
 				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_LEFT_BUMPER),
 				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_LEFT_TRIGGER)
-		).whileActive(new CommandSetCargoManip(true));
+		).whileActive(new CommandSetCargoManip(false));
 		
 		// Driver right bumper or right trigger: When pressed, start up the cargo roller going in, when released, stop it.
 		LogicGateTrigger.or(
 				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_RIGHT_BUMPER),
 				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER)
-		).whileActive(new CommandSetCargoManip(false));
+		).whileActive(new CommandSetCargoManip(true));
+		
+		setOpConsoleDisabledPattern();
 	}
 	
 	public double getTimeRemaining() {

@@ -119,8 +119,8 @@ public class RobotMap {
 	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
 	public static final double CARGO_MANIP_ROLLER_SPEED = .5; // TODO configure this
-	public static final double ARM_ELBOW_SPEED = .5; // TODO configure this
-	public static final double ARM_WRIST_SPEED = .5; // TODO configure this
+	public static final double ARM_ELBOW_SPEED = .7; // TODO configure this
+	public static final double ARM_WRIST_SPEED = .6; // TODO configure this
 	
 	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
