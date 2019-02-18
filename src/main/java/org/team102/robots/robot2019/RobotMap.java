@@ -30,11 +30,11 @@ public class RobotMap {
 	public static final int ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this
 	public static final int ARM_WRIST_UPPER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this
 	
-	public static final double DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED = .1; // TODO configure this
+	public static final double DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED = .4; // TODO configure this
 	
-	public static final double CLIMBER_EXTENSION_TIME = 10; // TODO configure this
-	public static final double CLIMBER_WAIT_BEFORE_DRIVE_TIME = 5; // TODO configure this
-	public static final double CLIMBER_DRIVE_FORWARD_TIME = 5; // TODO configure this
+	public static final double CLIMBER_EXTENSION_TIME = 15; // TODO configure this
+	public static final double CLIMBER_WAIT_BEFORE_DRIVE_TIME = 3; // TODO configure this
+	public static final double CLIMBER_DRIVE_FORWARD_TIME = 10; // TODO configure this
 	
 	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_TOP = null;  // TODO configure this
 	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_MIDDLE = null; // TODO configure this
