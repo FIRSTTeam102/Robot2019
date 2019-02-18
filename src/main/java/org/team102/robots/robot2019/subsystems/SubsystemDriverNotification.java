@@ -142,8 +142,12 @@ public class SubsystemDriverNotification extends Subsystem {
 				.withPosition(0, 2).withSize(2,2)
 				.getEntry();
 		
-		MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
-		VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
+		boolean piCamOn = piCamToggle.getBoolean(false);
+		
+		if (piCamOn) {		
+			MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
+			VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
+		}
 		
 		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
 		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
