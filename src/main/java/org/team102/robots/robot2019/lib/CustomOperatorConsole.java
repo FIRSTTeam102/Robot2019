@@ -50,9 +50,9 @@ public class CustomOperatorConsole {
 	}
 	
 	public void setLightPattern(int patternID) {
-		int patternOutputBits = ~patternID
-				<< 6 // Shift the data bits to the correct
-				& 0b00000000000000000000001111000000; // Clear all the bits except the ones we want
+		int patternOutputBits = ~patternID				// Invert the current bits (the light system is active-low)
+				<< 6									// Shift the data bits to the correct positions (from bits 29 - 32)
+				& 0b00000000000000000000001111000000;	// Clear all the bits except the ones we want
 		
 		connection.setOutputs(patternOutputBits);
 	}
