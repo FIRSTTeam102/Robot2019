@@ -142,10 +142,11 @@ public class VisionCameraHelper {
 	 * @param height The height of the stream
 	 * @param fps The FPS of the stream
 	 * @param brightness The brightness of the camera, or -1 to not set the brightness
+	 * @param autoGrayscaleFix Whether or not to attempt to automatically fix YUV cameras outputting in grayscale by default
 	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
 	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
 	 */
-	public static VideoSource openAndVerifyCamera(String name, int deviceID, int width, int height, int fps, int brightness, boolean autoCapture) {
+	public static VideoSource openAndVerifyCamera(String name, int deviceID, int width, int height, int fps, int brightness, boolean autoGrayscaleFix, boolean autoCapture) {
 		if(deviceID < 0) {
 			System.out.println("Warning: Given an invalid camera ID " + deviceID + "; ignoring...");
 			return null;
@@ -157,6 +158,10 @@ public class VisionCameraHelper {
 			safeSetResolution(cam, width, height);
 			cam.setFPS(fps);
 			safeSetBrightness(cam, brightness);
+			
+			if(autoGrayscaleFix && VideoMode.PixelFormat.kGray.equals(cam.getVideoMode().pixelFormat)) {
+				cam.setPixelFormat(VideoMode.PixelFormat.kYUYV);
+			}
 			
 			if(autoCapture) {
 				CameraServer.getInstance().startAutomaticCapture(cam);
