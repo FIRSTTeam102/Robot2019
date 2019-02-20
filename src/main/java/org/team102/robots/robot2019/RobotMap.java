@@ -25,6 +25,12 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
+	public static final boolean ARM_HAS_LIMIT_SWITCHES = false; // TODO get them installed?
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
+	
 	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
 	public static final int ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this

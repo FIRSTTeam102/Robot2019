@@ -25,9 +25,13 @@ import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 
 public class SubsystemArm extends SubsystemWithArduino {
+	
+	private DigitalInput elbowLimitLower, elbowLimitUpper;
+	private DigitalInput wristLimitLower, wristLimitUpper;
 	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
@@ -56,6 +60,22 @@ public class SubsystemArm extends SubsystemWithArduino {
 		
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
+		
+		if(RobotMap.ARM_HAS_LIMIT_SWITCHES) {
+			initializeLimitSwitches();
+		}
+	}
+	
+	private void initializeLimitSwitches() {
+		elbowLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER);
+		elbowLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER);
+		wristLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER);
+		wristLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER);
+		
+		addChild("Elbow: Lower Limit Switch", elbowLimitLower);
+		addChild("Elbow: Upper Limit Switch", elbowLimitUpper);
+		addChild("Wrist: Lower Limit Switch", wristLimitLower);
+		addChild("Wrist: Upper Limit Switch", wristLimitUpper);
 	}
 	
 	public String getElbowStatus() {
@@ -119,8 +139,72 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus = "Idle";
 		}
 		
-		elbow.set(elbowSpeed);
-		wrist.set(wristSpeed);
+		elbow.set(limitElbow(elbowSpeed));
+		wrist.set(limitWrist(wristSpeed));
+	}
+	
+	public boolean isElbowLimitedUp() {
+		if(elbowLimitUpper == null) {
+			return false;
+		} else {
+			return elbowLimitUpper.get();
+		}
+	}
+	
+	public boolean isElbowLimitedDown() {
+		if(elbowLimitLower == null) {
+			return false;
+		} else {
+			return elbowLimitLower.get();
+		}
+	}
+	
+	public boolean isElbowLimited(boolean isGoingDown) {
+		if(isGoingDown) {
+			return isElbowLimitedDown();
+		} else {
+			return isElbowLimitedUp();
+		}
+	}
+	
+	public double limitElbow(double speed) {
+		if(isElbowLimited(speed < 0)) {
+			return 0;
+		} else {
+			return speed;
+		}
+	}
+	
+	public boolean isWristLimitedUp() {
+		if(wristLimitUpper == null) {
+			return false;
+		} else {
+			return wristLimitUpper.get();
+		}
+	}
+	
+	public boolean isWristLimitedDown() {
+		if(wristLimitLower == null) {
+			return false;
+		} else {
+			return wristLimitLower.get();
+		}
+	}
+	
+	public boolean isWristLimited(boolean isGoingDown) {
+		if(isGoingDown) {
+			return isWristLimitedDown();
+		} else {
+			return isWristLimitedUp();
+		}
+	}
+	
+	public double limitWrist(double speed) {
+		if(isWristLimited(speed < 0)) {
+			return 0;
+		} else {
+			return speed;
+		}
 	}
 	
 	@Override
