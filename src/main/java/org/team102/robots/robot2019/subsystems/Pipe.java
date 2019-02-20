@@ -307,6 +307,7 @@ public class Pipe extends VisionCameraHelper.Pipeline {
 	
 	
 	//Takes in rRect pairs and returns one rRect pair
+	@SuppressWarnings("unused")
 	private void closestPair (Mat inputImage, RotatedRect[][] input, Rect[][] andrewInput, Mat outputImage, RotatedRect[] output, Rect[] andrewOutput) {
 		double maxheight = 0.0;
 		int best = 0; //
