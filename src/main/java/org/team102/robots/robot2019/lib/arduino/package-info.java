@@ -18,29 +18,7 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019.lib.commandsAndTrigger;
-
-import org.team102.robots.robot2019.lib.CustomOperatorConsole;
-
-import edu.wpi.first.wpilibj.command.InstantCommand;
-
 /**
- * Sets the light pattern on an {@link CustomOperatorConsole operator console}
+ * This package is for any serial communication (including Arduino connection) library classes that have been created
  */
-public class CommandSetOpConsoleLightPattern extends InstantCommand {
-	
-	private CustomOperatorConsole opCon;
-	private int pattern;
-	
-	public CommandSetOpConsoleLightPattern(CustomOperatorConsole opCon, int pattern) {
-		super("Set Operator Console Light Pattern: " + pattern);
-		
-		this.opCon = opCon;
-		this.pattern = pattern;
-	}
-	
-	@Override
-	public void initialize() {
-		opCon.setLightPattern(pattern);
-	}
-}
+package org.team102.robots.robot2019.lib.arduino;

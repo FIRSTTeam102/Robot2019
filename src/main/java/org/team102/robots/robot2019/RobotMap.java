@@ -25,6 +25,12 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
+	public static final boolean ARM_HAS_LIMIT_SWITCHES = false; // TODO get them installed?
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
+	
 	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
 	public static final int ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this
@@ -71,10 +77,10 @@ public class RobotMap {
 	
 	public static final int OP_CONTROLLER_BUTTON_ID_UNUSED = 16;
 	
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN = 17;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP = 18;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN = 19;
-	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP = 20;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP = 17;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN = 18;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP = 19;
+	public static final int OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN = 20;
 	
 	public static final int OP_CONTROLLER_PATTERN_OFF = 0;
 	public static final int OP_CONTROLLER_PATTERN_SCROLLING_ORANGE = 1;
@@ -84,17 +90,17 @@ public class RobotMap {
 	public static final int OP_CONTROLLER_PATTERN_COUNTDOWN_6_ON = 4;
 	public static final int OP_CONTROLLER_PATTERN_COUNTDOWN_8_ON = 5;
 	
-	public static final int OP_CONTROLLER_PATTERN_FLASH_RED = 6;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_GREEN = 8;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_BLUE = 10;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_YELLOW = 12;
-	public static final int OP_CONTROLLER_PATTERN_FLASH_PURPLE = 14;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_RED = 6;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_GREEN = 8;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_BLUE = 10;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_YELLOW = 12;
+	public static final int OP_CONTROLLER_PATTERN_SOLID_PURPLE = 14;
 	
-	public static final int OP_CONTROLLER_PATTERN_SOLID_RED = 7;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_GREEN = 9;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_BLUE = 11;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_YELLOW = 13;
-	public static final int OP_CONTROLLER_PATTERN_SOLID_PURPLE = 15;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_RED = 7;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_GREEN = 9;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_BLUE = 11;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_YELLOW = 13;
+	public static final int OP_CONTROLLER_PATTERN_FLASH_PURPLE = 15;
 	
 	public static final int[] OP_CONTROLLER_PATTERN_SET_COUNTDOWN = { OP_CONTROLLER_PATTERN_COUNTDOWN_2_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_4_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_6_ON, OP_CONTROLLER_PATTERN_COUNTDOWN_8_ON };
 	
@@ -104,8 +110,9 @@ public class RobotMap {
 	public static final int[] OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON = { OP_CONTROLLER_PATTERN_FLASH_YELLOW, OP_CONTROLLER_PATTERN_SOLID_YELLOW };
 	public static final int[] OP_CONTROLLER_PATTERN_SET_PURPLE_BUTTON = { OP_CONTROLLER_PATTERN_FLASH_PURPLE, OP_CONTROLLER_PATTERN_SOLID_PURPLE };
 	
-	public static final double JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER = .25; // TODO configure this
-	public static final double JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME = 2; // TODO configure this
+	public static final double JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER = .25;
+	public static final double JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME = 2;
+	public static final double JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME = 5;
 	
 	public static final double LOW_TIME = 30;
 	
@@ -118,9 +125,10 @@ public class RobotMap {
 	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
 	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
-	public static final double CARGO_MANIP_ROLLER_SPEED = .5; // TODO configure this
-	public static final double ARM_ELBOW_SPEED = .5; // TODO configure this
-	public static final double ARM_WRIST_SPEED = .5; // TODO configure this
+	public static final double CARGO_MANIP_ROLLER_SPEED = .6;
+	public static final double ARM_ELBOW_SPEED = 1;
+	public static final double ARM_ELBOW_DOWN_SPEED = -.2;
+	public static final double ARM_WRIST_SPEED = .6;
 	
 	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this

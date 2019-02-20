@@ -103,31 +103,30 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getLayout("HSVLow", BuiltInLayouts.kList)
 				.withPosition(2,0).withSize(2,3);
 		
-		
 		ShuffleboardLayout HSVHighLayout = visionInfoTab
 				.getLayout("HSVHigh", BuiltInLayouts.kList)
 				.withPosition(4,0).withSize(2,3);
 		
 		ShuffleboardLayout cameraSettings = visionInfoTab
 				.getLayout("cameraSettings", BuiltInLayouts.kList)
-				.withPosition(6,1).withSize(2,3);
+				.withPosition(6,1).withSize(2, 3);
 		
 		
 		
 		//starting values, 29, 75, 150
-		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider);
 		
 		//starting values 64, 255, 255
-		HSVHighLayout.add("HueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVHighLayout.add("hueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
 		
-		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -25, "max", 25));
-		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100));
-		cameraSettings.add("shuttterSpeed", 5000).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 10000));
-		cameraSettings.add("sharpness", 60).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100));
+		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("shuttterSpeed",5000).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("sharpness", 60).withWidget(BuiltInWidgets.kNumberSlider);
 		
 		//image display
 	}
@@ -234,9 +233,9 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		if(countdownStage != prevCountdownStage) {
 			prevCountdownStage = countdownStage;
+			
 			RobotMap.RUMBLE_LOW_TIME.play(Robot.oi.driverJoystick);
+			Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 		}
-		
-		Robot.oi.opConsole.setLightPattern(RobotMap.OP_CONTROLLER_PATTERN_SET_COUNTDOWN[countdownStage]);
 	}
 }

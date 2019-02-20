@@ -142,7 +142,7 @@ public class VisionCameraHelper {
 	 * @param height The height of the stream
 	 * @param fps The FPS of the stream
 	 * @param brightness The brightness of the camera, or -1 to not set the brightness
-	 * @param autoGrayscaleFix Whether or not to use the automatic grayscale fixing feature
+	 * @param autoGrayscaleFix Whether or not to attempt to automatically fix YUV cameras outputting in grayscale by default
 	 * @param autoCapture Whether to add a video output for it, or just add it to the camera server
 	 * @return The camera, whether or not it exists or is supported, unless an invalid ID is given
 	 */
@@ -159,8 +159,7 @@ public class VisionCameraHelper {
 			cam.setFPS(fps);
 			safeSetBrightness(cam, brightness);
 			
-			// For some reason, YUV cameras mount as grayscale by default. This should automatically fix that.
-			if(autoGrayscaleFix && cam.getVideoMode().pixelFormat.equals(VideoMode.PixelFormat.kGray)) {
+			if(autoGrayscaleFix && VideoMode.PixelFormat.kGray.equals(cam.getVideoMode().pixelFormat)) {
 				cam.setPixelFormat(VideoMode.PixelFormat.kYUYV);
 			}
 			

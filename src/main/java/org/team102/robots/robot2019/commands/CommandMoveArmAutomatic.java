@@ -41,8 +41,22 @@ public class CommandMoveArmAutomatic extends Command {
 		Robot.arm.setSetpoint(setpoint);
 	}
 	
+	public void done() {
+		Robot.arm.setSetpoint(null);
+	}
+	
 	@Override
 	protected boolean isFinished() {
 		return Robot.arm.isWithinMarginOfErrorOfSetpoints();
+	}
+	
+	@Override
+	public void end() {
+		done();
+	}
+	
+	@Override
+	public void interrupted() {
+		done();
 	}
 }
