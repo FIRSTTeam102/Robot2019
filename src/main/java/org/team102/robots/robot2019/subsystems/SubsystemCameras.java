@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class SubsystemCameras extends Subsystem {
 	
 	public ArrayList<VideoSource> visibleVideoOutputs = new ArrayList<>();
-	private VideoSource piVisionOutput;
+	public VideoSource piVisionOutput;
 	
 	private VisionCameraHelper.Pipeline pipe;
 	

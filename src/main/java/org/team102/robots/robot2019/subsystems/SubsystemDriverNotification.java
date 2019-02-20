@@ -32,6 +32,7 @@ import org.team102.robots.robot2019.lib.VisionCameraHelper;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -111,8 +112,6 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getLayout("cameraSettings", BuiltInLayouts.kList)
 				.withPosition(6,1).withSize(2, 3);
 		
-		
-		
 		//starting values, 29, 75, 150
 		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider);
 		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider);
@@ -140,14 +139,19 @@ public class SubsystemDriverNotification extends Subsystem {
 		NetworkTableEntry piCamToggle = visionInfoTab
 				.add("piCamSelector", false)
 				.withPosition(0, 2).withSize(2,2)
+				.withWidget(BuiltInWidgets.kToggleSwitch)
 				.getEntry();
 		
-		boolean piCamOn = piCamToggle.getBoolean(false);
+		MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
+		VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
 		
-		if (piCamOn) {		
-			MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
-			VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
-		}
+		piCamToggle.addListener(notif -> {
+			if(piCamToggle.getBoolean(false)) {
+				piVisionOutput.setSource(Robot.cameras.piVisionOutput);
+			} else {
+				piVisionOutput.setSource(null);
+			}
+		}, EntryListenerFlags.kUpdate);
 		
 		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
 		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
