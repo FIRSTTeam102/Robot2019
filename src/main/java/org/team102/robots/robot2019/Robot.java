@@ -23,6 +23,7 @@ package org.team102.robots.robot2019;
 import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
 import org.team102.robots.robot2019.subsystems.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
@@ -34,6 +35,7 @@ public class Robot extends TimedRobot {
 	public static SubsystemClimber climber;
 	public static SubsystemCameras cameras;
 	public static SubsystemCentering centering;
+	public static SubsystemAesthetics robotAesthetics;
 	public static SubsystemDriverNotification driverNotif;
 	
 	public static OI oi;
@@ -54,11 +56,15 @@ public class Robot extends TimedRobot {
 		climber = new SubsystemClimber();
 		cameras = new SubsystemCameras();
 		centering = new SubsystemCentering();
+		robotAesthetics = new SubsystemAesthetics();
 		driverNotif = new SubsystemDriverNotification();
 		
 		oi = new OI();
 		driverNotif.initOIPortions();
 		oi.init();
+		
+		oi.setOpConsoleDisabledPattern();
+		setLongLightStripPattern(false);
 	}
 	
 	@Override
@@ -69,6 +75,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		oi.setOpConsoleIdlePattern();
+		setLongLightStripPattern(true);
 	}
 	
 	@Override
@@ -77,6 +84,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		oi.setOpConsoleIdlePattern();
+		setLongLightStripPattern(true);
 	}
 	
 	@Override
@@ -85,6 +93,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		oi.setOpConsoleDisabledPattern();
+		setLongLightStripPattern(false);
 	}
 	
 	@Override
@@ -93,8 +102,31 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		oi.setOpConsoleIdlePattern();
+		setLongLightStripPattern(true);
 	}
 	
 	@Override
 	public void testPeriodic() {}
+	
+	private void setLongLightStripPattern(boolean enabled) {
+		int[] patterns = RobotMap.LONG_LIGHT_STRIP_PATTERN_SET_DISABLED;
+		
+		if(enabled) {
+			switch(DriverStation.getInstance().getAlliance()) {
+				case Red: {
+					patterns = RobotMap.LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE;
+					break;
+				}
+				
+				case Blue: {
+					patterns = RobotMap.LONG_LIGHT_STRIP_PATTERN_SET_BLUE_ALLIANCE;
+					break;
+				}
+				
+				default:
+			}
+		}
+		
+		robotAesthetics.setLongLightStripPatternSet(patterns);
+	}
 }

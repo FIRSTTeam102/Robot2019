@@ -101,8 +101,6 @@ public class OI {
 		JoystickButton jb = opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_UNUSED);
 		jb.whenPressed(new CommandExtendArm(true));
 		jb.whenReleased(new CommandExtendArm(false));
-		
-		setOpConsoleDisabledPattern();
 	}
 	
 	public double getTimeRemaining() {
