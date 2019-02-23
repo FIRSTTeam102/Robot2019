@@ -50,6 +50,8 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private String wristStatus = "Not updated yet?";
 	private String overallStatus = "Not updated yet?";
 	
+	private boolean isWristMovingDown = false;
+	
 	public SubsystemArm() {
 		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
@@ -139,8 +141,11 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus = "Idle";
 		}
 		
+		wristSpeed = limitWrist(wristSpeed);
+		isWristMovingDown = wristSpeed < 0;
+		
 		elbow.set(limitElbow(elbowSpeed));
-		wrist.set(limitWrist(wristSpeed));
+		wrist.set(wristSpeed);
 	}
 	
 	public boolean isElbowLimitedUp() {
@@ -217,61 +222,24 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	protected void onArduinoLineReceived(String line) {
-		String[] parts = line.split(",");
-		
 		try {
-			distanceElbow = Integer.parseInt(parts[0]);
-			boolean elbowInRange = distanceElbow != -1;
-			
-			int distanceWristLower = Integer.parseInt(parts[1]);
-			int distanceWristUpper = Integer.parseInt(parts[2]);
-			
-			if(distanceWristLower > RobotMap.ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE) {
-				distanceWristLower = -1;
-			}
-			
-			if(distanceWristUpper > RobotMap.ARM_WRIST_UPPER_MAXIMUM_RECORDABLE_DISTANCE) {
-				distanceWristUpper = -1;
-			}
-			
-			boolean wristLowerInRange = distanceWristLower != -1;
-			boolean wristUpperInRange = distanceWristUpper != -1;
-			
-			boolean ignoreWristLower = false;
-			boolean ignoreWristUpper = false;
-			
-			if(wristLowerInRange && wristUpperInRange) {
-				if(distanceWristLower < distanceWristUpper) {
-					ignoreWristLower = true;
+			if(line.equalsIgnoreCase("hallpulse")) {
+				if(isWristMovingDown) {
+					distanceWrist--;
 				} else {
-					ignoreWristUpper = true;
+					distanceWrist++;
 				}
-			}
-			
-			if((!wristLowerInRange || ignoreWristLower) && (!wristUpperInRange && ignoreWristUpper)) {
-				distanceWrist = 0;
-			} else if(wristLowerInRange && !ignoreWristLower) {
-				distanceWrist = -distanceWristLower;
-			} else {
-				distanceWrist = distanceWristUpper;
-			}
-			
-			if(!wristLowerInRange && !wristUpperInRange) {
-				wristStatus = "OK (Centered)";
-			} else if(wristLowerInRange != wristUpperInRange) {
+				
 				wristStatus = "OK (Range: " + distanceWrist + ")";
-			} else if(ignoreWristUpper && !ignoreWristLower) {
-				wristStatus = "Both in range, using lower";
-			} else if(ignoreWristLower && !ignoreWristUpper) {
-				wristStatus = "Both in range, using upper";
 			} else {
-				wristStatus = "Impossible state (Please report this)";
-			}
-			
-			if(elbowInRange) {
-				elbowStatus = "OK (Range: " + distanceElbow + ")";
-			} else {
-				elbowStatus = "Out of range";
+				distanceElbow = Integer.parseInt(line);
+				boolean elbowInRange = distanceElbow != -1;
+				
+				if(elbowInRange) {
+					elbowStatus = "OK (Range: " + distanceElbow + ")";
+				} else {
+					elbowStatus = "Out of range";
+				}
 			}
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
