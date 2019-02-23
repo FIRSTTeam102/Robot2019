@@ -25,6 +25,45 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
+	public static final double AESTHETICS_PATTERN_CHANGE_TIME = 3; // TODO configure me
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_TWINKLE_WHITE = 4;
+	public static final int LONG_LIGHT_STRIP_PATTERN_TWINKLE_ORANGE = 12;
+	public static final int LONG_LIGHT_STRIP_PATTERN_TWINKLE_RGBW = 11;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_ORANGE_YELLOW_GREEN_BLUE_PURPLE_SEGMENTED_SNAKE = 3;
+	public static final int LONG_LIGHT_STRIP_PATTERN_GREEN_RED_BLUE_SNAKE = 1;
+	public static final int LONG_LIGHT_STRIP_PATTERN_RANDOM_COLORS_SNAKE = 2;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_TWO_RANDOM_COLORED_SNAKES = 10;
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_YELLOW_GREEN_BLUE_SNAKES = 13;
+	public static final int LONG_LIGHT_STRIP_PATTERN_ORANGE_PINK_PURPLE_WHITE_SNAKES = 14;
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_GREEN_BLUE_SNAKES = 15;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_SNAKE_AND_BLUE_SNAKE = 7;
+	public static final int LONG_LIGHT_STRIP_PATTERN_YELLOW_SNAKE_AND_GREEN_SNAKE = 8;
+	public static final int LONG_LIGHT_STRIP_PATTERN_ORANGE_SNAKE_AND_PURPLE_SNAKE = 9;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_SNAKE = 5;
+	public static final int LONG_LIGHT_STRIP_PATTERN_BLUE_SNAKE = 6;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_ANY_COLOR_RANDOM_PIXELS = 16;
+	public static final int LONG_LIGHT_STRIP_PATTERN_DEFAULT_COLOR_RANDOM_PIXELS = 17;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_FLAMES = 18;
+	public static final int LONG_LIGHT_STRIP_PATTERN_GREEN_FLAMES = 19;
+	public static final int LONG_LIGHT_STRIP_PATTERN_BLUE_FLAMES = 20;
+	public static final int LONG_LIGHT_STRIP_PATTERN_PURPLE_FLAMES = 21;
+	public static final int LONG_LIGHT_STRIP_PATTERN_ORANGE_FLAMES = 22;
+	
+	public static final int LONG_LIGHT_STRIP_PATTERN_WHITE_COMET = 23;
+	public static final int LONG_LIGHT_STRIP_PATTERN_SLOW_COLOR_CHANGING  = 24;
+	public static final int LONG_LIGHT_STRIP_PATTERN_RED_GREEN_PURPLE_BOUNCING_BALLS = 25;
+	
+	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_DISABLED = { LONG_LIGHT_STRIP_PATTERN_ORANGE_FLAMES, LONG_LIGHT_STRIP_PATTERN_TWINKLE_ORANGE, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE_AND_BLUE_SNAKE, LONG_LIGHT_STRIP_PATTERN_WHITE_COMET };
+	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_BLUE_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_BLUE_FLAMES, LONG_LIGHT_STRIP_PATTERN_BLUE_SNAKE };
+	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_RED_FLAMES, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE }; // TODO use more patterns (or make more pattern sets)
+	
 	public static final boolean ARM_HAS_LIMIT_SWITCHES = false; // TODO get them installed?
 	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
