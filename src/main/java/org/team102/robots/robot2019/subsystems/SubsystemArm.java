@@ -265,7 +265,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	private boolean isElbowInRange() {
-		if(hasSetpoint()) {
+		if(hasSetpoint() && setpoint.elbowSetpoint != -1) {
 			return Math.abs(distanceElbow - setpoint.elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
 		} else {
 			return true;
@@ -273,7 +273,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	private boolean isWristInRange() {
-		if(hasSetpoint()) {
+		if(hasSetpoint() && setpoint.wristSetpoint != -1) {
 			return Math.abs(distanceWrist - setpoint.wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
 		} else {
 			return true;
