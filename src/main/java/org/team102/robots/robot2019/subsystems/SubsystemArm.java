@@ -100,14 +100,17 @@ public class SubsystemArm extends SubsystemWithArduino {
 		
 		if(isInManualMode) {
 			if(manualModeIsWrist) {
-				wristSpeed = RobotMap.ARM_WRIST_SPEED;
+				if(manualModeIsReverse) {
+					wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
+				} else {
+					wristSpeed = RobotMap.ARM_WRIST_SPEED;
+				}
 			} else {
-				elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
-			}
-			
-			if(manualModeIsReverse) {
-				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
-				wristSpeed *= -1;
+				if(manualModeIsReverse) {
+					elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
+				} else {
+					elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
+				}
 			}
 			
 			overallStatus = "Moving manually";
@@ -127,7 +130,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 			if(wristInRange) {
 				wristSpeed = 0;
 			} else if(distanceWrist > setpoint.wristSetpoint) {
-				wristSpeed *= -1;
+				wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
 			}
 			
 			if(elbowInRange && wristInRange) {
@@ -139,6 +142,14 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus += (" setpoint " + setpoint.name);
 		} else {
 			overallStatus = "Idle";
+		}
+		
+		if(RobotMap.ARM_REVERSE_ELBOW) {
+			elbowSpeed *= -1;
+		}
+		
+		if(RobotMap.ARM_REVERSE_WRIST) {
+			wristSpeed *= -1;
 		}
 		
 		wristSpeed = limitWrist(wristSpeed);
