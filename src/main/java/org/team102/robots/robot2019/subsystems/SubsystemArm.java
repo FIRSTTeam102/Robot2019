@@ -50,8 +50,6 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private String wristStatus = "Not updated yet?";
 	private String overallStatus = "Not updated yet?";
 	
-	private boolean isWristMovingDown = false;
-	
 	public SubsystemArm() {
 		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
@@ -157,11 +155,8 @@ public class SubsystemArm extends SubsystemWithArduino {
 			wristSpeed *= -1;
 		}
 		
-		wristSpeed = limitWrist(wristSpeed);
-		isWristMovingDown = wristSpeed < 0;
-		
 		elbow.set(limitElbow(elbowSpeed));
-		wrist.set(wristSpeed);
+		wrist.set(limitWrist(wristSpeed));
 	}
 	
 	public boolean isElbowLimitedUp() {
@@ -239,24 +234,19 @@ public class SubsystemArm extends SubsystemWithArduino {
 	
 	protected void onArduinoLineReceived(String line) {
 		try {
-			if(line.equalsIgnoreCase("hallpulse")) {
-				if(isWristMovingDown) {
-					distanceWrist--;
-				} else {
-					distanceWrist++;
-				}
-				
-				wristStatus = "OK (Range: " + distanceWrist + ")";
+			String[] tokens = line.split(",");
+			
+			distanceElbow = Integer.parseInt(tokens[0]);
+			boolean elbowInRange = distanceElbow != -1;
+			
+			if(elbowInRange) {
+				elbowStatus = "OK (Range: " + distanceElbow + ")";
 			} else {
-				distanceElbow = Integer.parseInt(line);
-				boolean elbowInRange = distanceElbow != -1;
-				
-				if(elbowInRange) {
-					elbowStatus = "OK (Range: " + distanceElbow + ")";
-				} else {
-					elbowStatus = "Out of range";
-				}
+				elbowStatus = "Out of range";
 			}
+			
+			distanceWrist = Integer.parseInt(tokens[1]);
+			wristStatus = "OK (Range: " + distanceWrist + ")";
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
 		}
