@@ -63,21 +63,26 @@ public class SubsystemArm extends SubsystemWithArduino {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		if(RobotMap.ARM_HAS_LIMIT_SWITCHES) {
-			initializeLimitSwitches();
-		}
-	}
-	
-	private void initializeLimitSwitches() {
 		elbowLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER);
-		elbowLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER);
+		//elbowLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER);
 		wristLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER);
 		wristLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER);
 		
-		addChild("Elbow: Lower Limit Switch", elbowLimitLower);
-		addChild("Elbow: Upper Limit Switch", elbowLimitUpper);
-		addChild("Wrist: Lower Limit Switch", wristLimitLower);
-		addChild("Wrist: Upper Limit Switch", wristLimitUpper);
+		if(elbowLimitLower != null) {
+			addChild("Elbow: Lower Limit Switch", elbowLimitLower);
+		}
+		
+		if(elbowLimitUpper != null) {
+			addChild("Elbow: Upper Limit Switch", elbowLimitUpper);
+		}
+		
+		if(wristLimitLower != null) {
+			addChild("Wrist: Lower Limit Switch", wristLimitLower);
+		}
+		
+		if(wristLimitUpper != null) {
+			addChild("Wrist: Upper Limit Switch", wristLimitUpper);
+		}
 	}
 	
 	public String getElbowStatus() {
