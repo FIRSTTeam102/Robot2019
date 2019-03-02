@@ -183,6 +183,7 @@ public class ArduinoConnection extends SerialConnection {
 		write((line + eol).getBytes(Charset.forName("ASCII")));
 	}
 	
+	@Override
 	public void update() {
 		super.update();
 		

@@ -30,6 +30,10 @@ public class CustomOperatorConsole {
 	
 	private GenericHID connection;
 	
+	/**
+	 * Create the console
+	 * @param port Which {@link GenericHID HID port} to connect to
+	 */
 	public CustomOperatorConsole(int port) {
 		connection = new GenericHID(port) {
 			
@@ -45,10 +49,19 @@ public class CustomOperatorConsole {
 		};
 	}
 	
+	/**
+	 * Gets the given button on the controller
+	 * @param which Which button
+	 * @return The {@link JoystickButton button version} of the given ID
+	 */
 	public JoystickButton getButton(int which) {
 		return new JoystickButton(connection, which);
 	}
 	
+	/**
+	 * Sets the light pattern to the given four-bit ID
+	 * @param patternID The light pattern's ID
+	 */
 	public void setLightPattern(int patternID) {
 		int patternOutputBits = ~patternID				// Invert the current bits (the light system is active-low)
 				<< 6									// Shift the data bits to the correct positions (from bits 29 - 32)

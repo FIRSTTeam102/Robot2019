@@ -22,10 +22,19 @@ package org.team102.robots.robot2019.lib.arduino;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
+/**
+ * A {@link Subsystem} that connects to an Arduino using an {@link ArduinoConnection}
+ */
 public abstract class SubsystemWithArduino extends Subsystem {
 	
 	private ArduinoConnection arduino;
 	
+	/**
+	 * Create the subsystem
+	 * @param subsystemName The name for the subsystem
+	 * @param arduinoWhoisResponse What the Arduino's WHOIS response will be
+	 * @param humanReadableArduinoName The human-readable name of the arduino
+	 */
 	public SubsystemWithArduino(String subsystemName, String arduinoWhoisResponse, String humanReadableArduinoName) {
 		super(subsystemName);
 		
@@ -38,12 +47,20 @@ public abstract class SubsystemWithArduino extends Subsystem {
 		}
 	}
 	
+	/**
+	 * Sends the given line of text to the Arduino (no CR or LF required), if it's connected
+	 * @param line The text
+	 */
 	protected void sendLineToArduino(String line) {
 		if(arduino != null) {
 			arduino.write(line);
 		}
 	}
 	
+	/**
+	 * Called by the {@link #periodic()} method when a line of text from the Arduino has been received
+	 * @param line The text that has been received
+	 */
 	protected abstract void onArduinoLineReceived(String line);
 	
 	@Override

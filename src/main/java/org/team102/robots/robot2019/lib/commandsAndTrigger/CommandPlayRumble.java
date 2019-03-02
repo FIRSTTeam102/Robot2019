@@ -48,5 +48,8 @@ public class CommandPlayRumble extends TimedCommand {
 		this.rumble = rumble;
 	}
 	
-	public void initialize() { rumble.play(joystick); }
+	@Override
+	public void initialize() {
+		rumble.play(joystick);
+	}
 }

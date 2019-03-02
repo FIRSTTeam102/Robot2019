@@ -32,6 +32,11 @@ public class CommandSetOpConsoleLightPattern extends InstantCommand {
 	private CustomOperatorConsole opCon;
 	private int pattern;
 	
+	/**
+	 * Create the command
+	 * @param opCon The {@link CustomOperatorConsole}
+	 * @param pattern Which pattern to use
+	 */
 	public CommandSetOpConsoleLightPattern(CustomOperatorConsole opCon, int pattern) {
 		super("Set Operator Console Light Pattern: " + pattern);
 		
