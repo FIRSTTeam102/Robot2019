@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.buttons.POVButton;
+import edu.wpi.first.wpilibj.buttons.Trigger;
 
 public class OI {
 	
@@ -77,14 +78,10 @@ public class OI {
 		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
 		
 		// Driver DPad Up for a certain amount of time: Climb
-		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME)
-				.withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false))
-				.whenActive(new CommandClimb());
+		addTimeConfirm(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), false).whenActive(new CommandClimb());
 		
 		// Driver DPad Down for a certain (longer) amount of time: Retract climber
-		new TimedTrigger(new POVButton(driverJoystick, CommonIDs.POVSwitch.DOWN_CENTER), RobotMap.JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME)
-				.withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false))
-				.whenActive(new CommandSetClimber(false));
+		addTimeConfirm(new POVButton(driverJoystick, CommonIDs.POVSwitch.DOWN_CENTER), true).whenActive(new CommandSetClimber(false));
 		
 		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
 		LogicGateTrigger.or(
@@ -113,8 +110,18 @@ public class OI {
 		}
 	}
 	
-	public static AxisTrigger getTriggerForAxis(Joystick js, int axis) {
+	public AxisTrigger getTriggerForAxis(Joystick js, int axis) {
 		return AxisTrigger.forGreaterThan(js, axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
+	}
+	
+	@SuppressWarnings("resource")
+	public TimedTrigger addTimeConfirm(Trigger trig, boolean longerTime) {
+		double time = RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME;
+		if(longerTime) {
+			time = RobotMap.JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME;
+		}
+		
+		return new TimedTrigger(trig, time).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false));
 	}
 	
 	public void setOpConsoleIdlePattern() {
