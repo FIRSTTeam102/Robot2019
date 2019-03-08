@@ -37,7 +37,7 @@ public class CommandMoveArmManual extends Command {
 	}
 	
 	@Override
-	public void initialize() {
+	protected void initialize() {
 		Robot.arm.setArmManual(isWrist, isReverse);
 	}
 	
@@ -46,12 +46,12 @@ public class CommandMoveArmManual extends Command {
 	}
 	
 	@Override
-	public void end() {
+	protected void end() {
 		done();
 	}
 	
 	@Override
-	public void interrupted() {
+	protected void interrupted() {
 		done();
 	}
 	

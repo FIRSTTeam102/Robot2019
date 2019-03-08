@@ -38,7 +38,7 @@ public class CommandDoCentering extends Command {
 	}
 	
 	@Override
-	public void execute() {
+	protected void execute() {
 		lastMoveDir = Robot.centering.getMoveDirection();
 		
 		double frontBack = 0;

@@ -36,7 +36,7 @@ public class CommandSetCargoManip extends Command {
 	}
 	
 	@Override
-	public void execute() {
+	protected void execute() {
 		Robot.cargoManip.setRoller(isReverse);
 	}
 	
@@ -45,12 +45,12 @@ public class CommandSetCargoManip extends Command {
 	}
 	
 	@Override
-	public void end() {
+	protected void end() {
 		done();
 	}
 	
 	@Override
-	public void interrupted() {
+	protected void interrupted() {
 		done();
 	}
 	

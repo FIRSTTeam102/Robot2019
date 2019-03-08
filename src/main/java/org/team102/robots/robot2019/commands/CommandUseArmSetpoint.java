@@ -68,7 +68,7 @@ public class CommandUseArmSetpoint extends CommandGroup {
 	}
 	
 	@Override
-	public void interrupted() {
+	protected void interrupted() {
 		Robot.oi.setOpConsoleIdlePattern();
 	}
 }

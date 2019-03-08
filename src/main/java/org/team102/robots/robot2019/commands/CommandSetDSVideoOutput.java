@@ -36,7 +36,7 @@ public class CommandSetDSVideoOutput extends InstantCommand {
 		this.streamName = streamName;
 	}
 	
-	public void initialize() {
+	protected void initialize() {
 		Robot.driverNotif.setVideoStream(streamName);
 	}
 }

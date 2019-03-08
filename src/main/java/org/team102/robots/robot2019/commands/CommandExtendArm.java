@@ -36,7 +36,7 @@ public class CommandExtendArm extends InstantCommand {
 	}
 	
 	@Override
-	public void initialize() {
+	protected void initialize() {
 		Robot.arm.setExtender(active);
 	}
 }

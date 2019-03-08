@@ -33,7 +33,7 @@ public class CommandDriveForwardTimed extends TimedCommand {
 	}
 	
 	@Override
-	public void execute() {
+	protected void execute() {
 		Robot.driveTrain.drive(RobotMap.DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED, 0, 0);
 	}
 }
