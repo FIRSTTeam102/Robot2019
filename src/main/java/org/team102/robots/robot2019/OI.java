@@ -44,13 +44,17 @@ public class OI {
 	
 	public Joystick driverJoystick;
 	public CustomOperatorConsole opConsole;
+	public Joystick testJoystick;
 	
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
 		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
+		
+		if(RobotMap.IS_TEST_JOYSTICK_ENABLED) {
+			testJoystick = new Joystick(RobotMap.JOYSTICK_ID_TEST);
+		}
 	}
 	
-	@SuppressWarnings("resource") // Because otherwise it would complain about all the joystick buttons not being closed, even though there is no good reason why they should be closed.
 	public void init() {
 		// All button assignments on the operator console should be fairly self-explanatory
 		// While progressing, they will light up the LEDs on the Operator Console the color of their buttons
@@ -75,29 +79,33 @@ public class OI {
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP).whileHeld(new CommandMoveArmManual(true, false));
 		
 		// Driver A: When pressed, extend the hatch ejector, when released, contract it.
-		new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_A).whileHeld(new CommandSetHatchManip());
+		getButton(CommonIDs.Gamepad.BTN_A, false).whileHeld(new CommandSetHatchManip());
 		
 		// Driver DPad Up for a certain amount of time: Climb
-		addTimeConfirm(new POVButton(driverJoystick, CommonIDs.POVSwitch.UP_CENTER), false).whenActive(new CommandClimb());
+		getTimedPOV(CommonIDs.POVSwitch.UP_CENTER, false, false).whenActive(new CommandClimb());
 		
 		// Driver DPad Down for a certain (longer) amount of time: Retract climber
-		addTimeConfirm(new POVButton(driverJoystick, CommonIDs.POVSwitch.DOWN_CENTER), true).whenActive(new CommandSetClimber(false));
+		getTimedPOV(CommonIDs.POVSwitch.DOWN_CENTER, true, false).whenActive(new CommandSetClimber(false));
 		
 		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
-		LogicGateTrigger.or(
-				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_LEFT_BUMPER),
-				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_LEFT_TRIGGER)
-		).whileActive(new CommandSetCargoManip(false));
+		getAxisOrButton(CommonIDs.Gamepad.AXIS_LEFT_TRIGGER, CommonIDs.Gamepad.BTN_LEFT_BUMPER, false).whileActive(new CommandSetCargoManip(false));
 		
 		// Driver right bumper or right trigger: When pressed, start up the cargo roller going in, when released, stop it.
-		LogicGateTrigger.or(
-				new JoystickButton(driverJoystick, CommonIDs.Gamepad.BTN_RIGHT_BUMPER),
-				getTriggerForAxis(driverJoystick, CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER)
-		).whileActive(new CommandSetCargoManip(true));
+		getAxisOrButton(CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER, CommonIDs.Gamepad.BTN_RIGHT_BUMPER, false).whileActive(new CommandSetCargoManip(true));
 		
-		JoystickButton jb = opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_UNUSED);
-		jb.whenPressed(new CommandExtendArm(true));
-		jb.whenReleased(new CommandExtendArm(false));
+		// If the test joystick is enabled...
+		if(testJoystick != null) {
+			// Set the arm extender's state from the state of the A button
+			JoystickButton extendArmTest = getButton(CommonIDs.Gamepad.BTN_A, true);
+			extendArmTest.whenPressed(new CommandExtendArm(true));
+			extendArmTest.whenReleased(new CommandExtendArm(false));
+			
+			// Climb unconditionally when X is pressed
+			getButton(CommonIDs.Gamepad.BTN_X, true).whenPressed(new CommandClimb.CommandClimbUnconditionally());
+			
+			// Retract the climber when Y is pressed
+			getButton(CommonIDs.Gamepad.BTN_Y, true).whenPressed(new CommandSetClimber(false));
+		}
 	}
 	
 	public double getTimeRemaining() {
@@ -110,18 +118,42 @@ public class OI {
 		}
 	}
 	
-	public AxisTrigger getTriggerForAxis(Joystick js, int axis) {
-		return AxisTrigger.forGreaterThan(js, axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
+	private TimedTrigger getTimedPOV(int position, boolean longerTime, boolean testJS) {
+		return addTimeConfirm(getPOV(position, testJS), longerTime);
+	}
+	
+	private LogicGateTrigger getAxisOrButton(int axis, int button, boolean testJS) {
+		return LogicGateTrigger.or(getAxis(axis, testJS), getButton(button, testJS));
+	}
+	
+	private POVButton getPOV(int position, boolean testJS) {
+		return new POVButton(getJS(testJS), position);
+	}
+	
+	private JoystickButton getButton(int button, boolean testJS) {
+		return new JoystickButton(getJS(testJS), button);
+	}
+	
+	private AxisTrigger getAxis(int axis, boolean testJS) {
+		return AxisTrigger.forGreaterThan(getJS(testJS), axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
 	}
 	
 	@SuppressWarnings("resource")
-	public TimedTrigger addTimeConfirm(Trigger trig, boolean longerTime) {
+	private TimedTrigger addTimeConfirm(Trigger trig, boolean longerTime) {
 		double time = RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME;
 		if(longerTime) {
 			time = RobotMap.JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME;
 		}
 		
 		return new TimedTrigger(trig, time).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false));
+	}
+	
+	private Joystick getJS(boolean testJS) {
+		if(testJS) {
+			return testJoystick;
+		} else {
+			return driverJoystick;
+		}
 	}
 	
 	public void setOpConsoleIdlePattern() {

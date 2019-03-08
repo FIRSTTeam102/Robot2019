@@ -25,8 +25,9 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
-	// LEAVE THIS ONE ONE AT THE TOP!
+	// LEAVE THESE AT THE TOP!
 	public static final boolean IS_TESTBED = false;
+	public static final boolean IS_TEST_JOYSTICK_ENABLED = false;
 	
 	public static final boolean ARM_REVERSE_ELBOW = true;
 	public static final boolean ARM_REVERSE_WRIST = true;
@@ -176,6 +177,7 @@ public class RobotMap {
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	public static final int JOYSTICK_ID_OPERATOR = 1;
+	public static final int JOYSTICK_ID_TEST = 2;
 	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
