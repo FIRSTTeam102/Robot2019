@@ -159,19 +159,27 @@ public class SubsystemArm extends SubsystemWithArduino {
 		wrist.set(limitWrist(wristSpeed));
 	}
 	
+	public boolean hasElbowUpperLimitSwitch() {
+		return elbowLimitUpper != null;
+	}
+	
+	public boolean hasElbowLowerLimitSwitch() {
+		return elbowLimitLower != null;
+	}
+	
 	public boolean isElbowLimitedUp() {
-		if(elbowLimitUpper == null) {
-			return false;
-		} else {
+		if(hasElbowUpperLimitSwitch()) {
 			return elbowLimitUpper.get();
+		} else {
+			return false;
 		}
 	}
 	
 	public boolean isElbowLimitedDown() {
-		if(elbowLimitLower == null) {
-			return false;
-		} else {
+		if(hasElbowLowerLimitSwitch()) {
 			return elbowLimitLower.get();
+		} else {
+			return false;
 		}
 	}
 	
@@ -191,19 +199,27 @@ public class SubsystemArm extends SubsystemWithArduino {
 		}
 	}
 	
+	public boolean hasWristUpperLimitSwitch() {
+		return wristLimitUpper != null;
+	}
+	
+	public boolean hasWristLowerLimitSwitch() {
+		return wristLimitLower != null;
+	}
+	
 	public boolean isWristLimitedUp() {
-		if(wristLimitUpper == null) {
-			return false;
-		} else {
+		if(hasWristUpperLimitSwitch()) {
 			return wristLimitUpper.get();
+		} else {
+			return false;
 		}
 	}
 	
 	public boolean isWristLimitedDown() {
-		if(wristLimitLower == null) {
-			return false;
-		} else {
+		if(hasWristLowerLimitSwitch()) {
 			return wristLimitLower.get();
+		} else {
+			return false;
 		}
 	}
 	
@@ -250,6 +266,10 @@ public class SubsystemArm extends SubsystemWithArduino {
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
 		}
+	}
+	
+	public void resetWristAccelerometer() {
+		sendLineToArduino("RESETACCEL");
 	}
 	
 	public void setArmManual(boolean isWrist, boolean isReverse) {
