@@ -30,6 +30,19 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class SubsystemArm extends SubsystemWithArduino {
 	
+	private static boolean readDIO(DigitalInput input, boolean activeLow) {
+		if(input == null) {
+			return false;
+		}
+		
+		boolean val = input.get();
+		if(activeLow) {
+			val = !val;
+		}
+		
+		return val;
+	}
+	
 	private DigitalInput elbowLimitLower, elbowLimitUpper;
 	private DigitalInput wristLimitLower, wristLimitUpper;
 	
@@ -141,6 +154,14 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus = "Idle";
 		}
 		
+		if((elbowSpeed < 0 && isElbowLimitedDown()) || (elbowSpeed > 0 && isElbowLimitedUp())) {
+			elbowSpeed = 0;
+		}
+		
+		if((wristSpeed < 0 && isWristLimitedDown()) || (wristSpeed > 0 && isWristLimitedUp())) {
+			wristSpeed = 0;
+		}
+		
 		if(RobotMap.ARM_REVERSE_ELBOW) {
 			elbowSpeed *= -1;
 		}
@@ -149,88 +170,24 @@ public class SubsystemArm extends SubsystemWithArduino {
 			wristSpeed *= -1;
 		}
 		
-		elbow.set(limitElbow(elbowSpeed));
-		wrist.set(limitWrist(wristSpeed));
-	}
-	
-	public boolean hasElbowUpperLimitSwitch() {
-		return elbowLimitUpper != null;
-	}
-	
-	public boolean hasElbowLowerLimitSwitch() {
-		return elbowLimitLower != null;
-	}
-	
-	public boolean isElbowLimitedUp() {
-		if(hasElbowUpperLimitSwitch()) {
-			return elbowLimitUpper.get();
-		} else {
-			return false;
-		}
+		elbow.set(elbowSpeed);
+		wrist.set(wristSpeed);
 	}
 	
 	public boolean isElbowLimitedDown() {
-		if(hasElbowLowerLimitSwitch()) {
-			return elbowLimitLower.get();
-		} else {
-			return false;
-		}
+		return readDIO(elbowLimitLower, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW);
 	}
 	
-	public boolean isElbowLimited(boolean isGoingDown) {
-		if(isGoingDown) {
-			return isElbowLimitedDown();
-		} else {
-			return isElbowLimitedUp();
-		}
-	}
-	
-	public double limitElbow(double speed) {
-		if(isElbowLimited(speed < 0)) {
-			return 0;
-		} else {
-			return speed;
-		}
-	}
-	
-	public boolean hasWristUpperLimitSwitch() {
-		return wristLimitUpper != null;
-	}
-	
-	public boolean hasWristLowerLimitSwitch() {
-		return wristLimitLower != null;
-	}
-	
-	public boolean isWristLimitedUp() {
-		if(hasWristUpperLimitSwitch()) {
-			return wristLimitUpper.get();
-		} else {
-			return false;
-		}
+	public boolean isElbowLimitedUp() {
+		return readDIO(elbowLimitUpper, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW);
 	}
 	
 	public boolean isWristLimitedDown() {
-		if(hasWristLowerLimitSwitch()) {
-			return wristLimitLower.get();
-		} else {
-			return false;
-		}
+		return readDIO(wristLimitLower, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW);
 	}
 	
-	public boolean isWristLimited(boolean isGoingDown) {
-		if(isGoingDown) {
-			return isWristLimitedDown();
-		} else {
-			return isWristLimitedUp();
-		}
-	}
-	
-	public double limitWrist(double speed) {
-		if(isWristLimited(speed < 0)) {
-			return 0;
-		} else {
-			return speed;
-		}
+	public boolean isWristLimitedUp() {
+		return readDIO(wristLimitUpper, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW);
 	}
 	
 	@Override

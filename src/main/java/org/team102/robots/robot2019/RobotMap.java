@@ -76,6 +76,11 @@ public class RobotMap {
 	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
 	
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
+	
 	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
 	public static final double DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED = .4; // TODO configure this
