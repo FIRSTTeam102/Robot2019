@@ -32,7 +32,7 @@ public class CommandResetWrist extends Command {
 	}
 	
 	protected void initialize() {
-		Robot.arm.setArmManual(true, true);
+		Robot.arm.setArmManual(true, false);
 	}
 	
 	@Override
