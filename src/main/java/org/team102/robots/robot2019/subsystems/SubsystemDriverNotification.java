@@ -102,30 +102,30 @@ public class SubsystemDriverNotification extends Subsystem {
 		//vision layout starts here
 		ShuffleboardLayout HSVLowLayout = visionInfoTab
 				.getLayout("HSVLow", BuiltInLayouts.kList)
-				.withPosition(2,0).withSize(2,3);
+				.withPosition(4,0).withSize(2,3);
 		
 		ShuffleboardLayout HSVHighLayout = visionInfoTab
 				.getLayout("HSVHigh", BuiltInLayouts.kList)
-				.withPosition(4,0).withSize(2,3);
+				.withPosition(6,0).withSize(2,3);
 		
 		ShuffleboardLayout cameraSettings = visionInfoTab
 				.getLayout("cameraSettings", BuiltInLayouts.kList)
-				.withPosition(6,1).withSize(2, 3);
+				.withPosition(2,1).withSize(2, 4);
 		
 		//starting values, 29, 75, 150
-		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVLowLayout.add("hueLow", 29).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("saturationLow", 75).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
 		//starting values 64, 255, 255
-		HSVHighLayout.add("hueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
-		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider);
+		HSVHighLayout.add("hueHigh", 64).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
-		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider);
-		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider);
-		cameraSettings.add("shuttterSpeed",5000).withWidget(BuiltInWidgets.kNumberSlider);
-		cameraSettings.add("sharpness", 60).withWidget(BuiltInWidgets.kNumberSlider);
+		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -25, "max", 25));
+		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100));
+		cameraSettings.add("shuttterSpeed",5000).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 10000));
+		cameraSettings.add("ledBrightness", 200).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
 		//image display
 	}
@@ -143,7 +143,7 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getEntry();
 		
 		MjpegServer piVisionOutput = CameraServer.getInstance().addServer("Vision Pi Output (Debug)");
-		VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(2, 0).withSize(3, 3);
+		VisionCameraHelper.advertiseServerToShuffleboard(piVisionOutput, visionInfoTab).withPosition(0, 0).withSize(2, 2);
 		
 		piCamToggle.addListener(notif -> {
 			if(piCamToggle.getBoolean(false)) {
