@@ -206,7 +206,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 				elbowStatus = "Out of range";
 			}
 			
-			distanceWrist = Integer.parseInt(tokens[1]);
+			distanceWrist = Integer.parseInt(tokens[1]) / 5;
 			wristStatus = "OK (Range: " + distanceWrist + ")";
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");

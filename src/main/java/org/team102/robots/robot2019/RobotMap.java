@@ -189,7 +189,7 @@ public class RobotMap {
 	public static final int PDP_ID_ARM_WRIST_ON_TESTBED = 10;
 	public static final int PDP_ID_ARM_WRIST_REAL = 4;
 	public static final int PDP_ID_ARM_WRIST = IS_TESTBED ? PDP_ID_ARM_WRIST_ON_TESTBED : PDP_ID_ARM_WRIST_REAL;
-	public static final double PDP_MAX_CURRENT_ARM_WRIST = 5; // TODO configure me
+	public static final double PDP_MAX_CURRENT_ARM_WRIST = -1; // TODO configure me
 	
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 2;
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;
