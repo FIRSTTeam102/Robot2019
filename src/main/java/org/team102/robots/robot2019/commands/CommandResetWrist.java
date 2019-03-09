@@ -21,18 +21,10 @@
 package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
-import org.team102.robots.robot2019.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CommandResetWrist extends Command {
-	
-	@SuppressWarnings("all") // To get rid of the annoying "comparing identical expressions" warning,
-							 // which is only useful when the values being compared AREN'T configuration values,
-							 // and there isn't a warning suppression option for just "comparing identical expressions". 
-	private static boolean hasNoWristLowerLimitSwitch() {
-		return RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER == -1;
-	}
 	
 	public CommandResetWrist() {
 		super("Reset Arm's Wrist");
@@ -45,7 +37,7 @@ public class CommandResetWrist extends Command {
 	
 	@Override
 	protected boolean isFinished() {
-		return Robot.arm.isWristLimitedDown() || hasNoWristLowerLimitSwitch();
+		return Robot.arm.isWristLimited();
 	}
 	
 	protected void end() {

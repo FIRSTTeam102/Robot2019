@@ -24,10 +24,13 @@ import org.team102.robots.robot2019.lib.arduino.ArduinoConnection;
 import org.team102.robots.robot2019.subsystems.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class Robot extends TimedRobot {
+	public static PowerDistributionPanel pdp;
+	
 	public static SubsystemDriveTrain driveTrain;
 	public static SubsystemArm arm;
 	public static SubsystemCargoManipulator cargoManip;
@@ -48,6 +51,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		ArduinoConnection.findArduinos();
+		
+		pdp = new PowerDistributionPanel(RobotMap.CAN_ID_PDP);
 		
 		driveTrain = new SubsystemDriveTrain();
 		arm = new SubsystemArm();
@@ -128,5 +133,13 @@ public class Robot extends TimedRobot {
 		}
 		
 		robotAesthetics.setLongLightStripPatternSet(patterns);
+	}
+	
+	public static boolean isOverCurrent(int channel, double maxCurrent) {
+		if(channel == -1) {
+			return false;
+		} else {
+			return pdp.getCurrent(channel) >= maxCurrent;
+		}
 	}
 }

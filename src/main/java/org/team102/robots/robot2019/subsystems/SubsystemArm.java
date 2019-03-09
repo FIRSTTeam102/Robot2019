@@ -20,6 +20,7 @@
 
 package org.team102.robots.robot2019.subsystems;
 
+import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
@@ -30,21 +31,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class SubsystemArm extends SubsystemWithArduino {
 	
-	private static boolean readDIO(DigitalInput input, boolean activeLow) {
-		if(input == null) {
-			return false;
-		}
-		
-		boolean val = input.get();
-		if(activeLow) {
-			val = !val;
-		}
-		
-		return val;
-	}
-	
-	private DigitalInput elbowLimitLower, elbowLimitUpper;
-	private DigitalInput wristLimitLower, wristLimitUpper;
+	private DigitalInput elbowLimitLower;
 	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
@@ -74,10 +61,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		elbowLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER, "Elbow: Lower");
-		elbowLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER, "Elbow: Upper");
-		wristLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER, "Wrist: Lower");
-		wristLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER, "Wrist: Upper");
+		elbowLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_SWITCH, "Elbow");
 	}
 	
 	private DigitalInput addLimitSwitch(int id, String name) {
@@ -154,11 +138,11 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus = "Idle";
 		}
 		
-		if((elbowSpeed < 0 && isElbowLimitedDown()) || (elbowSpeed > 0 && isElbowLimitedUp())) {
+		if(elbowSpeed < 0 && isElbowLimitedDown()) {
 			elbowSpeed = 0;
 		}
 		
-		if((wristSpeed < 0 && isWristLimitedDown()) || (wristSpeed > 0 && isWristLimitedUp())) {
+		if(isWristLimited()) {
 			wristSpeed = 0;
 		}
 		
@@ -175,19 +159,20 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	public boolean isElbowLimitedDown() {
-		return readDIO(elbowLimitLower, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW);
+		if(elbowLimitLower == null) {
+			return false;
+		}
+		
+		boolean active = elbowLimitLower.get();
+		if(RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_SWITCH_IS_ACTIVE_LOW) {
+			active = !active;
+		}
+		
+		return active;
 	}
 	
-	public boolean isElbowLimitedUp() {
-		return readDIO(elbowLimitUpper, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW);
-	}
-	
-	public boolean isWristLimitedDown() {
-		return readDIO(wristLimitLower, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW);
-	}
-	
-	public boolean isWristLimitedUp() {
-		return readDIO(wristLimitUpper, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW);
+	public boolean isWristLimited() {
+		return Robot.isOverCurrent(RobotMap.PDP_ID_ARM_WRIST, RobotMap.PDP_MAX_CURRENT_ARM_WRIST);
 	}
 	
 	@Override

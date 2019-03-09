@@ -71,15 +71,8 @@ public class RobotMap {
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_BLUE_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_BLUE_FLAMES, LONG_LIGHT_STRIP_PATTERN_BLUE_SNAKE };
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_RED_FLAMES, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE }; // TODO use more patterns (or make more pattern sets)
 	
-	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
-	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
-	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
-	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
-	
-	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
-	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
-	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
-	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_SWITCH = -1; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_SWITCH_IS_ACTIVE_LOW = true; // TODO configure this
 	
 	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
@@ -190,16 +183,23 @@ public class RobotMap {
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
 	public static final String CAMERA_URL_VISION_PI_OUTPUT = "http://frcvision.local:1181/?action=stream";
 	
+	public static final int CAN_ID_PDP = 0;
+	
+	public static final int PDP_ID_ARM_WRIST_ON_TESTBED = 10;
+	public static final int PDP_ID_ARM_WRIST_REAL = 4;
+	public static final int PDP_ID_ARM_WRIST = IS_TESTBED ? PDP_ID_ARM_WRIST_ON_TESTBED : PDP_ID_ARM_WRIST_REAL;
+	public static final double PDP_MAX_CURRENT_ARM_WRIST = 5; // TODO configure me
+	
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 2;
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;
 	public static final int CAN_TALON_DRIVE_TRAIN_REAR_LEFT = 4;
 	public static final int CAN_TALON_DRIVE_TRAIN_REAR_RIGHT = 3;
 	
-	public static final int CAN_TALON_ARM_ELBOW_ON_TESTBED = 1;
+	public static final int CAN_TALON_ARM_ELBOW_ON_TESTBED = 0;
 	public static final int CAN_TALON_ARM_ELBOW_REAL= 5;
 	public static final int CAN_TALON_ARM_ELBOW = IS_TESTBED ? CAN_TALON_ARM_ELBOW_ON_TESTBED : CAN_TALON_ARM_ELBOW_REAL;
 	
-	public static final int CAN_TALON_ARM_WRIST_ON_TESTBED = 0;
+	public static final int CAN_TALON_ARM_WRIST_ON_TESTBED = 1;
 	public static final int CAN_TALON_ARM_WRIST_REAL = 6;
 	public static final int CAN_TALON_ARM_WRIST = IS_TESTBED ? CAN_TALON_ARM_WRIST_ON_TESTBED : CAN_TALON_ARM_WRIST_REAL;
 	

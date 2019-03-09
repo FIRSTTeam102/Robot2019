@@ -67,6 +67,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
+		addChild("The PDP", Robot.pdp);
+		
 		driverInfoTab = Shuffleboard.getTab("Driver Information");
 		visionInfoTab = Shuffleboard.getTab("Vision Information");
 		
