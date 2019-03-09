@@ -25,6 +25,13 @@ import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
+	// LEAVE THESE AT THE TOP!
+	public static final boolean IS_TESTBED = false;
+	public static final boolean IS_TEST_JOYSTICK_ENABLED = false;
+	
+	public static final boolean ARM_REVERSE_ELBOW = true;
+	public static final boolean ARM_REVERSE_WRIST = true;
+	
 	public static final double AESTHETICS_PATTERN_CHANGE_TIME = 3; // TODO configure me
 	
 	public static final int LONG_LIGHT_STRIP_PATTERN_TWINKLE_WHITE = 4;
@@ -64,16 +71,17 @@ public class RobotMap {
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_BLUE_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_BLUE_FLAMES, LONG_LIGHT_STRIP_PATTERN_BLUE_SNAKE };
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_RED_FLAMES, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE }; // TODO use more patterns (or make more pattern sets)
 	
-	public static final boolean ARM_HAS_LIMIT_SWITCHES = false; // TODO get them installed?
 	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
 	
-	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW = true; // TODO configure this
+	public static final boolean DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW = true; // TODO configure this
 	
-	public static final int ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this
-	public static final int ARM_WRIST_UPPER_MAXIMUM_RECORDABLE_DISTANCE = 20; // TODO configure this
+	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
 	public static final double DRIVE_TRAIN_AUTONOMOUS_FORWARD_SPEED = .4; // TODO configure this
 	
@@ -164,16 +172,18 @@ public class RobotMap {
 	public static final String CENTERING_ARDUINO_WHOIS_RESPONSE = "ls-r2";
 	public static final String LONG_LIGHT_STRIP_ARDUINO_WHOIS_RESPONSE = "led-r2";
 	
-	public static final double CARGO_MANIP_ROLLER_SPEED = .6;
+	public static final double CARGO_MANIP_ROLLER_SPEED = 1;
 	public static final double ARM_ELBOW_SPEED = 1;
 	public static final double ARM_ELBOW_DOWN_SPEED = -.2;
-	public static final double ARM_WRIST_SPEED = .6;
+	public static final double ARM_WRIST_SPEED = 1;
+	public static final double ARM_WRIST_DOWN_SPEED = -.3;
 	
 	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	public static final int JOYSTICK_ID_OPERATOR = 1;
+	public static final int JOYSTICK_ID_TEST = 2;
 	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
@@ -185,10 +195,17 @@ public class RobotMap {
 	public static final int CAN_TALON_DRIVE_TRAIN_REAR_LEFT = 4;
 	public static final int CAN_TALON_DRIVE_TRAIN_REAR_RIGHT = 3;
 	
-	public static final int CAN_TALON_ARM_ELBOW = 5;
-	public static final int CAN_TALON_ARM_WRIST = 6;
+	public static final int CAN_TALON_ARM_ELBOW_ON_TESTBED = 1;
+	public static final int CAN_TALON_ARM_ELBOW_REAL= 5;
+	public static final int CAN_TALON_ARM_ELBOW = IS_TESTBED ? CAN_TALON_ARM_ELBOW_ON_TESTBED : CAN_TALON_ARM_ELBOW_REAL;
 	
-	public static final int CAN_TALON_CARGO_MANIP_ROLLER = 7;
+	public static final int CAN_TALON_ARM_WRIST_ON_TESTBED = 0;
+	public static final int CAN_TALON_ARM_WRIST_REAL = 6;
+	public static final int CAN_TALON_ARM_WRIST = IS_TESTBED ? CAN_TALON_ARM_WRIST_ON_TESTBED : CAN_TALON_ARM_WRIST_REAL;
+	
+	public static final int CAN_TALON_CARGO_MANIP_ROLLER_ON_TESTBED = 2;
+	public static final int CAN_TALON_CARGO_MANIP_ROLLER_REAL = 7;
+	public static final int CAN_TALON_CARGO_MANIP_ROLLER = IS_TESTBED ? CAN_TALON_CARGO_MANIP_ROLLER_ON_TESTBED : CAN_TALON_CARGO_MANIP_ROLLER_REAL;
 	
 	public static final int SOLENOID_ARM_EXTENDER = 0;
 	public static final int SOLENOID_HATCH_MANIP_EJECTOR = 1;

@@ -36,7 +36,7 @@ public class CommandSetClimber extends InstantCommand {
 	}
 	
 	@Override
-	public void initialize() {
+	protected void initialize() {
 		Robot.climber.setClimberExtended(extended);
 	}
 }

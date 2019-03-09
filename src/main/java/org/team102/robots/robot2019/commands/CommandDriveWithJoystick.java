@@ -32,7 +32,7 @@ public class CommandDriveWithJoystick extends Command {
 	}
 	
 	@Override
-	public void execute() {
+	protected void execute() {
 		Robot.driveTrain.driveWithJoystick(Robot.oi.driverJoystick);
 	}
 	

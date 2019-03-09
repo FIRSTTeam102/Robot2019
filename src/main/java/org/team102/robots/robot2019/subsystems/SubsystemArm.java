@@ -30,6 +30,19 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class SubsystemArm extends SubsystemWithArduino {
 	
+	private static boolean readDIO(DigitalInput input, boolean activeLow) {
+		if(input == null) {
+			return false;
+		}
+		
+		boolean val = input.get();
+		if(activeLow) {
+			val = !val;
+		}
+		
+		return val;
+	}
+	
 	private DigitalInput elbowLimitLower, elbowLimitUpper;
 	private DigitalInput wristLimitLower, wristLimitUpper;
 	
@@ -61,21 +74,20 @@ public class SubsystemArm extends SubsystemWithArduino {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		if(RobotMap.ARM_HAS_LIMIT_SWITCHES) {
-			initializeLimitSwitches();
-		}
+		elbowLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER, "Elbow: Lower");
+		elbowLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER, "Elbow: Upper");
+		wristLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER, "Wrist: Lower");
+		wristLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER, "Wrist: Upper");
 	}
 	
-	private void initializeLimitSwitches() {
-		elbowLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER);
-		elbowLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER);
-		wristLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER);
-		wristLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER);
+	private DigitalInput addLimitSwitch(int id, String name) {
+		if(id == -1) {
+			return null;
+		}
 		
-		addChild("Elbow: Lower Limit Switch", elbowLimitLower);
-		addChild("Elbow: Upper Limit Switch", elbowLimitUpper);
-		addChild("Wrist: Lower Limit Switch", wristLimitLower);
-		addChild("Wrist: Upper Limit Switch", wristLimitUpper);
+		DigitalInput input = new DigitalInput(id);
+		addChild(name + " Limit Switch", input);
+		return input;
 	}
 	
 	public String getElbowStatus() {
@@ -98,14 +110,17 @@ public class SubsystemArm extends SubsystemWithArduino {
 		
 		if(isInManualMode) {
 			if(manualModeIsWrist) {
-				wristSpeed = RobotMap.ARM_WRIST_SPEED;
+				if(manualModeIsReverse) {
+					wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
+				} else {
+					wristSpeed = RobotMap.ARM_WRIST_SPEED;
+				}
 			} else {
-				elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
-			}
-			
-			if(manualModeIsReverse) {
-				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
-				wristSpeed *= -1;
+				if(manualModeIsReverse) {
+					elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
+				} else {
+					elbowSpeed = RobotMap.ARM_ELBOW_SPEED;
+				}
 			}
 			
 			overallStatus = "Moving manually";
@@ -125,7 +140,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 			if(wristInRange) {
 				wristSpeed = 0;
 			} else if(distanceWrist > setpoint.wristSetpoint) {
-				wristSpeed *= -1;
+				wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
 			}
 			
 			if(elbowInRange && wristInRange) {
@@ -139,72 +154,40 @@ public class SubsystemArm extends SubsystemWithArduino {
 			overallStatus = "Idle";
 		}
 		
-		elbow.set(limitElbow(elbowSpeed));
-		wrist.set(limitWrist(wristSpeed));
-	}
-	
-	public boolean isElbowLimitedUp() {
-		if(elbowLimitUpper == null) {
-			return false;
-		} else {
-			return elbowLimitUpper.get();
+		if((elbowSpeed < 0 && isElbowLimitedDown()) || (elbowSpeed > 0 && isElbowLimitedUp())) {
+			elbowSpeed = 0;
 		}
+		
+		if((wristSpeed < 0 && isWristLimitedDown()) || (wristSpeed > 0 && isWristLimitedUp())) {
+			wristSpeed = 0;
+		}
+		
+		if(RobotMap.ARM_REVERSE_ELBOW) {
+			elbowSpeed *= -1;
+		}
+		
+		if(RobotMap.ARM_REVERSE_WRIST) {
+			wristSpeed *= -1;
+		}
+		
+		elbow.set(elbowSpeed);
+		wrist.set(wristSpeed);
 	}
 	
 	public boolean isElbowLimitedDown() {
-		if(elbowLimitLower == null) {
-			return false;
-		} else {
-			return elbowLimitLower.get();
-		}
+		return readDIO(elbowLimitLower, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_LOWER_ACTIVE_LOW);
 	}
 	
-	public boolean isElbowLimited(boolean isGoingDown) {
-		if(isGoingDown) {
-			return isElbowLimitedDown();
-		} else {
-			return isElbowLimitedUp();
-		}
-	}
-	
-	public double limitElbow(double speed) {
-		if(isElbowLimited(speed < 0)) {
-			return 0;
-		} else {
-			return speed;
-		}
-	}
-	
-	public boolean isWristLimitedUp() {
-		if(wristLimitUpper == null) {
-			return false;
-		} else {
-			return wristLimitUpper.get();
-		}
+	public boolean isElbowLimitedUp() {
+		return readDIO(elbowLimitUpper, RobotMap.DIO_CONFIG_ARM_ELBOW_LIMIT_UPPER_ACTIVE_LOW);
 	}
 	
 	public boolean isWristLimitedDown() {
-		if(wristLimitLower == null) {
-			return false;
-		} else {
-			return wristLimitLower.get();
-		}
+		return readDIO(wristLimitLower, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_LOWER_ACTIVE_LOW);
 	}
 	
-	public boolean isWristLimited(boolean isGoingDown) {
-		if(isGoingDown) {
-			return isWristLimitedDown();
-		} else {
-			return isWristLimitedUp();
-		}
-	}
-	
-	public double limitWrist(double speed) {
-		if(isWristLimited(speed < 0)) {
-			return 0;
-		} else {
-			return speed;
-		}
+	public boolean isWristLimitedUp() {
+		return readDIO(wristLimitUpper, RobotMap.DIO_CONFIG_ARM_WRIST_LIMIT_UPPER_ACTIVE_LOW);
 	}
 	
 	@Override
@@ -217,65 +200,27 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	protected void onArduinoLineReceived(String line) {
-		String[] parts = line.split(",");
-		
 		try {
-			distanceElbow = Integer.parseInt(parts[0]);
+			String[] tokens = line.split(",");
+			
+			distanceElbow = Integer.parseInt(tokens[0]);
 			boolean elbowInRange = distanceElbow != -1;
-			
-			int distanceWristLower = Integer.parseInt(parts[1]);
-			int distanceWristUpper = Integer.parseInt(parts[2]);
-			
-			if(distanceWristLower > RobotMap.ARM_WRIST_LOWER_MAXIMUM_RECORDABLE_DISTANCE) {
-				distanceWristLower = -1;
-			}
-			
-			if(distanceWristUpper > RobotMap.ARM_WRIST_UPPER_MAXIMUM_RECORDABLE_DISTANCE) {
-				distanceWristUpper = -1;
-			}
-			
-			boolean wristLowerInRange = distanceWristLower != -1;
-			boolean wristUpperInRange = distanceWristUpper != -1;
-			
-			boolean ignoreWristLower = false;
-			boolean ignoreWristUpper = false;
-			
-			if(wristLowerInRange && wristUpperInRange) {
-				if(distanceWristLower < distanceWristUpper) {
-					ignoreWristLower = true;
-				} else {
-					ignoreWristUpper = true;
-				}
-			}
-			
-			if((!wristLowerInRange || ignoreWristLower) && (!wristUpperInRange && ignoreWristUpper)) {
-				distanceWrist = 0;
-			} else if(wristLowerInRange && !ignoreWristLower) {
-				distanceWrist = -distanceWristLower;
-			} else {
-				distanceWrist = distanceWristUpper;
-			}
-			
-			if(!wristLowerInRange && !wristUpperInRange) {
-				wristStatus = "OK (Centered)";
-			} else if(wristLowerInRange != wristUpperInRange) {
-				wristStatus = "OK (Range: " + distanceWrist + ")";
-			} else if(ignoreWristUpper && !ignoreWristLower) {
-				wristStatus = "Both in range, using lower";
-			} else if(ignoreWristLower && !ignoreWristUpper) {
-				wristStatus = "Both in range, using upper";
-			} else {
-				wristStatus = "Impossible state (Please report this)";
-			}
 			
 			if(elbowInRange) {
 				elbowStatus = "OK (Range: " + distanceElbow + ")";
 			} else {
 				elbowStatus = "Out of range";
 			}
+			
+			distanceWrist = Integer.parseInt(tokens[1]);
+			wristStatus = "OK (Range: " + distanceWrist + ")";
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
 		}
+	}
+	
+	public void resetWristAccelerometer() {
+		sendLineToArduino("RESETACCEL");
 	}
 	
 	public void setArmManual(boolean isWrist, boolean isReverse) {
@@ -297,7 +242,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	private boolean isElbowInRange() {
-		if(hasSetpoint()) {
+		if(hasSetpoint() && setpoint.elbowSetpoint != -1) {
 			return Math.abs(distanceElbow - setpoint.elbowSetpoint) <= RobotMap.ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR;
 		} else {
 			return true;
@@ -305,7 +250,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	private boolean isWristInRange() {
-		if(hasSetpoint()) {
+		if(hasSetpoint() && setpoint.wristSetpoint != -1) {
 			return Math.abs(distanceWrist - setpoint.wristSetpoint) <= RobotMap.ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR;
 		} else {
 			return true;

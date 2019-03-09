@@ -37,11 +37,11 @@ public class CommandMoveArmAutomatic extends Command {
 	}
 	
 	@Override
-	public void initialize() {
+	protected void initialize() {
 		Robot.arm.setSetpoint(setpoint);
 	}
 	
-	public void done() {
+	private void done() {
 		Robot.arm.setSetpoint(null);
 	}
 	
@@ -51,12 +51,12 @@ public class CommandMoveArmAutomatic extends Command {
 	}
 	
 	@Override
-	public void end() {
+	protected void end() {
 		done();
 	}
 	
 	@Override
-	public void interrupted() {
+	protected void interrupted() {
 		done();
 	}
 }

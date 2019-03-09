@@ -21,22 +21,43 @@
 package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
+import org.team102.robots.robot2019.RobotMap;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.command.Command;
 
-public class CommandExtendArm extends InstantCommand {
+public class CommandResetWrist extends Command {
 	
-	private boolean active;
+	@SuppressWarnings("all") // To get rid of the annoying "comparing identical expressions" warning,
+							 // which is only useful when the values being compared AREN'T configuration values,
+							 // and there isn't a warning suppression option for just "comparing identical expressions". 
+	private static boolean hasNoWristLowerLimitSwitch() {
+		return RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER == -1;
+	}
 	
-	public CommandExtendArm(boolean active) {
-		super("Set Arm Extension: " + (active ? "Extended" : "Contracted"));
+	public CommandResetWrist() {
+		super("Reset Arm's Wrist");
 		requires(Robot.arm);
-		
-		this.active = active;
+	}
+	
+	protected void initialize() {
+		Robot.arm.setArmManual(true, true);
 	}
 	
 	@Override
-	protected void initialize() {
-		Robot.arm.setExtender(active);
+	protected boolean isFinished() {
+		return Robot.arm.isWristLimitedDown() || hasNoWristLowerLimitSwitch();
+	}
+	
+	protected void end() {
+		done();
+		Robot.arm.resetWristAccelerometer();
+	}
+	
+	protected void interrupted() {
+		done();
+	}
+	
+	private void done() {
+		Robot.arm.endManualMode();
 	}
 }

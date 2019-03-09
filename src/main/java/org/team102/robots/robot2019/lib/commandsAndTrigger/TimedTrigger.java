@@ -34,6 +34,11 @@ public class TimedTrigger extends Trigger {
 	
 	private long startTime = -1;
 	
+	/**
+	 * Create the trigger
+	 * @param parent The parent, which will be checked to see if it is active for long enough
+	 * @param minTime How long the parent must remain active for this trigger to activate
+	 */
 	public TimedTrigger(Trigger parent, double minTime) {
 		this.parent = parent;
 		this.minTime = minTime;
