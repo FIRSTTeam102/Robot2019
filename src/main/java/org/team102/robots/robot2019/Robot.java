@@ -134,12 +134,4 @@ public class Robot extends TimedRobot {
 		
 		robotAesthetics.setLongLightStripPatternSet(patterns);
 	}
-	
-	public static boolean isOverCurrent(int channel, double maxCurrent) {
-		if(channel == -1) {
-			return false;
-		} else {
-			return pdp.getCurrent(channel) >= maxCurrent;
-		}
-	}
 }

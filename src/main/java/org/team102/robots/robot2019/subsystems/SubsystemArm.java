@@ -22,6 +22,7 @@ package org.team102.robots.robot2019.subsystems;
 
 import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
+import org.team102.robots.robot2019.lib.CurrentLimitDetector;
 import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 public class SubsystemArm extends SubsystemWithArduino {
 	
 	private DigitalInput elbowLimitLower;
+	private CurrentLimitDetector wristLimit;
 	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
@@ -62,6 +64,9 @@ public class SubsystemArm extends SubsystemWithArduino {
 		addChild("Extender Cylinder", extender);
 		
 		elbowLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_SWITCH, "Elbow");
+		
+		wristLimit = new CurrentLimitDetector(Robot.pdp, RobotMap.PDP_ID_ARM_WRIST, RobotMap.PDP_MAX_CURRENT_ARM_WRIST);
+		addChild("Wrist Limit Current Sensor", wristLimit);
 	}
 	
 	private DigitalInput addLimitSwitch(int id, String name) {
@@ -172,7 +177,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	public boolean isWristLimited() {
-		return Robot.isOverCurrent(RobotMap.PDP_ID_ARM_WRIST, RobotMap.PDP_MAX_CURRENT_ARM_WRIST);
+		return wristLimit.isOverCurrent();
 	}
 	
 	@Override
