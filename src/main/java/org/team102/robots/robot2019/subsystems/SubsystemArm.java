@@ -61,26 +61,20 @@ public class SubsystemArm extends SubsystemWithArduino {
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
 		addChild("Extender Cylinder", extender);
 		
-		elbowLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER);
-		//elbowLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER);
-		wristLimitLower = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER);
-		wristLimitUpper = new DigitalInput(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER);
-		
-		if(elbowLimitLower != null) {
-			addChild("Elbow: Lower Limit Switch", elbowLimitLower);
+		elbowLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_LOWER, "Elbow: Lower");
+		elbowLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_ELBOW_LIMIT_UPPER, "Elbow: Upper");
+		wristLimitLower = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_LOWER, "Wrist: Lower");
+		wristLimitUpper = addLimitSwitch(RobotMap.DIO_ID_ARM_WRIST_LIMIT_UPPER, "Wrist: Upper");
+	}
+	
+	private DigitalInput addLimitSwitch(int id, String name) {
+		if(id == -1) {
+			return null;
 		}
 		
-		if(elbowLimitUpper != null) {
-			addChild("Elbow: Upper Limit Switch", elbowLimitUpper);
-		}
-		
-		if(wristLimitLower != null) {
-			addChild("Wrist: Lower Limit Switch", wristLimitLower);
-		}
-		
-		if(wristLimitUpper != null) {
-			addChild("Wrist: Upper Limit Switch", wristLimitUpper);
-		}
+		DigitalInput input = new DigitalInput(id);
+		addChild(name + " Limit Switch", input);
+		return input;
 	}
 	
 	public String getElbowStatus() {

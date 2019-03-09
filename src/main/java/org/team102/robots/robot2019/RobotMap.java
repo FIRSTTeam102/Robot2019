@@ -72,6 +72,7 @@ public class RobotMap {
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_RED_FLAMES, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE }; // TODO use more patterns (or make more pattern sets)
 	
 	public static final int DIO_ID_ARM_ELBOW_LIMIT_LOWER = -1; // TODO configure this
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_UPPER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_WRIST_LIMIT_LOWER = -1; // TODO configure this
 	public static final int DIO_ID_ARM_WRIST_LIMIT_UPPER = -1; // TODO configure this
 	
