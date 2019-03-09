@@ -151,6 +151,10 @@ public class SubsystemArm extends SubsystemWithArduino {
 			wristSpeed = 0;
 		}
 		
+		if(elbowSpeed == 0) {
+			elbowSpeed = RobotMap.ARM_ELBOW_GRAV_COMP_SPEED;
+		}
+		
 		if(RobotMap.ARM_REVERSE_ELBOW) {
 			elbowSpeed *= -1;
 		}
