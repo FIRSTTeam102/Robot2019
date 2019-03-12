@@ -29,17 +29,24 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class SubsystemClimber  extends Subsystem {
 	
 	private Solenoid climber;
+	private Solenoid frontStage;
 	
 	public SubsystemClimber() {
 		super("Climber");
 		
 		climber = new Solenoid(RobotMap.SOLENOID_CLIMBER);
+		frontStage = new Solenoid(RobotMap.SOLENOID_CLIMBER_FRONT_STAGE);
 		addChild("Climbing Cylinder", climber);
+		addChild("Climber Front Stage", frontStage);
 	}
 
 	@Override
 	protected void initDefaultCommand() {
 		
+	}
+	
+	public void setFrontStageExtended(boolean extended) {
+		frontStage.set(extended);
 	}
 	
 	public void setClimberExtended(boolean extended) {

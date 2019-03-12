@@ -215,4 +215,5 @@ public class RobotMap {
 	public static final int SOLENOID_ARM_EXTENDER = 0;
 	public static final int SOLENOID_HATCH_MANIP_EJECTOR = 1;
 	public static final int SOLENOID_CLIMBER = 2;
+	public static final int SOLENOID_CLIMBER_FRONT_STAGE = 3;
 }
