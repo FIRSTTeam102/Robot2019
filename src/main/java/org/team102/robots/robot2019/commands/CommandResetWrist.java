@@ -27,17 +27,17 @@ import edu.wpi.first.wpilibj.command.Command;
 public class CommandResetWrist extends Command {
 	
 	public CommandResetWrist() {
-		super("Reset Arm's Wrist");
+		super("Reset Wrist");
 		requires(Robot.arm);
 	}
 	
 	protected void initialize() {
-		Robot.arm.setArmManual(true, false);
+		//Robot.arm.setArmManual(true, false);
 	}
 	
 	@Override
 	protected boolean isFinished() {
-		return Robot.arm.isWristLimited();
+		return true;//Robot.arm.isWristLimited();
 	}
 	
 	protected void end() {
@@ -50,6 +50,6 @@ public class CommandResetWrist extends Command {
 	}
 	
 	private void done() {
-		Robot.arm.endManualMode();
+		//Robot.arm.endManualMode();
 	}
 }

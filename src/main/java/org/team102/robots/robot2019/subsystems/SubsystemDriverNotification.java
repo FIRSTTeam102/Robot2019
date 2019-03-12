@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
+import org.team102.robots.robot2019.commands.CommandResetWrist;
 import org.team102.robots.robot2019.commands.CommandSetDSVideoOutput;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
@@ -43,6 +44,7 @@ public class SubsystemDriverNotification extends Subsystem {
 	public static final Map<String, Object> PROP_HIDE_LABELS = Collections.<String, Object>singletonMap("Label Position", "HIDDEN");
 	public static final DecimalFormat ROUNDING_FORMATTER = new DecimalFormat("#.#");
 	
+	private ShuffleboardTab debugTab;
 	private ShuffleboardTab driverInfoTab;
 	private ShuffleboardTab visionInfoTab;
 	private NetworkTableEntry lowTimeNotifier;
@@ -69,6 +71,7 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		addChild("The PDP", Robot.pdp);
 		
+		debugTab = Shuffleboard.getTab("Debug");
 		driverInfoTab = Shuffleboard.getTab("Driver Information");
 		visionInfoTab = Shuffleboard.getTab("Vision Information");
 		
@@ -100,6 +103,11 @@ public class SubsystemDriverNotification extends Subsystem {
 				.add("Climber Status", "")
 				.withPosition(6, 2).withSize(2, 1)
 				.getEntry();
+		
+		// Debug tab begins here
+		debugTab.add(new CommandResetWrist())
+				.withPosition(0, 0).withSize(0, 0)
+				.withProperties(PROP_HIDE_LABELS);
 		
 		//vision layout starts here
 		ShuffleboardLayout HSVLowLayout = visionInfoTab
