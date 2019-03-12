@@ -30,7 +30,9 @@ public class RobotMap {
 	public static final boolean IS_TEST_JOYSTICK_ENABLED = false;
 	
 	public static final boolean ARM_REVERSE_ELBOW = true;
-	public static final boolean ARM_REVERSE_WRIST = true;
+	public static final boolean ARM_REVERSE_WRIST = false;
+	
+	public static final boolean ARM_USE_VICTOR_FOR_WRIST = true;
 	
 	public static final double AESTHETICS_PATTERN_CHANGE_TIME = 3; // TODO configure me
 	
@@ -190,6 +192,8 @@ public class RobotMap {
 	public static final int PDP_ID_ARM_WRIST_REAL = 4;
 	public static final int PDP_ID_ARM_WRIST = IS_TESTBED ? PDP_ID_ARM_WRIST_ON_TESTBED : PDP_ID_ARM_WRIST_REAL;
 	public static final double PDP_MAX_CURRENT_ARM_WRIST = -1; // TODO configure me
+	
+	public static final int PWM_ID_ARM_WRIST_USING_VICTOR = 0;
 	
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_LEFT = 2;
 	public static final int CAN_TALON_DRIVE_TRAIN_FRONT_RIGHT = 1;

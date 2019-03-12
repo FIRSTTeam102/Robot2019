@@ -28,7 +28,10 @@ import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.SpeedController;
 
 public class SubsystemArm extends SubsystemWithArduino {
 	
@@ -38,7 +41,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
 	
-	private WPI_TalonSRX wrist;
+	private SpeedController wrist;
 	private WPI_TalonSRX elbow;
 	
 	private Solenoid extender;
@@ -55,9 +58,14 @@ public class SubsystemArm extends SubsystemWithArduino {
 	public SubsystemArm() {
 		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
-		wrist = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_WRIST);
+		if(RobotMap.ARM_USE_VICTOR_FOR_WRIST) {
+			wrist = new VictorSP(RobotMap.PWM_ID_ARM_WRIST_USING_VICTOR);
+		} else {
+			wrist = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_WRIST);
+		}
+		
 		elbow = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_ELBOW);
-		addChild("Wrist Motor", wrist);
+		addChild("Wrist Motor", (Sendable)wrist);
 		addChild("Elbow Motor", elbow);
 		
 		extender = new Solenoid(RobotMap.SOLENOID_ARM_EXTENDER);		
