@@ -26,17 +26,27 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 
 public class CommandSetClimber extends InstantCommand {
 	
+	private boolean frontStage;
 	private boolean extended;
 	
 	public CommandSetClimber(boolean extended) {
-		super("Set Climber: " + (extended ? "Extended" : "Contracted"));
+		this(false, extended);
+	}
+	
+	public CommandSetClimber(boolean frontStage, boolean extended) {
+		super("Set Climber " + (frontStage ? "Front Stage" : "Back Stage") + ": " + (extended ? "Extended" : "Contracted"));
 		requires(Robot.climber);
 		
+		this.frontStage = frontStage;
 		this.extended = extended;
 	}
 	
 	@Override
 	protected void initialize() {
-		Robot.climber.setClimberExtended(extended);
+		if(frontStage) {
+			Robot.climber.setFrontStageExtended(extended);
+		} else {
+			Robot.climber.setClimberExtended(extended);
+		}
 	}
 }

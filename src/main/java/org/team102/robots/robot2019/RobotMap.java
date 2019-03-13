@@ -21,7 +21,6 @@
 package org.team102.robots.robot2019;
 
 import org.team102.robots.robot2019.lib.RumbleSeries;
-import org.team102.robots.robot2019.subsystems.SubsystemArm.ArmSetpoint;
 
 public class RobotMap {
 	
@@ -83,20 +82,6 @@ public class RobotMap {
 	public static final double CLIMBER_EXTENSION_TIME = 15; // TODO configure this
 	public static final double CLIMBER_WAIT_BEFORE_DRIVE_TIME = 3; // TODO configure this
 	public static final double CLIMBER_DRIVE_FORWARD_TIME = 10; // TODO configure this
-	
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_TOP = null;  // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_MIDDLE = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_HATCH_BOTTOM = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_TOP = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_MIDDLE = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_ROCKET_CARGO_BOTTOM = null; // TODO configure this
-	
-	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_CARGO = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_CARGO_SHIP_OR_LOADING_STATION_HATCH = null; // TODO configure this
-	
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_ABOVE_POSITION = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_HATCH_COMMIT = null; // TODO configure this
-	public static final ArmSetpoint ARM_SETPOINT_FLOOR_CARGO = null; // TODO configure this
 	
 	public static final RumbleSeries RUMBLE_ARM_AT_SETPOINT = new RumbleSeries().addSoft(.5);
 	public static final RumbleSeries RUMBLE_LOW_TIME = new RumbleSeries().addRough(.2).addBreak(.1).addRough(.2);
@@ -173,9 +158,6 @@ public class RobotMap {
 	public static final double ARM_WRIST_SPEED = .7;
 	public static final double ARM_WRIST_DOWN_SPEED = -.4;
 	public static final double ARM_ELBOW_GRAV_COMP_SPEED = .1;
-	
-	public static final int ARM_ELBOW_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
-	public static final int ARM_WRIST_ACCEPTABLE_RANGE_OF_ERROR = 1; // TODO configure this
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	public static final int JOYSTICK_ID_OPERATOR = 1;

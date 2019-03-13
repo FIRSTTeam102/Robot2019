@@ -59,19 +59,19 @@ public class OI {
 		// All button assignments on the operator console should be fairly self-explanatory
 		// While progressing, they will light up the LEDs on the Operator Console the color of their buttons
 		
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_BOTTOM).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_HATCH_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_TOP).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_MIDDLE).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_BOTTOM).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_ROCKET_CARGO_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_TOP).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_HATCH_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_MIDDLE).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_HATCH_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_HATCH_BOTTOM).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_HATCH_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_YELLOW_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_TOP).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_CARGO_TOP, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_MIDDLE).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_CARGO_MIDDLE, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_ROCKET_CARGO_BOTTOM).whileHeld(new CommandUseArmSetpoint(ArmConfig.ROCKET_CARGO_BOTTOM, RobotMap.OP_CONTROLLER_PATTERN_SET_RED_BUTTON));
 		
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_CARGO_SHIP_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_OR_LOADING_STATION_HATCH).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_CARGO_SHIP_OR_LOADING_STATION_HATCH, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO).whileHeld(new CommandUseArmSetpoint(ArmConfig.CARGO_SHIP_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_OR_LOADING_STATION_HATCH).whileHeld(new CommandUseArmSetpoint(ArmConfig.CARGO_SHIP_OR_LOADING_STATION_HATCH, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
 		
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_ABOVE_POSITION).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_HATCH_ABOVE_POSITION, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_COMMIT).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_HATCH_COMMIT, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO).whileHeld(new CommandUseArmSetpoint(RobotMap.ARM_SETPOINT_FLOOR_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_ABOVE_POSITION).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_HATCH_ABOVE_POSITION, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_COMMIT).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_HATCH_COMMIT, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
 		
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN).whileHeld(new CommandMoveArmManual(false, true));
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_UP).whileHeld(new CommandMoveArmManual(false, false));
@@ -95,16 +95,25 @@ public class OI {
 		
 		// If the test joystick is enabled...
 		if(testJoystick != null) {
-			// Set the arm extender's state from the state of the A button
-			JoystickButton extendArmTest = getButton(CommonIDs.Gamepad.BTN_A, true);
+			// Set the arm extender's state from the state of the Back button
+			JoystickButton extendArmTest = getButton(CommonIDs.Gamepad.BTN_BACK, true);
 			extendArmTest.whenPressed(new CommandExtendArm(true));
 			extendArmTest.whenReleased(new CommandExtendArm(false));
 			
-			// Climb unconditionally when X is pressed
-			getButton(CommonIDs.Gamepad.BTN_X, true).whenPressed(new CommandClimb.CommandClimbUnconditionally());
+			// Climb unconditionally when Start is pressed
+			getButton(CommonIDs.Gamepad.BTN_START, true).whenPressed(new CommandClimb.CommandClimbUnconditionally());
 			
-			// Retract the climber when Y is pressed
+			// Extend the climber when X is pressed
+			getButton(CommonIDs.Gamepad.BTN_X, true).whenPressed(new CommandSetClimber(true));
+			
+			// Contract the climber when Y is pressed
 			getButton(CommonIDs.Gamepad.BTN_Y, true).whenPressed(new CommandSetClimber(false));
+			
+			// Extend the front stage of the climber when A is pressed
+			getButton(CommonIDs.Gamepad.BTN_A, true).whenPressed(new CommandSetClimber(true, true));
+			
+			// Contract the front stage of the climber when B is pressed
+			getButton(CommonIDs.Gamepad.BTN_B, true).whenPressed(new CommandSetClimber(true, false));
 		}
 	}
 	
