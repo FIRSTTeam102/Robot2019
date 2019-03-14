@@ -21,7 +21,9 @@
 package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
+import org.team102.robots.robot2019.RobotMap;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class CommandDriveWithJoystick extends Command {
@@ -33,7 +35,15 @@ public class CommandDriveWithJoystick extends Command {
 	
 	@Override
 	protected void execute() {
-		Robot.driveTrain.driveWithJoystick(Robot.oi.driverJoystick);
+		Joystick js;
+		
+		if(RobotMap.IS_TEST_JOYSTICK_ENABLED && Robot.driverNotif.isDriveWithTestJSEnabled()) {
+			js = Robot.oi.testJoystick;
+		} else {
+			js = Robot.oi.driverJoystick;
+		}
+		
+		Robot.driveTrain.driveWithJoystick(js);
 	}
 	
 	@Override

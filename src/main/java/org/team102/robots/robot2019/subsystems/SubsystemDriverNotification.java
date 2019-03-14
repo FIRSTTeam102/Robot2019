@@ -65,6 +65,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry centeringStatus;
 	
 	private NetworkTableEntry climberStatus;
+	
+	private NetworkTableEntry driveWithTestJS;
 		
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
@@ -106,8 +108,14 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		// Debug tab begins here
 		debugTab.add(new CommandResetWrist())
-				.withPosition(0, 0).withSize(0, 0)
+				.withPosition(0, 0).withSize(1, 1)
 				.withProperties(PROP_HIDE_LABELS);
+		
+		driveWithTestJS = debugTab.add("Test JS Drive", false)
+				.withPosition(1, 0).withSize(1, 1)
+				.withProperties(PROP_HIDE_LABELS)
+				.withWidget(BuiltInWidgets.kToggleSwitch)
+				.getEntry();
 		
 		//vision layout starts here
 		ShuffleboardLayout HSVLowLayout = visionInfoTab
@@ -184,6 +192,10 @@ public class SubsystemDriverNotification extends Subsystem {
 		} else {
 			System.out.println("Warning: No video streams present! Skipping video output to the driver station.");
 		}
+	}
+	
+	public boolean isDriveWithTestJSEnabled() {
+		return driveWithTestJS.getBoolean(false);
 	}
 	
 	public void setVideoStream(String name) {
