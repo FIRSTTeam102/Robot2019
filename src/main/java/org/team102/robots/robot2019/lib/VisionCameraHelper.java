@@ -20,6 +20,8 @@
 
 package org.team102.robots.robot2019.lib;
 
+import java.net.InetAddress;
+
 import org.opencv.core.Mat;
 import org.team102.robots.robot2019.Robot;
 
@@ -91,11 +93,40 @@ public class VisionCameraHelper {
 			}
 		});
 		
-		NetworkTableInstance.getDefault().getTable("/CameraPublisher/" + name).getEntry("streams").setStringArray(new String[] {
-				"mjpg:http://" + CameraServerJNI.getHostname() + ".local:" + srv.getPort() + "/?action=stream"
-		});
+		NetworkTableInstance.getDefault().getTable("/CameraPublisher/" + name).getEntry("streams").setStringArray(getMJPEGURLs(srv.getPort()));
 		
 		return widge;
+	}
+	
+	/**
+	 * Gets the possible MJPEG URLs for the given port
+	 * @param port The port
+	 * @return The possible URLs
+	 */
+	public static String[] getMJPEGURLs(int port) {
+		String hostnameURL = getMJPEGURL(CameraServerJNI.getHostname(), port);
+		String ipURL = null;
+		
+		try {
+			ipURL = getMJPEGURL(InetAddress.getLocalHost().getHostAddress(), port);
+		} catch(Exception e) {
+			System.err.println("Failed to get IP address: ");
+			e.printStackTrace();
+			
+			return new String[] { hostnameURL };
+		}
+		
+		return new String[] { hostnameURL, ipURL };
+	}
+	
+	/**
+	 * Formats the given host and port into a valid MJPEG URL
+	 * @param host The hostname or IP
+	 * @param port The port
+	 * @return The MJPEG URL
+	 */
+	public static String getMJPEGURL(String host, int port) {
+		return "mjpg:http://" + host + ":" + port + "/?action=stream";
 	}
 	
 	/**

@@ -72,8 +72,8 @@ public class RobotMap {
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_BLUE_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_BLUE_FLAMES, LONG_LIGHT_STRIP_PATTERN_BLUE_SNAKE };
 	public static final int[] LONG_LIGHT_STRIP_PATTERN_SET_RED_ALLIANCE = { LONG_LIGHT_STRIP_PATTERN_RED_FLAMES, LONG_LIGHT_STRIP_PATTERN_RED_SNAKE }; // TODO use more patterns (or make more pattern sets)
 	
-	public static final int DIO_ID_ARM_ELBOW_LIMIT_SWITCH = -1; // TODO configure this
-	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_SWITCH_IS_ACTIVE_LOW = true; // TODO configure this
+	public static final int DIO_ID_ARM_ELBOW_LIMIT_SWITCH = 0;
+	public static final boolean DIO_CONFIG_ARM_ELBOW_LIMIT_SWITCH_IS_ACTIVE_LOW = true;
 	
 	public static final boolean DEBUG_USE_LOCAL_PIPELINE = false;
 	
