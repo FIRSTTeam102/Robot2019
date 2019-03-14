@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public abstract class SubsystemWithArduino extends Subsystem {
 	
 	private ArduinoConnection arduino;
+	private long lastLineReceivedTime = -1;
 	
 	/**
 	 * Create the subsystem
@@ -42,7 +43,7 @@ public abstract class SubsystemWithArduino extends Subsystem {
 		if(arduino == null) {
 			System.out.println("Warning: " + humanReadableArduinoName + " arduino not found!");
 		} else {
-			arduino.setLineListener(this::onArduinoLineReceived);
+			arduino.setLineListener(this::onArduinoLineReceivedRaw);
 			addChild(humanReadableArduinoName + " Arduino", arduino);
 		}
 	}
@@ -55,6 +56,23 @@ public abstract class SubsystemWithArduino extends Subsystem {
 		if(arduino != null) {
 			arduino.write(line);
 		}
+	}
+	
+	/**
+	 * Gives back the time (in seconds) since the last line has been received from the arduino
+	 * @return The time since the last input
+	 */
+	protected double getTimeSinceLastArduinoMessage() {
+		return (System.nanoTime() - lastLineReceivedTime) / 1e9D;
+	}
+	
+	/**
+	 * Called before {@link #onArduinoLineReceived(String)}, in order to update the time since the last message
+	 * @param line The text that has been received
+	 */
+	protected void onArduinoLineReceivedRaw(String line) {
+		lastLineReceivedTime = System.nanoTime();
+		onArduinoLineReceived(line);
 	}
 	
 	/**

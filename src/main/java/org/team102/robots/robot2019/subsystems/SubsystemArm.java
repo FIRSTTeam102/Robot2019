@@ -104,6 +104,10 @@ public class SubsystemArm extends SubsystemWithArduino {
 	public void periodic() {
 		super.periodic();
 		
+		if(getTimeSinceLastArduinoMessage() >= 2) {
+			overallStatus = "CONNECTION LOST";
+		}
+		
 		double elbowSpeed = 0, wristSpeed = 0;
 		
 		if(isInManualMode) {
