@@ -26,7 +26,6 @@ public class RobotMap {
 	
 	// LEAVE THESE AT THE TOP!
 	public static final boolean IS_TESTBED = false;
-	public static final boolean IS_TEST_JOYSTICK_ENABLED = false;
 	
 	public static final boolean ARM_REVERSE_ELBOW = true;
 	public static final boolean ARM_REVERSE_WRIST = false;
@@ -161,12 +160,11 @@ public class RobotMap {
 	
 	public static final int JOYSTICK_ID_DRIVER = 0;
 	public static final int JOYSTICK_ID_OPERATOR = 1;
-	public static final int JOYSTICK_ID_TEST = 2;
 	
 	public static final int CAMERA_ID_VISION_REAL = 0;
 	public static final int CAMERA_ID_VISION_IN_SIMULATOR = 1;
 	public static final int CAMERA_ID_VISION = Robot.isReal() ? CAMERA_ID_VISION_REAL : CAMERA_ID_VISION_IN_SIMULATOR;
-	public static final String CAMERA_URL_VISION_PI_OUTPUT = "http://frcvision.local:1181/?action=stream";
+    public static final String CAMERA_URL_VISION_PI_OUTPUT = "http://frcvision.local:1181/?action=stream";
 	
 	public static final int CAN_ID_PDP = 0;
 	

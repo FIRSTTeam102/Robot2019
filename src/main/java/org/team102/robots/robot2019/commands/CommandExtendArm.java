@@ -26,17 +26,44 @@ import edu.wpi.first.wpilibj.command.InstantCommand;
 
 public class CommandExtendArm extends InstantCommand {
 	
-	private boolean active;
+	private ArmExtendStatus status;
 	
-	public CommandExtendArm(boolean active) {
-		super("Set Arm Extension: " + (active ? "Extended" : "Contracted"));
+	public CommandExtendArm(boolean extended) {
+		this(extended ? ArmExtendStatus.EXTEND : ArmExtendStatus.CONTRACT);
+	}
+	
+	public CommandExtendArm(ArmExtendStatus status) {
+		super("Set Arm Extension: " + status);
 		requires(Robot.arm);
 		
-		this.active = active;
+		this.status = status;
 	}
 	
 	@Override
 	protected void initialize() {
+		boolean active;
+		
+		switch(status) {
+			case CONTRACT: {
+				active = false;
+				break;
+			}
+			
+			case EXTEND: {
+				active = true;
+				break;
+			}
+			
+			default: {
+				active = !Robot.arm.getExtender();
+				break;
+			}
+		}
+		
 		Robot.arm.setExtender(active);
+	}
+	
+	public enum ArmExtendStatus {
+		CONTRACT, EXTEND, TOGGLE
 	}
 }

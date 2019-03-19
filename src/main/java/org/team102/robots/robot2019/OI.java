@@ -20,19 +20,11 @@
 
 package org.team102.robots.robot2019;
 
-import org.team102.robots.robot2019.commands.CommandClimb;
-import org.team102.robots.robot2019.commands.CommandExtendArm;
-import org.team102.robots.robot2019.commands.CommandMoveArmManual;
-import org.team102.robots.robot2019.commands.CommandSetCargoManip;
-import org.team102.robots.robot2019.commands.CommandSetClimber;
-import org.team102.robots.robot2019.commands.CommandSetHatchManip;
-import org.team102.robots.robot2019.commands.CommandUseArmSetpoint;
+import org.team102.robots.robot2019.commands.*;
+
 import org.team102.robots.robot2019.lib.CommonIDs;
 import org.team102.robots.robot2019.lib.CustomOperatorConsole;
-import org.team102.robots.robot2019.lib.commandsAndTrigger.AxisTrigger;
-import org.team102.robots.robot2019.lib.commandsAndTrigger.CommandPlayRumble;
-import org.team102.robots.robot2019.lib.commandsAndTrigger.LogicGateTrigger;
-import org.team102.robots.robot2019.lib.commandsAndTrigger.TimedTrigger;
+import org.team102.robots.robot2019.lib.commandsAndTrigger.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -42,17 +34,14 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
 
 public class OI {
 	
+	private LogicGateTrigger climbTimeCheck = new LogicGateTrigger(() -> getTimeRemaining() <= RobotMap.CLIMB_MAX_TIME_REMAINING);
+	
 	public Joystick driverJoystick;
 	public CustomOperatorConsole opConsole;
-	public Joystick testJoystick;
 	
 	public OI() {
 		driverJoystick = new Joystick(RobotMap.JOYSTICK_ID_DRIVER);
 		opConsole = new CustomOperatorConsole(RobotMap.JOYSTICK_ID_OPERATOR);
-		
-		if(RobotMap.IS_TEST_JOYSTICK_ENABLED) {
-			testJoystick = new Joystick(RobotMap.JOYSTICK_ID_TEST);
-		}
 	}
 	
 	public void init() {
@@ -78,91 +67,73 @@ public class OI {
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_DOWN).whileHeld(new CommandMoveArmManual(true, true));
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_WRIST_UP).whileHeld(new CommandMoveArmManual(true, false));
 		
-		// Driver A: When pressed, extend the hatch ejector, when released, contract it.
-		getButton(CommonIDs.Gamepad.BTN_A, false).whileHeld(new CommandSetHatchManip());
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_UNUSED).whenPressed(new CommandExtendArm(CommandExtendArm.ArmExtendStatus.TOGGLE));
 		
-		// Driver DPad Up for a certain amount of time: Climb
-		getTimedPOV(CommonIDs.POVSwitch.UP_CENTER, false, false).whenActive(new CommandClimb());
+		// Driver Bumpers: When pressed, extend the hatch ejector, when released, contract it.
+		LogicGateTrigger.or(getButton(CommonIDs.Gamepad.BTN_LEFT_BUMPER), getButton(CommonIDs.Gamepad.BTN_RIGHT_BUMPER)).whileActive(new CommandSetHatchManip());
 		
-		// Driver DPad Down for a certain (longer) amount of time: Retract climber
-		getTimedPOV(CommonIDs.POVSwitch.DOWN_CENTER, true, false).whenActive(new CommandSetClimber(false));
+		// Driver DPad: Climb -- This code is old, so it is currently disabled
+		//getClimbPOV(CommonIDs.POVSwitch.UP_CENTER).whenActive(new CommandClimb());
+		//getClimbPOV(CommonIDs.POVSwitch.DOWN_CENTER).whenActive(new CommandSetClimber(false));
 		
-		// Driver left bumper or left trigger: When pressed, start up the cargo roller going out, when released, stop it.
-		getAxisOrButton(CommonIDs.Gamepad.AXIS_LEFT_TRIGGER, CommonIDs.Gamepad.BTN_LEFT_BUMPER, false).whileActive(new CommandSetCargoManip(false));
+		// Driver triggers: While held, use the cargo roller
+		getAxis(CommonIDs.Gamepad.AXIS_LEFT_TRIGGER).whileActive(new CommandSetCargoManip(false));
+		getAxis(CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER).whileActive(new CommandSetCargoManip(true));
 		
-		// Driver right bumper or right trigger: When pressed, start up the cargo roller going in, when released, stop it.
-		getAxisOrButton(CommonIDs.Gamepad.AXIS_RIGHT_TRIGGER, CommonIDs.Gamepad.BTN_RIGHT_BUMPER, false).whileActive(new CommandSetCargoManip(true));
+		// Climber primary stage: Extend with X, contract with Y
+		getClimbButton(CommonIDs.Gamepad.BTN_X).whenActive(new CommandSetClimber(true));
+		getClimbButton(CommonIDs.Gamepad.BTN_Y).whenActive(new CommandSetClimber(false));
 		
-		// If the test joystick is enabled...
-		if(testJoystick != null) {
-			// Set the arm extender's state from the state of the Back button
-			JoystickButton extendArmTest = getButton(CommonIDs.Gamepad.BTN_BACK, true);
-			extendArmTest.whenPressed(new CommandExtendArm(true));
-			extendArmTest.whenReleased(new CommandExtendArm(false));
-			
-			// Climb unconditionally when Start is pressed
-			getButton(CommonIDs.Gamepad.BTN_START, true).whenPressed(new CommandClimb.CommandClimbUnconditionally());
-			
-			// Extend the climber when X is pressed
-			getButton(CommonIDs.Gamepad.BTN_X, true).whenPressed(new CommandSetClimber(true));
-			
-			// Contract the climber when Y is pressed
-			getButton(CommonIDs.Gamepad.BTN_Y, true).whenPressed(new CommandSetClimber(false));
-			
-			// Extend the front stage of the climber when A is pressed
-			getButton(CommonIDs.Gamepad.BTN_A, true).whenPressed(new CommandSetClimber(true, true));
-			
-			// Contract the front stage of the climber when B is pressed
-			getButton(CommonIDs.Gamepad.BTN_B, true).whenPressed(new CommandSetClimber(true, false));
-		}
+		// Climber front stage: Extend with A, contract with B
+		getClimbButton(CommonIDs.Gamepad.BTN_A).whenActive(new CommandSetClimber(true, true));
+		getClimbButton(CommonIDs.Gamepad.BTN_B).whenActive(new CommandSetClimber(true, false));
 	}
 	
 	public double getTimeRemaining() {
 		double time = DriverStation.getInstance().getMatchTime();
 		
 		if(time == -1) {
-			return 120;
+			return 35;
 		} else {
 			return time;
 		}
 	}
 	
-	private TimedTrigger getTimedPOV(int position, boolean longerTime, boolean testJS) {
-		return addTimeConfirm(getPOV(position, testJS), longerTime);
-	}
-	
-	private LogicGateTrigger getAxisOrButton(int axis, int button, boolean testJS) {
-		return LogicGateTrigger.or(getAxis(axis, testJS), getButton(button, testJS));
-	}
-	
-	private POVButton getPOV(int position, boolean testJS) {
-		return new POVButton(getJS(testJS), position);
-	}
-	
-	private JoystickButton getButton(int button, boolean testJS) {
-		return new JoystickButton(getJS(testJS), button);
-	}
-	
-	private AxisTrigger getAxis(int axis, boolean testJS) {
-		return AxisTrigger.forGreaterThan(getJS(testJS), axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
+	private LogicGateTrigger getClimbButton(int button) {
+		return LogicGateTrigger.and(getButton(button), climbTimeCheck);
 	}
 	
 	@SuppressWarnings("resource")
-	private TimedTrigger addTimeConfirm(Trigger trig, boolean longerTime) {
-		double time = RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME;
-		if(longerTime) {
-			time = RobotMap.JOYSTICK_TIMED_TRIGGER_LONG_CONFIRM_TIME;
-		}
-		
-		return new TimedTrigger(trig, time).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false));
+	private Trigger getClimbPOV(int position) {
+		return new TimedTrigger(getPOV(position), RobotMap.JOYSTICK_TIMED_TRIGGER_CONFIRM_TIME).withNotification(new CommandPlayRumble(driverJoystick, RobotMap.RUMBLE_PROGRESS, false));
 	}
 	
-	private Joystick getJS(boolean testJS) {
-		if(testJS) {
-			return testJoystick;
-		} else {
-			return driverJoystick;
+	private Trigger getPOV(int position) {
+		if(position == -1) {
+			return getNoOp();
 		}
+		
+		return new POVButton(driverJoystick, position);
+	}
+	
+	private Trigger getButton(int button) {
+		if(button == -1) {
+			return getNoOp();
+		}
+		
+		return new JoystickButton(driverJoystick, button);
+	}
+	
+	private Trigger getAxis(int axis) {
+		if(axis == -1) {
+			return getNoOp();
+		}
+		
+		return AxisTrigger.forGreaterThan(driverJoystick, axis, RobotMap.JOYSTICK_MIN_AXIS_PRESS_TO_ACTIVATE_TRIGGER);
+	}
+	
+	private LogicGateTrigger getNoOp() {
+		return LogicGateTrigger.or();
 	}
 	
 	public void setOpConsoleIdlePattern() {
