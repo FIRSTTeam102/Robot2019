@@ -32,6 +32,8 @@ public class RobotMap {
 	
 	public static final boolean ARM_USE_VICTOR_FOR_WRIST = true;
 	
+	public static final double CLIMB_MAX_TIME_REMAINING = 35;
+	
 	public static final double AESTHETICS_PATTERN_CHANGE_TIME = 3; // TODO configure me
 	
 	public static final int LONG_LIGHT_STRIP_PATTERN_TWINKLE_WHITE = 4;
