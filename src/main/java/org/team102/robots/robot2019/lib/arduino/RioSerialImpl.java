@@ -22,7 +22,7 @@ package org.team102.robots.robot2019.lib.arduino;
 
 import edu.wpi.first.wpilibj.SerialPort;
 
-public class RioSerialImpl implements ArduinoConnection.SerialImpl {
+public class RioSerialImpl implements SerialConnection.SerialImpl {
 	
 	private SerialPort port;
 	private boolean open;
@@ -32,8 +32,6 @@ public class RioSerialImpl implements ArduinoConnection.SerialImpl {
 		if(id.endsWith("0")) {
 			return SerialPort.Port.kUSB;
 		} else if(id.endsWith("1")) {
-			return SerialPort.Port.kUSB1;
-		} else if(id.endsWith("2")) {
 			return SerialPort.Port.kUSB2;
 		} else {
 			throw new IllegalArgumentException("Unknown or unsupported port " + id);
