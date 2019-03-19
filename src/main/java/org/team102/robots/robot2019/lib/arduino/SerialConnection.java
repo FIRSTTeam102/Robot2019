@@ -82,7 +82,9 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 							token = ("/dev/" + token);
 						}
 						
-						ports.add(token);
+						if(!ports.contains(token)) {
+							ports.add(token);
+						}
 					}
 				}
 			}
