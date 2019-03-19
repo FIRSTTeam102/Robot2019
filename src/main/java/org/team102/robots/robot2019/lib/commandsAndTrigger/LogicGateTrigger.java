@@ -31,7 +31,7 @@ public class LogicGateTrigger extends Trigger {
 	
 	private Supplier<Boolean> getImpl;
 	
-	private LogicGateTrigger(Supplier<Boolean> getImpl) {
+	public LogicGateTrigger(Supplier<Boolean> getImpl) {
 		this.getImpl = getImpl;
 	}
 	
@@ -41,7 +41,7 @@ public class LogicGateTrigger extends Trigger {
 	 * @return The {@code not} of that trigger
 	 */
 	public static LogicGateTrigger not(Trigger trig) {
-		return new LogicGateTrigger(() -> !trig.get());
+		return new LogicGateTrigger(() -> trig != null && !trig.get());
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class LogicGateTrigger extends Trigger {
 	public static LogicGateTrigger and(Trigger... triggers) {
 		return new LogicGateTrigger(() -> {
 			for(Trigger trig : triggers) {
-				if(!trig.get()) {
+				if(trig != null && !trig.get()) {
 					return false;
 				}
 			}
@@ -69,7 +69,7 @@ public class LogicGateTrigger extends Trigger {
 	public static LogicGateTrigger or(Trigger... triggers) {
 		return new LogicGateTrigger(() -> {
 			for(Trigger trig : triggers) {
-				if(trig.get()) {
+				if(trig != null && trig.get()) {
 					return true;
 				}
 			}
@@ -85,7 +85,7 @@ public class LogicGateTrigger extends Trigger {
 	 * @return The {@code xor} of those triggers
 	 */
 	public static LogicGateTrigger xor(Trigger trig1, Trigger trig2) {
-		return new LogicGateTrigger(() -> trig1.get() != trig2.get());
+		return new LogicGateTrigger(() -> trig1 != null && trig2 != null && (trig1.get() != trig2.get()));
 	}
 	
 	/**
