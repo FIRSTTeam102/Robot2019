@@ -44,6 +44,51 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class VisionCameraHelper {
 	
+	/** The IP of the roboRIO over USB */
+	public static final String USB_IP = "172.22.11.2";
+	
+	/** The IP of the roboRIO over ethernet */
+	public static final String ETHERNET_IP;
+	
+	/** The hostname of the roboRIO */
+	public static final String HOSTNAME = CameraServerJNI.getHostname();
+	
+	/** All possible resolvable names or addresses for the roboRIO */
+	public static final String[] POSSIBLE_RESOLVABLE_NAMES;
+	
+	static {
+		String ip = null;
+		
+		try {
+			ip = InetAddress.getLocalHost().getHostAddress();
+		} catch(Exception e) {
+			System.err.println("Failed to get IP address");
+		}
+		
+		ETHERNET_IP = ip;
+		
+		String[] possiblePossibleNames = { USB_IP, ETHERNET_IP, HOSTNAME };
+		int nonNullCount = 0;
+		
+		for(String possiblePossibleName : possiblePossibleNames) {
+			if(possiblePossibleName != null) {
+				nonNullCount++;
+			}
+		}
+		
+		String[] possibleNames = new String[nonNullCount];
+		int position = 0;
+		
+		for(String possiblePossibleName : possiblePossibleNames) {
+			if(possiblePossibleName != null) {
+				possibleNames[position] = possiblePossibleName;
+				position++;
+			}
+		}
+		
+		POSSIBLE_RESOLVABLE_NAMES = possibleNames;
+	}
+	
 	/**
 	 * Cause OpenCV and CSCore to be loaded manually
 	 */
@@ -104,29 +149,13 @@ public class VisionCameraHelper {
 	 * @return The possible URLs
 	 */
 	public static String[] getMJPEGURLs(int port) {
-		String hostnameURL = getMJPEGURL(CameraServerJNI.getHostname(), port);
-		String ipURL = null;
+		String[] urls = new String[POSSIBLE_RESOLVABLE_NAMES.length];
 		
-		try {
-			ipURL = getMJPEGURL(InetAddress.getLocalHost().getHostAddress(), port);
-		} catch(Exception e) {
-			System.err.println("Failed to get IP address: ");
-			e.printStackTrace();
-			
-			return new String[] { hostnameURL };
+		for(int i = 0; i < urls.length; i++) {
+			urls[i] = "mjpg:http://" + POSSIBLE_RESOLVABLE_NAMES[i] + ":" + port + "/?action=stream";
 		}
 		
-		return new String[] { hostnameURL, ipURL };
-	}
-	
-	/**
-	 * Formats the given host and port into a valid MJPEG URL
-	 * @param host The hostname or IP
-	 * @param port The port
-	 * @return The MJPEG URL
-	 */
-	public static String getMJPEGURL(String host, int port) {
-		return "mjpg:http://" + host + ":" + port + "/?action=stream";
+		return urls;
 	}
 	
 	/**
