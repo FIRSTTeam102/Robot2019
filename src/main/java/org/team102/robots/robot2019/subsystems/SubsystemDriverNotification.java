@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
-import org.team102.robots.robot2019.commands.CommandResetWrist;
+import org.team102.robots.robot2019.commands.CommandResetAccelerometer;
 import org.team102.robots.robot2019.commands.CommandSetDSVideoOutput;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
@@ -66,8 +66,6 @@ public class SubsystemDriverNotification extends Subsystem {
 	
 	private NetworkTableEntry climberStatus;
 	
-	private NetworkTableEntry driveWithTestJS;
-		
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
@@ -107,15 +105,13 @@ public class SubsystemDriverNotification extends Subsystem {
 				.getEntry();
 		
 		// Debug tab begins here
-		debugTab.add(new CommandResetWrist())
+		debugTab.add(new CommandResetAccelerometer(true))
 				.withPosition(0, 0).withSize(1, 1)
 				.withProperties(PROP_HIDE_LABELS);
 		
-		driveWithTestJS = debugTab.add("Test JS Drive", false)
-				.withPosition(1, 0).withSize(1, 1)
-				.withProperties(PROP_HIDE_LABELS)
-				.withWidget(BuiltInWidgets.kToggleSwitch)
-				.getEntry();
+		debugTab.add(new CommandResetAccelerometer(false))
+			.withPosition(1, 0).withSize(1, 1)
+			.withProperties(PROP_HIDE_LABELS);
 		
 		//vision layout starts here
 		ShuffleboardLayout HSVLowLayout = visionInfoTab
@@ -192,10 +188,6 @@ public class SubsystemDriverNotification extends Subsystem {
 		} else {
 			System.out.println("Warning: No video streams present! Skipping video output to the driver station.");
 		}
-	}
-	
-	public boolean isDriveWithTestJSEnabled() {
-		return driveWithTestJS.getBoolean(false);
 	}
 	
 	public void setVideoStream(String name) {
