@@ -22,34 +22,25 @@ package org.team102.robots.robot2019.commands;
 
 import org.team102.robots.robot2019.Robot;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.InstantCommand;
 
-public class CommandResetWrist extends Command {
+public class CommandResetAccelerometer extends InstantCommand {
 	
-	public CommandResetWrist() {
-		super("Reset Wrist");
+	private boolean wrist;
+	
+	public CommandResetAccelerometer(boolean wrist) {
+		super("Reset " + (wrist ? "Wrist" : "Elbow"));
 		requires(Robot.arm);
-	}
-	
-	protected void initialize() {
-		//Robot.arm.setArmManual(true, false);
+		
+		this.wrist = wrist;
 	}
 	
 	@Override
-	protected boolean isFinished() {
-		return true;//Robot.arm.isWristLimited();
-	}
-	
-	protected void end() {
-		done();
-		Robot.arm.resetWristAccelerometer();
-	}
-	
-	protected void interrupted() {
-		done();
-	}
-	
-	private void done() {
-		//Robot.arm.endManualMode();
+	protected void initialize() {
+		if(wrist) {
+			Robot.arm.resetWristAccelerometer();
+		} else {
+			Robot.arm.resetElbowAccelerometer();
+		}
 	}
 }

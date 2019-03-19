@@ -39,6 +39,9 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private DigitalInput elbowLimitLower;
 	private CurrentLimitDetector wristLimit;
 	
+	private int elbowMin = Integer.MAX_VALUE;
+	private int wristMin = Integer.MAX_VALUE;
+	
 	private int distanceElbow = 0;
 	private int distanceWrist = 0;
 	
@@ -206,20 +209,28 @@ public class SubsystemArm extends SubsystemWithArduino {
 		extender.set(active);
 	}
 	
+	public boolean getExtender() {
+		return extender.get();
+	}
+	
 	protected void onArduinoLineReceived(String line) {
 		try {
 			String[] tokens = line.split(",");
 			
-			distanceElbow = Integer.parseInt(tokens[0]);
-			boolean elbowInRange = distanceElbow != -1;
-			
-			if(elbowInRange) {
-				elbowStatus = "OK (Range: " + distanceElbow + ")";
-			} else {
-				elbowStatus = "Out of range";
+			int elbow = Integer.parseInt(tokens[0]) / 5;
+			if(elbowMin == Integer.MAX_VALUE) {
+				elbowMin = elbow;
 			}
 			
-			distanceWrist = Integer.parseInt(tokens[1]) / 5;
+			int wrist = Integer.parseInt(tokens[1]) / 5;
+			if(wristMin == Integer.MAX_VALUE) {
+				wristMin = wrist;
+			}
+			
+			distanceElbow = elbow - elbowMin;
+			elbowStatus = "OK (Range: " + distanceElbow + ")";
+			
+			distanceWrist = wrist - wristMin;
 			wristStatus = "OK (Range: " + distanceWrist + ")";
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
@@ -227,7 +238,11 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	public void resetWristAccelerometer() {
-		sendLineToArduino("RESETACCEL");
+		wristMin += distanceWrist;
+	}
+	
+	public void resetElbowAccelerometer() {
+		elbowMin += distanceElbow;
 	}
 	
 	public void setArmManual(boolean isWrist, boolean isReverse) {
@@ -248,17 +263,25 @@ public class SubsystemArm extends SubsystemWithArduino {
 		return setpoint != null;
 	}
 	
+	private int getElbowAbsError() {
+		return Math.abs(distanceElbow - setpoint.elbowSetpoint);
+	}
+	
 	private boolean isElbowInRange() {
 		if(hasSetpoint() && setpoint.elbowSetpoint != -1) {
-			return Math.abs(distanceElbow - setpoint.elbowSetpoint) <= ArmConfig.ELBOW_MARGIN_OF_ERROR;
+			return getElbowAbsError() <= ArmConfig.ELBOW_MARGIN_OF_ERROR;
 		} else {
 			return true;
 		}
 	}
 	
+	private int getWristAbsError() {
+		return Math.abs(distanceWrist - setpoint.wristSetpoint);
+	}
+	
 	private boolean isWristInRange() {
 		if(hasSetpoint() && setpoint.wristSetpoint != -1) {
-			return Math.abs(distanceWrist - setpoint.wristSetpoint) <= ArmConfig.WRIST_MARGIN_OF_ERROR;
+			return getWristAbsError() <= ArmConfig.WRIST_MARGIN_OF_ERROR;
 		} else {
 			return true;
 		}
