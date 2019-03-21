@@ -50,6 +50,9 @@ public class SubsystemCameras extends Subsystem {
 		VideoSource visionCamera = VisionCameraHelper.openAndVerifyCamera("Chassis Camera", RobotMap.CAMERA_ID_VISION, 320, 240, 30, camBrightness, true, false);
 		visibleVideoOutputs.add(visionCamera);
 		
+		VideoSource armCamera = VisionCameraHelper.openAndVerifyCamera("Arm Camera", RobotMap.CAMERA_ID_ARM, 480, 360, 30, -1, false, false);
+		visibleVideoOutputs.add(armCamera);
+		
 		if(pipe == null) {
 			piVisionOutput = new HttpCamera("Vision Pi Output", RobotMap.CAMERA_URL_VISION_PI_OUTPUT, HttpCamera.HttpCameraKind.kMJPGStreamer);
 			visibleVideoOutputs.add(piVisionOutput);
