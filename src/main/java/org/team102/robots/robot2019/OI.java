@@ -58,8 +58,8 @@ public class OI {
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_CARGO).whileHeld(new CommandUseArmSetpoint(ArmConfig.CARGO_SHIP_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_CARGO_SHIP_OR_LOADING_STATION_HATCH).whileHeld(new CommandUseArmSetpoint(ArmConfig.CARGO_SHIP_OR_LOADING_STATION_HATCH, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
 		
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_ABOVE_POSITION).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_HATCH_ABOVE_POSITION, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
-		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_COMMIT).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_HATCH_COMMIT, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_ABOVE_POSITION).whileHeld(new CommandUseArmSetpoint(ArmConfig.VERTICAL_VERTICAL, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
+		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_HATCH_COMMIT).whileHeld(new CommandUseArmSetpoint(ArmConfig.HORIZONTAL_WRIST, RobotMap.OP_CONTROLLER_PATTERN_SET_BLUE_BUTTON));
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_FLOOR_CARGO).whileHeld(new CommandUseArmSetpoint(ArmConfig.FLOOR_CARGO, RobotMap.OP_CONTROLLER_PATTERN_SET_GREEN_BUTTON));
 		
 		opConsole.getButton(RobotMap.OP_CONTROLLER_BUTTON_ID_MANUAL_ELBOW_DOWN).whileHeld(new CommandMoveArmManual(false, true));

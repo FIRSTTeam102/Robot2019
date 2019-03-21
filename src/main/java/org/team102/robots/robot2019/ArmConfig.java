@@ -28,8 +28,10 @@ public class ArmConfig {
 	
 	// END PER-COMPETITION CONFIGURABLES
 	
-	public static final int ELBOW_MARGIN_OF_ERROR = 1; // TODO configure this
-	public static final int WRIST_MARGIN_OF_ERROR = 1; // TODO configure this
+	public static final int NO_MOVE = -1;
+	
+	public static final int ELBOW_MARGIN_OF_ERROR = 2; // TODO configure this
+	public static final int WRIST_MARGIN_OF_ERROR = 2; // TODO configure this
 	
 	public static final ArmSetpoint ROCKET_HATCH_TOP = new ArmSetpoint("Rocket: Hatch Top", false, ELBOW_ROCKET_HATCH_TOP, WRIST_VERTICAL);
 	public static final ArmSetpoint ROCKET_HATCH_MIDDLE = new ArmSetpoint("Rocket: Hatch Middle", false, ELBOW_ROCKET_HATCH_MIDDLE, WRIST_VERTICAL);
@@ -41,7 +43,8 @@ public class ArmConfig {
 	public static final ArmSetpoint CARGO_SHIP_CARGO = new ArmSetpoint("Cargo Ship: Cargo", false, ELBOW_CARGO_SHIP_CARGO, WRIST_ANGLED_DOWN);
 	public static final ArmSetpoint CARGO_SHIP_OR_LOADING_STATION_HATCH = new ArmSetpoint("Cargo Ship/Loading Station: Hatch", false, ELBOW_CARGO_SHIP_OR_LOADING_STATION_HATCH, WRIST_VERTICAL);
 	
-	public static final ArmSetpoint FLOOR_HATCH_ABOVE_POSITION = new ArmSetpoint("Floor: Hatch (Above)", false, ELBOW_FLOOR_HATCH_ABOVE, WRIST_HORIZONTAL);
-	public static final ArmSetpoint FLOOR_HATCH_COMMIT = new ArmSetpoint("Floor: Hatch", false, ELBOW_FLOOR_HATCH, WRIST_HORIZONTAL);
 	public static final ArmSetpoint FLOOR_CARGO = new ArmSetpoint("Floor: Cargo", false, ELBOW_FLOOR_CARGO, WRIST_ANGLED_DOWN);
+	
+	public static final ArmSetpoint VERTICAL_VERTICAL = new ArmSetpoint("Vertical Wrist", false, NO_MOVE, WRIST_VERTICAL);
+	public static final ArmSetpoint HORIZONTAL_WRIST = new ArmSetpoint("Horizontal Wrist", false, NO_MOVE, WRIST_HORIZONTAL);
 }
