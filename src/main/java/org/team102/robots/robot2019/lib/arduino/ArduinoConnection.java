@@ -53,6 +53,7 @@ public class ArduinoConnection extends SerialConnection {
 	 */
 	public static void findArduinos(boolean debugPrint) {
 		System.out.println("Finding Arduinos...");
+		System.out.println("Prepare yourself for an error message that will always occur and means NOTHING!");
 		
 		for(String port : findSerialPorts()) {
 			System.out.print("On serial port \"" + port + "\": ");
@@ -117,7 +118,7 @@ public class ArduinoConnection extends SerialConnection {
 	 * @param portID The name of the serial port, i.e. {@code /dev/tty0}
 	 */
 	public ArduinoConnection(String portID) {
-		super(portID);
+		super(portID, 9600, 0, 0, 8, 1);
 	}
 	
 	/**

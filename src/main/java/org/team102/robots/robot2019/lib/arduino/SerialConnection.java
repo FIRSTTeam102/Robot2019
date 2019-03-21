@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.team102.robots.robot2019.Robot;
+import com.fazecast.jSerialComm.SerialPort;
 
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,7 +42,7 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 		serialPortPrefixes.add("tty");
 	}
 	
-	private final SerialImpl portImpl;
+	private final SerialPort port;
 	private String dataBuff = "";
 	
 	private static String getListSerialPortsCommand() {
@@ -98,14 +98,21 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	
 	/**
 	 * Create the serial connection to the given port
-	 * @param portID
+	 * @param portID The device name of the port
+	 * @param baud The baud rate
+	 * @param parity The parity (0 = none, 1 = odd, 2 = even)
+	 * @param flowControl The flow control (see documentation for the {@link SerialPort jSerialComm port class}
+	 * @param stopBits The number of stop bits
+	 * @param dataBits The number of data bits
 	 */
-	public SerialConnection(String portID) {
-		if(Robot.isReal()) {
-			portImpl = new RioSerialImpl(portID);
-		} else {
-			portImpl = new DesktopSerialImpl(portID);
-		}
+	public SerialConnection(String portID, int baud, int parity, int flowControl, int stopBits, int dataBits) {
+		port = SerialPort.getCommPort(portID);
+		port.setBaudRate(baud);
+		port.setParity(parity);
+		port.setFlowControl(flowControl);
+		port.setNumStopBits(stopBits);
+		port.setNumDataBits(dataBits);
+		port.openPort();
 		
 		// Magic sleep time to make sure we can actually write some data
 		Timer.delay(1.75);
@@ -115,18 +122,19 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	 * Polls the serial port for new data
 	 */
 	public void update() {
-		int bytesAvailable = portImpl.bytesAvailable();
+		int bytesAvailable = port.bytesAvailable();
 		
 		if(bytesAvailable > 0) {
-			byte[] buff = portImpl.read(bytesAvailable);
+			byte[] buff = new byte[bytesAvailable];
+			port.readBytes(buff, bytesAvailable);
 			dataBuff += new String(buff);
 		}
 	}
 	
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addBooleanProperty("serialPortConnected", portImpl::isOpen, null);
-		builder.addStringProperty("serialPortID", portImpl::getName, null);
+		builder.addBooleanProperty("serialPortConnected", port::isOpen, null);
+		builder.addStringProperty("serialPortID", port::getSystemPortName, null);
 	}
 	
 	/**
@@ -141,7 +149,7 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	
 	@Override
 	public void close() {
-		portImpl.close();
+		port.closePort();
 	}
 	
 	/**
@@ -149,7 +157,7 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	 * @param data The data
 	 */
 	public void write(byte[] data) {
-		portImpl.write(data);
+		port.writeBytes(data, data.length);
 	}
 	
 	/**
@@ -173,17 +181,5 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	 */
 	public void clearReadData() {
 		setReadData("");
-	}
-	
-	public static interface SerialImpl {
-		boolean isOpen();
-		String getName();
-		
-		int bytesAvailable();
-		
-		void write(byte[] data);
-		byte[] read(int len);
-		
-		void close();
 	}
 }
