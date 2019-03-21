@@ -156,7 +156,7 @@ public class RobotMap {
 	public static final double CARGO_MANIP_ROLLER_SPEED = 1;
 	public static final double ARM_ELBOW_SPEED = .6;
 	public static final double ARM_ELBOW_DOWN_SPEED = -.2;
-	public static final double ARM_WRIST_SPEED = .7;
+	public static final double ARM_WRIST_SPEED = .8;
 	public static final double ARM_WRIST_DOWN_SPEED = -.4;
 	public static final double ARM_ELBOW_GRAV_COMP_SPEED = .1;
 	
