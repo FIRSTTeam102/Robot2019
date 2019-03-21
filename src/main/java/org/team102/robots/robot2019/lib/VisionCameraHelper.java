@@ -50,6 +50,9 @@ public class VisionCameraHelper {
 	/** The IP of the roboRIO over ethernet */
 	public static final String ETHERNET_IP;
 	
+	/** The fallback IP over ethernet */
+	public static final String ETHERNET_FALLBACK_IP = "10.1.2.2";
+	
 	/** The hostname of the roboRIO */
 	public static final String HOSTNAME = CameraServerJNI.getHostname();
 	
@@ -60,9 +63,21 @@ public class VisionCameraHelper {
 		String ip = null;
 		
 		try {
-			ip = InetAddress.getLocalHost().getHostAddress();
+			ip = InetAddress.getByName(HOSTNAME).getHostAddress();
 		} catch(Exception e) {
-			System.err.println("Failed to get IP address");
+			System.err.println("Failed to get the ethernet IP address (method 1), trying method 2...");
+			
+			try {
+				ip = InetAddress.getLocalHost().getHostAddress();
+			} catch(Exception e2) {
+				System.err.println("Failed to get the ethernet IP address (method 2), falling back to the default, " + ETHERNET_FALLBACK_IP);
+				ip = ETHERNET_FALLBACK_IP;
+			}
+		}
+		
+		if(ip.contains("127.0.0.1")) {
+			System.out.println("For some reason, a loopback address was returned, falling back to the default, " + ETHERNET_FALLBACK_IP);
+			ip = ETHERNET_FALLBACK_IP;
 		}
 		
 		ETHERNET_IP = ip;
