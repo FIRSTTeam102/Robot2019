@@ -30,6 +30,7 @@ public class CommandResetAccelerometer extends InstantCommand {
 	
 	public CommandResetAccelerometer(boolean wrist) {
 		super("Reset " + (wrist ? "Wrist" : "Elbow"));
+		setRunWhenDisabled(true);
 		requires(Robot.arm);
 		
 		this.wrist = wrist;
