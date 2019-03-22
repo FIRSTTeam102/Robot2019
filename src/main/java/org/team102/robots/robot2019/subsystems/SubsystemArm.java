@@ -141,7 +141,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 			
 			if(elbowInRange) {
 				elbowSpeed = 0;
-			} else if(distanceElbow > setpoint.elbowSetpoint) {
+			} else if(distanceElbow < setpoint.elbowSetpoint) {
 				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
 			}
 			
