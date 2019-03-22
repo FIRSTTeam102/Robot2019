@@ -66,6 +66,8 @@ public class SubsystemDriverNotification extends Subsystem {
 	
 	private NetworkTableEntry climberStatus;
 	
+	private int prevSourceIndex;
+	
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
 		
@@ -192,9 +194,13 @@ public class SubsystemDriverNotification extends Subsystem {
 	
 	public void setVideoStream(String name) {
 		VideoSource source = null;
-		for(VideoSource possibleSource : Robot.cameras.visibleVideoOutputs) {
+		for(int i = 0; i < Robot.cameras.visibleVideoOutputs.size(); i++) {
+			VideoSource possibleSource = Robot.cameras.visibleVideoOutputs.get(i);
+			
 			if(possibleSource != null && possibleSource.getName().equals(name)) {
 				source = possibleSource;
+				prevSourceIndex = i;
+				
 				break;
 			}
 		}
@@ -206,6 +212,17 @@ public class SubsystemDriverNotification extends Subsystem {
 		
 		videoOutput.setSource(source);
 		selectedStreamName.setString("Current Stream: " + name);
+	}
+	
+	public void advanceVideoOutput() {
+		int next = (prevSourceIndex + 1) % Robot.cameras.visibleVideoOutputs.size();
+		VideoSource src = Robot.cameras.visibleVideoOutputs.get(next);
+		
+		if(src == null) {
+			System.out.println("Error: Tried to advance to a non-existant source, abort!");
+		} else {
+			setVideoStream(src.getName());
+		}
 	}
 	
 	@Override

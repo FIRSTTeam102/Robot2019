@@ -87,6 +87,9 @@ public class OI {
 		// Climber front stage: Extend with A, contract with B
 		getClimbButton(CommonIDs.Gamepad.BTN_A).whenActive(new CommandSetClimber(true, true));
 		getClimbButton(CommonIDs.Gamepad.BTN_B).whenActive(new CommandSetClimber(true, false));
+		
+		// Driver start: switch cameras
+		getButton(CommonIDs.Gamepad.BTN_START).whenActive(new CommandAdvanceDSVideoOutput());
 	}
 	
 	public double getTimeRemaining() {
