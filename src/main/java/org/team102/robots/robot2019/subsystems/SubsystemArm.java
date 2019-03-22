@@ -26,6 +26,7 @@ import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.lib.CurrentLimitDetector;
 import org.team102.robots.robot2019.lib.arduino.SubsystemWithArduino;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -69,6 +70,8 @@ public class SubsystemArm extends SubsystemWithArduino {
 		}
 		
 		elbow = new WPI_TalonSRX(RobotMap.CAN_TALON_ARM_ELBOW);
+		elbow.setNeutralMode(NeutralMode.Brake);
+		
 		addChild("Wrist Motor", (Sendable)wrist);
 		addChild("Elbow Motor", elbow);
 		
