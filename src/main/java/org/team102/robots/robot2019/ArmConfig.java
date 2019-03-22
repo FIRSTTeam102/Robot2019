@@ -10,28 +10,25 @@ public class ArmConfig {
 	public static final int WRIST_HORIZONTAL = -13;
 	public static final int WRIST_ANGLED_DOWN = -23;
 	
-	public static final int ELBOW_FLOOR_CARGO = 16;
+	public static final int ELBOW_FLOOR_CARGO = -3;
 	
-	public static final int ELBOW_ROCKET_HATCH_TOP = 34;
-	public static final int ELBOW_ROCKET_HATCH_MIDDLE = 24;
-	public static final int ELBOW_ROCKET_HATCH_BOTTOM = 16;
+	public static final int ELBOW_ROCKET_HATCH_TOP = -17;
+	public static final int ELBOW_ROCKET_HATCH_MIDDLE = -8;
+	public static final int ELBOW_ROCKET_HATCH_BOTTOM = -1;
 	
-	public static final int ELBOW_ROCKET_CARGO_TOP = 41;
-	public static final int ELBOW_ROCKET_CARGO_MIDDLE = 27;
-	public static final int ELBOW_ROCKET_CARGO_BOTTOM = 20;
+	public static final int ELBOW_ROCKET_CARGO_TOP = -21;
+	public static final int ELBOW_ROCKET_CARGO_MIDDLE = -13;
+	public static final int ELBOW_ROCKET_CARGO_BOTTOM = -4;
 	
-	public static final int ELBOW_CARGO_SHIP_CARGO = 29;
-	public static final int ELBOW_CARGO_SHIP_OR_LOADING_STATION_HATCH = 14;
-	
-	public static final int ELBOW_FLOOR_HATCH_ABOVE = -1; // TODO configure this
-	public static final int ELBOW_FLOOR_HATCH = -1; // TODO configure this
+	public static final int ELBOW_CARGO_SHIP_CARGO = -13;
+	public static final int ELBOW_CARGO_SHIP_OR_LOADING_STATION_HATCH = 0;
 	
 	// END PER-COMPETITION CONFIGURABLES
 	
 	public static final int NO_MOVE = -1;
 	
 	public static final int ELBOW_MARGIN_OF_ERROR = 2; // TODO configure this
-	public static final int WRIST_MARGIN_OF_ERROR = 2; // TODO configure this
+	public static final int WRIST_MARGIN_OF_ERROR = 1; // TODO configure this
 	
 	public static final ArmSetpoint ROCKET_HATCH_TOP = new ArmSetpoint("Rocket: Hatch Top", false, ELBOW_ROCKET_HATCH_TOP, WRIST_VERTICAL);
 	public static final ArmSetpoint ROCKET_HATCH_MIDDLE = new ArmSetpoint("Rocket: Hatch Middle", false, ELBOW_ROCKET_HATCH_MIDDLE, WRIST_VERTICAL);
