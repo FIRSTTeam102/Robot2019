@@ -89,7 +89,7 @@ public class OI {
 		getClimbButton(CommonIDs.Gamepad.BTN_B).whenActive(new CommandSetClimber(true, false));
 		
 		// Driver start: switch cameras
-		getButton(CommonIDs.Gamepad.BTN_START).whenActive(new CommandAdvanceDSVideoOutput());
+		getButton(CommonIDs.Gamepad.BTN_START).whenActive(new CommandAdvanceVideoOutput(Robot.driverNotif.streams));
 	}
 	
 	public double getTimeRemaining() {

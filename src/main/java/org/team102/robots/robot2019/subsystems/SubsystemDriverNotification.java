@@ -21,17 +21,15 @@
 package org.team102.robots.robot2019.subsystems;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.Map;
 
 import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
 import org.team102.robots.robot2019.commands.CommandResetAccelerometer;
-import org.team102.robots.robot2019.commands.CommandSetDSVideoOutput;
+import org.team102.robots.robot2019.lib.VideoSelector;
 import org.team102.robots.robot2019.lib.VisionCameraHelper;
 
 import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -41,7 +39,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 
 public class SubsystemDriverNotification extends Subsystem {
-	public static final Map<String, Object> PROP_HIDE_LABELS = Collections.<String, Object>singletonMap("Label Position", "HIDDEN");
 	public static final DecimalFormat ROUNDING_FORMATTER = new DecimalFormat("#.#");
 	
 	private ShuffleboardTab debugTab;
@@ -53,8 +50,7 @@ public class SubsystemDriverNotification extends Subsystem {
 	private int notificationBlinkTime = 0;
 	private int prevCountdownStage = -1;
 	
-	private NetworkTableEntry selectedStreamName;
-	private MjpegServer videoOutput;
+	public VideoSelector streams;
 	
 	private NetworkTableEntry armElbowStatus;
 	private NetworkTableEntry armWristStatus;
@@ -65,8 +61,6 @@ public class SubsystemDriverNotification extends Subsystem {
 	private NetworkTableEntry centeringStatus;
 	
 	private NetworkTableEntry climberStatus;
-	
-	private int prevSourceIndex;
 	
 	public SubsystemDriverNotification() {
 		super("Driver Notification");
@@ -80,7 +74,7 @@ public class SubsystemDriverNotification extends Subsystem {
 		ShuffleboardLayout timeLayout = driverInfoTab
 				.getLayout("Time", BuiltInLayouts.kList)
 				.withPosition(0, 0).withSize(2, 1)
-				.withProperties(PROP_HIDE_LABELS);
+				.withProperties(VideoSelector.PROP_HIDE_LABELS);
 		
 		timeLeftPane = timeLayout.add("Time Remaining", "").getEntry();
 		lowTimeNotifier = timeLayout.add("Low Time", false).getEntry();
@@ -101,6 +95,8 @@ public class SubsystemDriverNotification extends Subsystem {
 		armWristStatus = armStatusLayout.add("Status: Wrist", "").getEntry();
 		armOverallStatus = armStatusLayout.add("Overall", "").getEntry();
 		
+		streams = new VideoSelector(Robot.cameras.visibleVideoOutputs, "Selected Stream");
+		
 		climberStatus = driverInfoTab
 				.add("Climber Status", "")
 				.withPosition(6, 2).withSize(2, 1)
@@ -109,11 +105,11 @@ public class SubsystemDriverNotification extends Subsystem {
 		// Debug tab begins here
 		debugTab.add(new CommandResetAccelerometer(true))
 				.withPosition(0, 0).withSize(1, 1)
-				.withProperties(PROP_HIDE_LABELS);
+				.withProperties(VideoSelector.PROP_HIDE_LABELS);
 		
 		debugTab.add(new CommandResetAccelerometer(false))
 			.withPosition(1, 0).withSize(1, 1)
-			.withProperties(PROP_HIDE_LABELS);
+			.withProperties(VideoSelector.PROP_HIDE_LABELS);
 		
 		//vision layout starts here
 		ShuffleboardLayout HSVLowLayout = visionInfoTab
@@ -147,10 +143,9 @@ public class SubsystemDriverNotification extends Subsystem {
 	}
 	
 	public void initOIPortions() {
-		ShuffleboardLayout selectCameraLayout = driverInfoTab
-				.getLayout("Video Selector", BuiltInLayouts.kList)
+		streams.getSelectorHolder(driverInfoTab)
 				.withPosition(0, 1).withSize(2, 2)
-				.withProperties(PROP_HIDE_LABELS);
+				.withProperties(VideoSelector.PROP_HIDE_LABELS);
 		
 		NetworkTableEntry piCamToggle = visionInfoTab
 				.add("piCamSelector", false)
@@ -169,60 +164,7 @@ public class SubsystemDriverNotification extends Subsystem {
 			}
 		}, EntryListenerFlags.kUpdate);
 		
-		selectedStreamName = selectCameraLayout.add("Selected Stream Name", "").getEntry();
-		videoOutput = CameraServer.getInstance().addServer("Selected Video Stream");
-		
-		boolean streamSet = false;
-		for(VideoSource src : Robot.cameras.visibleVideoOutputs) {
-			if(src != null) {
-				String name = src.getName();
-				selectCameraLayout.add(new CommandSetDSVideoOutput(name)).withWidget(BuiltInWidgets.kCommand);
-				
-				if(!streamSet) {
-					setVideoStream(name);
-					streamSet = true;
-				}
-			}
-		}
-		
-		if(streamSet) {
-			VisionCameraHelper.advertiseServerToShuffleboard(videoOutput, driverInfoTab).withPosition(2, 0).withSize(3, 3);
-		} else {
-			System.out.println("Warning: No video streams present! Skipping video output to the driver station.");
-		}
-	}
-	
-	public void setVideoStream(String name) {
-		VideoSource source = null;
-		for(int i = 0; i < Robot.cameras.visibleVideoOutputs.size(); i++) {
-			VideoSource possibleSource = Robot.cameras.visibleVideoOutputs.get(i);
-			
-			if(possibleSource != null && possibleSource.getName().equals(name)) {
-				source = possibleSource;
-				prevSourceIndex = i;
-				
-				break;
-			}
-		}
-		
-		if(source == null) {
-			System.out.println("Warning: Tried to switch to non-existant camera " + name);
-			return;
-		}
-		
-		videoOutput.setSource(source);
-		selectedStreamName.setString("Current Stream: " + name);
-	}
-	
-	public void advanceVideoOutput() {
-		int next = (prevSourceIndex + 1) % Robot.cameras.visibleVideoOutputs.size();
-		VideoSource src = Robot.cameras.visibleVideoOutputs.get(next);
-		
-		if(src == null) {
-			System.out.println("Error: Tried to advance to a non-existant source, abort!");
-		} else {
-			setVideoStream(src.getName());
-		}
+		streams.getStreamHolder(driverInfoTab).withPosition(2, 0).withSize(3, 3);
 	}
 	
 	@Override

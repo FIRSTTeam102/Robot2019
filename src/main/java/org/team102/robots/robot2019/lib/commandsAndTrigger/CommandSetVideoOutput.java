@@ -18,25 +18,26 @@
  * Contact us at: firstteam102@gmail.com
  */
 
-package org.team102.robots.robot2019.commands;
+package org.team102.robots.robot2019.lib.commandsAndTrigger;
 
-import org.team102.robots.robot2019.Robot;
+import org.team102.robots.robot2019.lib.VideoSelector;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
 
-public class CommandSetDSVideoOutput extends InstantCommand {
+public class CommandSetVideoOutput extends InstantCommand {
 	
+	private VideoSelector selector;
 	private String streamName;
 	
-	public CommandSetDSVideoOutput(String streamName) {
+	public CommandSetVideoOutput(VideoSelector selector, String streamName) {
 		super(streamName);
 		setRunWhenDisabled(true);
 		
-		requires(Robot.driverNotif);
+		this.selector = selector;
 		this.streamName = streamName;
 	}
 	
 	protected void initialize() {
-		Robot.driverNotif.setVideoStream(streamName);
+		selector.setStreamByName(streamName);
 	}
 }
