@@ -22,8 +22,11 @@ package org.team102.robots.robot2019.lib.arduino;
 
 import java.io.Closeable;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import org.team102.robots.robot2019.Robot;
 
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -44,6 +47,27 @@ public class SerialConnection extends SendableBase implements Closeable, AutoClo
 	
 	private final SerialPort port;
 	private String dataBuff = "";
+	
+	private static boolean initialized = false;
+	
+	public static void consumeInitialError() {
+		if(!initialized) {
+			if(Robot.isReal()) {
+				PrintStream out = System.out;
+				PrintStream err = System.err;
+				
+				System.setOut(new PrintStream(PrintStream.nullOutputStream()));
+				System.setErr(new PrintStream(PrintStream.nullOutputStream()));
+				
+				SerialPort.getCommPort("/dev/null").closePort();
+				
+				System.setOut(out);
+				System.setErr(err);
+			}
+			
+			initialized = true;
+		}
+	}
 	
 	private static String getListSerialPortsCommand() {
 		if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("window")) {

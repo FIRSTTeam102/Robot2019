@@ -53,7 +53,12 @@ public class ArduinoConnection extends SerialConnection {
 	 */
 	public static void findArduinos(boolean debugPrint) {
 		System.out.println("Finding Arduinos...");
-		System.out.println("Prepare yourself for an error message that will always occur and means NOTHING!");
+		
+		if(debugPrint) {
+			System.out.println("Prepare yourself for an error message that will always occur and means NOTHING!");
+		} else {
+			consumeInitialError();
+		}
 		
 		for(String port : findSerialPorts()) {
 			System.out.print("On serial port \"" + port + "\": ");
