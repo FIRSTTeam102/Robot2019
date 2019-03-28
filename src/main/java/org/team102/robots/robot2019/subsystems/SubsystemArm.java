@@ -60,6 +60,15 @@ public class SubsystemArm extends SubsystemWithArduino {
 	private String wristStatus = "Not updated yet?";
 	private String overallStatus = "Not updated yet?";
 	
+	public static double sigmoid(double val) {
+		return 1 / (1 + Math.exp(-val));
+	}
+	
+	public static double squish(double val, double min) {
+		double modifiedSigmoid = 2 * sigmoid(val) - 1;
+		return Math.max(modifiedSigmoid, min);
+	}
+	
 	public SubsystemArm() {
 		super("Arm", RobotMap.ARM_ARDUINO_WHOIS_RESPONSE, "LIDAR Control");
 		
@@ -141,14 +150,26 @@ public class SubsystemArm extends SubsystemWithArduino {
 			
 			if(elbowInRange) {
 				elbowSpeed = 0;
-			} else if(distanceElbow < setpoint.elbowSetpoint) {
-				elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
+			} else {
+				if(distanceElbow > setpoint.elbowSetpoint) {
+					elbowSpeed = RobotMap.ARM_ELBOW_DOWN_SPEED;
+				}
+				
+				if(RobotMap.ARM_ENABLE_DAMPENING) {
+					elbowSpeed *= squish(getElbowAbsError(), RobotMap.ARM_ELBOW_GRAV_COMP_SPEED * 1.5);
+				}
 			}
 			
 			if(wristInRange) {
 				wristSpeed = 0;
-			} else if(distanceWrist > setpoint.wristSetpoint) {
-				wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
+			} else {
+				if(distanceWrist < setpoint.wristSetpoint) {
+					wristSpeed = RobotMap.ARM_WRIST_DOWN_SPEED;
+				}
+				
+				if(RobotMap.ARM_ENABLE_DAMPENING) {
+					wristSpeed *= squish(getWristAbsError(), 0);
+				}
 			}
 			
 			if(elbowInRange && wristInRange) {
@@ -230,10 +251,10 @@ public class SubsystemArm extends SubsystemWithArduino {
 				wristMin = wrist;
 			}
 			
-			distanceElbow = elbow - elbowMin;
+			distanceElbow = -(elbow - elbowMin);
 			elbowStatus = "OK (Range: " + distanceElbow + ")";
 			
-			distanceWrist = wrist - wristMin;
+			distanceWrist = -(wrist - wristMin);
 			wristStatus = "OK (Range: " + distanceWrist + ")";
 		} catch(Exception e) {
 			System.err.println("Warning: Invalid data \"" + line + "\" from the arm distance sensor Arduino!");
