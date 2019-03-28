@@ -125,19 +125,19 @@ public class SubsystemDriverNotification extends Subsystem {
 				.withPosition(2,1).withSize(2, 4);
 		
 		//starting values, 90, 50, 200
-		HSVLowLayout.add("hueLow", 90).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVLowLayout.add("saturationLow", 50).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
-		HSVLowLayout.add("valueLow", 200).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("hueLow", 60).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("saturationLow", 150).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVLowLayout.add("valueLow", 150).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
 		//starting values 210, 255, 255
-		HSVHighLayout.add("hueHigh", 210).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		HSVHighLayout.add("hueHigh", 100).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		HSVHighLayout.add("saturationHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		HSVHighLayout.add("valueHigh", 255).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
 		cameraSettings.add("exposure", 20).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -25, "max", 25));
 		cameraSettings.add("brightness", 55).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 100));
 		cameraSettings.add("shuttterSpeed",4000).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 10000));
-		cameraSettings.add("ledBrightness", 200).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
+		cameraSettings.add("ledBrightness", 50).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 255));
 		
 		//image display
 	}
