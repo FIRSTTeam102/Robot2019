@@ -208,7 +208,7 @@ public class SubsystemArm extends SubsystemWithArduino {
 	}
 	
 	public boolean isElbowLimitedDown() {
-		if(elbowLimitLower == null) {
+		if(elbowLimitLower == null || Robot.limitSwitchesDisabled) {
 			return false;
 		}
 		

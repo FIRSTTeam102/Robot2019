@@ -43,6 +43,8 @@ public class Robot extends TimedRobot {
 	
 	public static OI oi;
 	
+	public static boolean limitSwitchesDisabled = false;
+	
 	// ALWAYS include this!!
 	public static void main(String[] args) {
 		TimedRobot.startRobot(Robot::new);

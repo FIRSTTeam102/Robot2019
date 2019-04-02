@@ -90,6 +90,9 @@ public class OI {
 		
 		// Driver start: switch cameras
 		getButton(CommonIDs.Gamepad.BTN_START).whenActive(new CommandAdvanceVideoOutput(Robot.driverNotif.streams));
+		
+		// Driver back: Toggle usage of limit switch on elbow
+		getButton(CommonIDs.Gamepad.BTN_BACK).whenActive(new CommandToggleOverrideLimitSwitch());
 	}
 	
 	public double getTimeRemaining() {
