@@ -65,10 +65,14 @@ public class SubsystemDriveTrain extends Subsystem {
 		drive.driveCartesian(-frontBack, leftRight, rotation);
 	}
 	
-	public void driveWithJoystick(Joystick joy) {
+	public void driveWithJoystick(Joystick joy, boolean safetyEnabled) {
 		double frontBack = joy.getRawAxis(CommonIDs.Gamepad.AXIS_LEFT_Y);
 		double leftRight = joy.getRawAxis(CommonIDs.Gamepad.AXIS_LEFT_X);
 		double rotation = joy.getRawAxis(CommonIDs.Gamepad.AXIS_RIGHT_X);
+		
+		if(safetyEnabled) {
+			frontBack /= RobotMap.SAFETY_SENSOR_SPEED_DIVISOR;
+		}
 		
 		drive(frontBack, leftRight, rotation);
 	}

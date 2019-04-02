@@ -23,6 +23,7 @@ package org.team102.robots.robot2019.subsystems;
 import org.team102.robots.robot2019.Robot;
 import org.team102.robots.robot2019.RobotMap;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -31,6 +32,8 @@ public class SubsystemClimber  extends Subsystem {
 	private Solenoid climber;
 	private Solenoid frontStage;
 	
+	private AnalogInput safetySensor;
+	
 	public SubsystemClimber() {
 		super("Climber");
 		
@@ -38,8 +41,20 @@ public class SubsystemClimber  extends Subsystem {
 		frontStage = new Solenoid(RobotMap.SOLENOID_CLIMBER_FRONT_STAGE);
 		addChild("Climbing Cylinder", climber);
 		addChild("Climber Front Stage", frontStage);
+		
+		safetySensor = addInput(RobotMap.SAFETY_SENSOR, "Safety Sensor");
 	}
-
+	
+	private AnalogInput addInput(int id, String name) {
+		if(id == -1) {
+			return null;
+		} else {
+			AnalogInput analog = new AnalogInput(id);
+			addChild(name, analog);
+			return analog;
+		}
+	}
+	
 	@Override
 	protected void initDefaultCommand() {
 		
@@ -61,13 +76,29 @@ public class SubsystemClimber  extends Subsystem {
 		return climber.get();
 	}
 	
+	public boolean isFrontStageClimbing() {
+		return frontStage.get();
+	}
+	
 	public String getStatus() {
 		if(isClimbing()) {
 			return "CLIMBING!";
 		} else if(hasEnoughTimeToClimb()) {
-			return "Ready";
+			return "Ready (Safety range: " + getSafetySensorValue() + ")";
 		} else {
 			return "Not enough time!!";
 		}
+	}
+	
+	public int getSafetySensorValue() {
+		if(safetySensor != null) {
+			return safetySensor.getValue();
+		} else {
+			return Integer.MAX_VALUE;
+		}
+	}
+	
+	public boolean isSafetySensorTriggered() {
+		return (getSafetySensorValue() < RobotMap.SAFETY_ENABLED_DISTANCE) && isFrontStageClimbing() && !Robot.limitSwitchesDisabled;
 	}
 }
