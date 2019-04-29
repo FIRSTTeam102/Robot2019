@@ -26,13 +26,17 @@ import org.team102.robots.robot2019.lib.CommonIDs;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 
 public class SubsystemDriveTrain extends Subsystem {
 	
-	private MecanumDrive drive;
+	private RobotDriveBase drive;
 	
 	private WPI_TalonSRX frontLeft;
 	private WPI_TalonSRX frontRight;
@@ -51,9 +55,16 @@ public class SubsystemDriveTrain extends Subsystem {
 		addChild("Rear Left Motor", rearLeft);
 		addChild("Rear Right Motor", rearRight);
 		
-		drive = new MecanumDrive(frontLeft, frontRight, rearLeft, rearRight);
+		if(RobotMap.IS_TANK_MODE) {
+			drive = new DifferentialDrive(
+					new SpeedControllerGroup(frontLeft, rearLeft),
+					new SpeedControllerGroup(frontRight, rearRight));
+		} else {
+			drive = new MecanumDrive(frontLeft, frontRight, rearLeft, rearRight);
+		}
+		
 		drive.setSafetyEnabled(true);
-		addChild("Mecanum Drive Train", drive);
+		addChild("Drive Train", drive);
 	}
 	
 	@Override
@@ -62,7 +73,13 @@ public class SubsystemDriveTrain extends Subsystem {
 	}
 	
 	public void drive(double frontBack, double leftRight, double rotation) {
-		drive.driveCartesian(-frontBack, leftRight, rotation);
+		if(drive instanceof MecanumDrive) {
+			((MecanumDrive)drive).driveCartesian(-frontBack, leftRight, rotation);
+		} else if(drive instanceof DifferentialDrive) {
+			((DifferentialDrive)drive).arcadeDrive(-frontBack, rotation);
+		} else {
+			DriverStation.reportError("DRIVE TRAIN IS IN AN INVALID STATE!!! THIS SHOULD BE IMPOSSIBLE!!!", false);
+		}
 	}
 	
 	public void driveWithJoystick(Joystick joy, boolean safetyEnabled) {

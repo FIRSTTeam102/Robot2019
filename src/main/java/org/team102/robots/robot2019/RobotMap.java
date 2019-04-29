@@ -26,6 +26,7 @@ public class RobotMap {
 	
 	// LEAVE THESE AT THE TOP!
 	public static final boolean IS_TESTBED = false;
+	public static final boolean IS_TANK_MODE = false;
 	
 	public static final boolean ARM_REVERSE_ELBOW = true;
 	public static final boolean ARM_REVERSE_WRIST = false;
