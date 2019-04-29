@@ -81,13 +81,19 @@ public class SubsystemClimber  extends Subsystem {
 	}
 	
 	public String getStatus() {
-		if(isClimbing()) {
+		/*if(isClimbing()) {
 			return "CLIMBING!";
 		} else if(hasEnoughTimeToClimb()) {
-			return "Ready (Safety range: " + getSafetySensorValue() + ")";
+			return "Ready";
 		} else {
 			return "Not enough time!!";
-		}
+		}*/
+		
+		return getSafetySensorStatus();
+	}
+	
+	private String getSafetySensorStatus() {
+		return "Safety range: " + getSafetySensorValue() + (isSafetySensorInRange() ? ", IN RANGE" : "");
 	}
 	
 	public int getSafetySensorValue() {
@@ -98,7 +104,11 @@ public class SubsystemClimber  extends Subsystem {
 		}
 	}
 	
+	public boolean isSafetySensorInRange() {
+		return getSafetySensorValue() < RobotMap.SAFETY_ENABLED_DISTANCE;
+	}
+	
 	public boolean isSafetySensorTriggered() {
-		return (getSafetySensorValue() < RobotMap.SAFETY_ENABLED_DISTANCE) && isFrontStageClimbing() && !Robot.limitSwitchesDisabled;
+		return isSafetySensorInRange() && isFrontStageClimbing() && !Robot.limitSwitchesDisabled;
 	}
 }

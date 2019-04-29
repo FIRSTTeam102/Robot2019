@@ -206,6 +206,6 @@ public class RobotMap {
 	public static final int SOLENOID_CLIMBER_FRONT_STAGE = 3;
 	
 	public static final int SAFETY_SENSOR = 0;
-	public static final int SAFETY_ENABLED_DISTANCE = 65; // TODO configure me
-	public static final double SAFETY_SENSOR_SPEED_DIVISOR = 10;
+	public static final int SAFETY_ENABLED_DISTANCE = 100;
+	public static final double SAFETY_SENSOR_SPEED_DIVISOR = 4;
 }
